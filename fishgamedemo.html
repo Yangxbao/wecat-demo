@@ -1,0 +1,2486 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#001a33">
+<title>深海进化 · 大鱼吃小鱼</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;}
+html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#001a33;}
+#gameWrap{position:fixed;inset:0;overflow:hidden;background:radial-gradient(ellipse at 50% 40%, #0a4d7c 0%, #022c4a 40%, #001a33 70%, #000a15 100%);}
+#gameCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;}
+
+/* HUD */
+.hud{position:absolute;top:0;left:0;right:0;z-index:10;padding:calc(env(safe-area-inset-top,0px) + 8px) 10px 8px;display:flex;align-items:center;justify-content:space-between;pointer-events:none;gap:6px;}
+.hud-box{background:rgba(0,30,60,.55);border:1px solid rgba(120,220,255,.25);border-radius:12px;padding:6px 10px;display:flex;align-items:center;gap:6px;pointer-events:auto;}
+.hud-icon{font-size:16px;line-height:1;}
+.hud-label{font-size:9px;color:#7ed6ff;font-weight:600;}
+.hud-value{font-size:15px;color:#fff;font-weight:800;}
+.hud-bar{width:60px;height:5px;border-radius:3px;background:rgba(0,0,0,.4);overflow:hidden;margin-left:4px;}
+.hud-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#00e5ff,#00b3ff);width:0%;transition:width .3s;}
+.hp-hearts{font-size:11px;letter-spacing:1px;margin-left:4px;}
+.btn-icon{width:38px;height:38px;border-radius:12px;background:rgba(0,30,60,.55);border:1px solid rgba(120,220,255,.25);display:flex;align-items:center;justify-content:center;font-size:18px;color:#7ed6ff;pointer-events:auto;cursor:pointer;}
+.btn-icon:active{transform:scale(.9);}
+
+.bottom-tip{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);left:0;right:0;z-index:10;text-align:center;pointer-events:none;}
+.bottom-tip span{display:inline-block;background:rgba(0,30,60,.55);border:1px solid rgba(120,220,255,.2);border-radius:20px;padding:5px 14px;font-size:11px;color:#7ed6ff;font-weight:500;}
+
+/* 技能栏 */
+.skill-bar{position:absolute;right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 55px);z-index:20;display:flex;flex-direction:column;gap:8px;}
+.skill-btn{width:52px;height:52px;border-radius:50%;background:radial-gradient(circle at 30% 30%, rgba(0,229,255,.4), rgba(0,80,140,.85));border:2px solid rgba(120,220,255,.6);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;cursor:pointer;position:relative;overflow:hidden;}
+.skill-btn:active{transform:scale(.9);}
+.skill-btn .si-icon{font-size:20px;line-height:1;}
+.skill-btn .si-label{font-size:8px;font-weight:700;margin-top:1px;}
+.skill-btn .cd-mask{position:absolute;inset:0;background:rgba(0,0,0,.65);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#7ed6ff;opacity:0;transition:opacity .2s;}
+.skill-btn.cooling .cd-mask{opacity:1;}
+.skill-btn.fire{background:radial-gradient(circle at 30% 30%, rgba(255,150,80,.5), rgba(180,40,20,.9));border-color:rgba(255,180,120,.8);width:58px;height:58px;}
+.skill-btn.fire .si-icon{font-size:24px;}
+.skill-btn.bubble{background:radial-gradient(circle at 30% 30%, rgba(180,240,255,.55), rgba(0,120,180,.9));border-color:rgba(180,240,255,.85);}
+.skill-btn.dash{background:radial-gradient(circle at 30% 30%, rgba(255,220,100,.5), rgba(200,100,0,.9));border-color:rgba(255,220,100,.8);}
+.skill-btn.shield{background:radial-gradient(circle at 30% 30%, rgba(100,200,255,.5), rgba(0,60,140,.9));border-color:rgba(100,200,255,.85);}
+.skill-btn.suck{background:radial-gradient(circle at 30% 30%, rgba(200,150,255,.5), rgba(90,20,180,.9));border-color:rgba(200,150,255,.85);}
+.ammo-badge{position:absolute;top:-5px;right:-5px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:linear-gradient(135deg,#ff8a65,#d84315);color:#fff;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;border:2px solid #001a33;}
+
+.skill-status{position:absolute;top:35%;left:50%;transform:translate(-50%,-50%) scale(.5);z-index:50;pointer-events:none;opacity:0;font-size:20px;font-weight:900;padding:8px 20px;border-radius:26px;color:#fff;transition:opacity .3s;}
+.skill-status.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
+
+/* 覆盖层 */
+.overlay{position:absolute;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%, rgba(10,77,124,.95) 0%, rgba(2,44,74,.97) 40%, rgba(0,26,51,.99) 100%);padding:14px;overflow-y:auto;}
+.overlay.hide{opacity:0;pointer-events:none;display:none;}
+.game-logo{font-size:44px;font-weight:900;background:linear-gradient(180deg,#7ed6ff,#00b3ff,#005f9e);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:4px;margin-bottom:4px;}
+.game-sub{font-size:11px;color:#7ed6ff;letter-spacing:6px;margin-bottom:14px;}
+.btn-start{padding:13px 50px;border:none;border-radius:50px;background:linear-gradient(180deg,#00e5ff,#0088cc);color:#fff;font-size:17px;font-weight:800;letter-spacing:3px;margin-bottom:10px;cursor:pointer;}
+.btn-start:active{transform:scale(.95);}
+
+.rules{background:rgba(0,30,60,.6);border:1px solid rgba(120,220,255,.2);border-radius:14px;padding:10px 16px;max-width:340px;margin-bottom:8px;color:#bfe8ff;font-size:11.5px;line-height:1.7;}
+.rules h3{font-size:12px;color:#7ed6ff;font-weight:700;margin-bottom:6px;text-align:center;letter-spacing:2px;}
+
+.diff-picker{background:rgba(0,30,60,.6);border:1px solid rgba(120,220,255,.2);border-radius:14px;padding:10px 14px;max-width:340px;margin-bottom:8px;width:100%;}
+.diff-picker h3{font-size:12px;color:#7ed6ff;font-weight:700;margin-bottom:8px;text-align:center;letter-spacing:2px;}
+.diff-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.diff-item{padding:8px 4px;border-radius:10px;background:rgba(0,20,40,.6);border:2px solid transparent;text-align:center;cursor:pointer;color:#bfe8ff;font-size:12px;font-weight:700;}
+.diff-item.selected{border-color:#00e5ff;background:rgba(0,100,160,.6);color:#fff;}
+.diff-item .di-sub{font-size:9px;color:#7ed6ff;margin-top:2px;font-weight:500;}
+
+.skin-picker{background:rgba(0,30,60,.6);border:1px solid rgba(120,220,255,.2);border-radius:14px;padding:10px 14px;max-width:340px;margin-bottom:8px;width:100%;}
+.skin-picker h3{font-size:12px;color:#7ed6ff;font-weight:700;margin-bottom:8px;text-align:center;letter-spacing:2px;}
+.skin-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.skin-item{aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,20,40,.6);border:2px solid transparent;cursor:pointer;position:relative;font-size:20px;}
+.skin-item.locked{opacity:.45;cursor:not-allowed;}
+.skin-item.locked::after{content:'🔒';position:absolute;top:1px;right:1px;font-size:9px;}
+.skin-item.selected{border-color:#00e5ff;background:rgba(0,100,160,.6);}
+.skin-item .si-name{font-size:8px;color:#7ed6ff;margin-top:2px;font-weight:600;}
+
+/* 结束 */
+.over-icon{font-size:60px;margin-bottom:8px;}
+.over-title{font-size:28px;font-weight:900;background:linear-gradient(180deg,#ff8a8a,#ff3b3b);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:4px;margin-bottom:14px;}
+.over-stats{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;justify-content:center;}
+.over-stat{background:rgba(0,30,60,.6);border:1px solid rgba(120,220,255,.2);border-radius:12px;padding:8px 12px;text-align:center;min-width:74px;}
+.over-stat .os-val{font-size:18px;font-weight:900;color:#7ed6ff;margin-bottom:2px;}
+.over-stat .os-label{font-size:9px;color:#7fa8c8;letter-spacing:1px;}
+.over-stat.best .os-val{color:#ffd700;}
+
+/* 解锁皮肤展示 */
+.unlock-show{background:rgba(0,30,60,.6);border:1px solid rgba(255,215,0,.4);border-radius:12px;padding:10px 14px;margin-bottom:10px;text-align:center;}
+.unlock-show h4{font-size:11px;color:#ffd700;font-weight:800;letter-spacing:2px;margin-bottom:6px;}
+.unlock-list{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.unlock-skin{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;border:2px solid #ffd700;}
+
+/* 暂停 */
+.pause-card{background:linear-gradient(180deg,#1a3a5c,#0a1f33);border:2px solid #00e5ff;border-radius:20px;padding:22px 20px;max-width:340px;width:100%;}
+.pause-title{font-size:22px;color:#fff;font-weight:900;text-align:center;margin-bottom:16px;letter-spacing:4px;}
+.settings-block{background:rgba(0,20,40,.5);border:1px solid rgba(120,220,255,.2);border-radius:12px;padding:12px 14px;margin-bottom:12px;}
+.settings-block h4{font-size:11px;color:#7ed6ff;font-weight:700;margin-bottom:10px;text-align:center;letter-spacing:2px;}
+.volume-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.volume-row:last-child{margin-bottom:0;}
+.volume-row .vlabel{font-size:11px;color:#bfe8ff;font-weight:700;min-width:60px;}
+.volume-row .vvalue{font-size:11px;color:#7ed6ff;font-weight:900;min-width:32px;text-align:right;}
+.volume-slider{flex:1;height:5px;-webkit-appearance:none;appearance:none;background:rgba(0,0,0,.4);border-radius:3px;outline:none;}
+.volume-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:#00e5ff;cursor:pointer;}
+.volume-slider::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#00e5ff;cursor:pointer;border:none;}
+
+/* 复活 */
+.revive-modal{position:absolute;inset:0;z-index:110;display:none;align-items:center;justify-content:center;background:rgba(0,10,25,.85);padding:20px;}
+.revive-modal.show{display:flex;}
+.revive-card{background:linear-gradient(180deg,#1a3a5c,#0a1f33);border:2px solid #00e5ff;border-radius:20px;padding:22px 20px;max-width:340px;width:100%;text-align:center;}
+.revive-icon{font-size:48px;margin-bottom:6px;}
+.revive-card h2{font-size:20px;color:#fff;font-weight:900;margin-bottom:5px;letter-spacing:2px;}
+.revive-card p{font-size:12px;color:#a8d4f0;line-height:1.6;margin-bottom:14px;}
+.revive-btn{width:100%;height:44px;border-radius:22px;border:none;font-size:15px;font-weight:800;letter-spacing:2px;color:#fff;cursor:pointer;margin-bottom:7px;}
+.revive-btn.ad{background:linear-gradient(180deg,#ffb74d,#f57c00);}
+.revive-btn.score{background:linear-gradient(180deg,#00e5ff,#0088cc);}
+.revive-btn.giveup{background:linear-gradient(180deg,#666,#333);font-size:12px;height:36px;}
+
+/* 任务面板 */
+.quest-panel{position:absolute;top:calc(env(safe-area-inset-top,0px) + 56px);right:10px;z-index:15;background:rgba(0,30,60,.75);border:1px solid rgba(120,220,255,.3);border-radius:12px;padding:8px 10px;min-width:140px;max-width:170px;pointer-events:auto;}
+.quest-panel.collapsed .quest-list{display:none;}
+.quest-header{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#ffd700;font-weight:800;letter-spacing:1px;cursor:pointer;}
+.quest-header .qh-toggle{font-size:12px;color:#7ed6ff;}
+.quest-list{margin-top:6px;display:flex;flex-direction:column;gap:5px;}
+.quest-item{display:flex;flex-direction:column;gap:2px;font-size:10px;color:#bfe8ff;}
+.quest-item .qi-name{display:flex;justify-content:space-between;font-weight:600;}
+.quest-item .qi-progress{height:3px;background:rgba(0,0,0,.4);border-radius:2px;overflow:hidden;}
+.quest-item .qi-progress-fill{height:100%;background:linear-gradient(90deg,#ffd700,#ff8a00);border-radius:2px;transition:width .3s;}
+.quest-item.done{color:#7effb0;}
+.quest-item.done .qi-progress-fill{background:linear-gradient(90deg,#4ade80,#22c55e);}
+
+/* 成就通知 */
+.achievement-toast{position:absolute;top:20%;left:50%;transform:translate(-50%,-50%) scale(.5);z-index:60;pointer-events:none;opacity:0;background:linear-gradient(135deg,rgba(255,215,0,.95),rgba(255,138,0,.95));border-radius:14px;padding:10px 20px;color:#5a3200;font-size:13px;font-weight:900;transition:all .3s;}
+.achievement-toast.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
+
+/* 死亡回放提示 */
+.replay-panel{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:120;background:rgba(0,10,25,.9);border:2px solid #ff5252;border-radius:14px;padding:12px 18px;color:#fff;font-size:12px;font-weight:700;text-align:center;display:none;}
+.replay-panel.show{display:block;}
+.replay-panel .rp-title{color:#ff5252;font-size:11px;font-weight:900;letter-spacing:3px;margin-bottom:4px;}
+
+@media(max-width:380px){
+  .game-logo{font-size:36px;}
+  .btn-start{padding:11px 40px;font-size:15px;}
+  .skill-btn{width:46px;height:46px;}
+  .skill-btn.fire{width:52px;height:52px;}
+  .quest-panel{min-width:120px;max-width:150px;}
+}
+</style>
+</head>
+<body>
+
+<div id="gameWrap">
+  <canvas id="gameCanvas"></canvas>
+
+  <div class="hud">
+    <div class="hud-box">
+      <div class="hud-icon" id="hudIcon">🐟</div>
+      <div>
+        <div class="hud-label">等级</div>
+        <div class="hud-value" id="hudLevel">1</div>
+      </div>
+      <div class="hud-bar"><div class="hud-bar-fill" id="hudBarFill"></div></div>
+      <div class="hp-hearts" id="hpHarts">❤️❤️❤️</div>
+    </div>
+    <div style="display:flex;gap:5px;">
+      <div class="hud-box">
+        <div class="hud-icon">⭐</div>
+        <div>
+          <div class="hud-label">得分</div>
+          <div class="hud-value" id="hudScore">0</div>
+        </div>
+      </div>
+      <div class="btn-icon" id="btnPause">⏸</div>
+    </div>
+  </div>
+
+  <div class="quest-panel" id="questPanel">
+    <div class="quest-header" id="questHeader">
+      <span>📋 局内任务</span>
+      <span class="qh-toggle" id="questToggle">▾</span>
+    </div>
+    <div class="quest-list" id="questList"></div>
+  </div>
+
+  <div class="skill-bar">
+    <div class="skill-btn fire" id="skillFire">
+      <div class="si-icon">💥</div>
+      <div class="si-label">发射</div>
+      <div class="cd-mask" id="cdFire">0</div>
+      <div class="ammo-badge" id="ammoBadge">10</div>
+    </div>
+    <div class="skill-btn suck" id="skillSuck">
+      <div class="si-icon">🌀</div>
+      <div class="si-label">吸力</div>
+      <div class="cd-mask" id="cdSuck">0</div>
+    </div>
+    <div class="skill-btn bubble" id="skillBubble">
+      <div class="si-icon">🫧</div>
+      <div class="si-label">诱捕</div>
+      <div class="cd-mask" id="cdBubble">0</div>
+    </div>
+    <div class="skill-btn dash" id="skillDash">
+      <div class="si-icon">💨</div>
+      <div class="si-label">冲刺</div>
+      <div class="cd-mask" id="cdDash">0</div>
+    </div>
+    <div class="skill-btn shield" id="skillShield">
+      <div class="si-icon">🛡</div>
+      <div class="si-label">护盾</div>
+      <div class="cd-mask" id="cdShield">0</div>
+    </div>
+  </div>
+
+  <div class="skill-status" id="skillStatus"></div>
+  <div class="achievement-toast" id="achievementToast"></div>
+
+  <div class="bottom-tip">
+    <span id="bottomTip">拖动控制移动 · 右下角技能</span>
+  </div>
+
+  <!-- 开始界面 -->
+  <div class="overlay" id="startOverlay">
+    <div class="game-logo">深海进化</div>
+    <div class="game-sub">DEEP SEA EVOLUTION</div>
+    <button class="btn-start" id="btnStart">开 始 游 戏</button>
+
+    <div class="diff-picker">
+      <h3>⚙️ 选择难度</h3>
+      <div class="diff-grid">
+        <div class="diff-item" data-diff="easy">简单<div class="di-sub">AI迟钝</div></div>
+        <div class="diff-item selected" data-diff="normal">普通<div class="di-sub">平衡</div></div>
+        <div class="diff-item" data-diff="hard">困难<div class="di-sub">AI凶猛</div></div>
+      </div>
+    </div>
+
+    <div class="skin-picker">
+      <h3>🎨 选择皮肤</h3>
+      <div class="skin-grid" id="skinGrid"></div>
+    </div>
+
+    <div class="rules">
+      <h3>玩 法 说 明</h3>
+      <div>👆 拖动屏幕控制小鱼</div>
+      <div>🐟 吃小鱼成长，躲大鱼</div>
+      <div>🦈 大鱼越大追得越快</div>
+      <div>🦴 吃残骸快速涨体型</div>
+      <div>⭐ 稀有金鱼大量加分</div>
+      <div>💥 右下角技能多种多样</div>
+    </div>
+  </div>
+
+  <!-- 暂停 -->
+  <div class="overlay hide" id="pauseOverlay">
+    <div class="pause-card">
+      <div class="pause-title">⏸ 游 戏 暂 停</div>
+      <div class="settings-block">
+        <h4>🔊 音量调节</h4>
+        <div class="volume-row">
+          <span class="vlabel">🎵 BGM</span>
+          <input type="range" class="volume-slider" id="bgmVolume" min="0" max="100" value="50">
+          <span class="vvalue" id="bgmVolumeVal">50</span>
+        </div>
+        <div class="volume-row">
+          <span class="vlabel">🔔 音效</span>
+          <input type="range" class="volume-slider" id="sfxVolume" min="0" max="100" value="70">
+          <span class="vvalue" id="sfxVolumeVal">70</span>
+        </div>
+      </div>
+      <button class="btn-start" id="btnResume" style="width:100%;padding:12px 0;font-size:16px;">继 续 游 戏</button>
+      <button class="btn-start" id="btnBackHome" style="width:100%;padding:12px 0;font-size:16px;background:linear-gradient(180deg,#666,#333);">返 回 主 页</button>
+    </div>
+  </div>
+
+  <!-- 结束 -->
+  <div class="overlay hide" id="overOverlay">
+    <div class="over-icon">💀</div>
+    <div class="over-title">游 戏 结 束</div>
+    <div class="over-stats">
+      <div class="over-stat">
+        <div class="os-val" id="overScore">0</div>
+        <div class="os-label">本局得分</div>
+      </div>
+      <div class="over-stat best">
+        <div class="os-val" id="overBest">0</div>
+        <div class="os-label">最高纪录</div>
+      </div>
+      <div class="over-stat">
+        <div class="os-val" id="overLevel">1</div>
+        <div class="os-label">达到等级</div>
+      </div>
+      <div class="over-stat">
+        <div class="os-val" id="overKills">0</div>
+        <div class="os-label">击杀数</div>
+      </div>
+    </div>
+
+    <div class="unlock-show" id="unlockShow" style="display:none;">
+      <h4>🎉 解锁新皮肤</h4>
+      <div class="unlock-list" id="unlockList"></div>
+    </div>
+
+    <button class="btn-start" id="btnRestart">再 来 一 局</button>
+    <button class="btn-start" id="btnHome" style="padding:10px 40px;font-size:14px;background:linear-gradient(180deg,#666,#333);">返 回 主 页</button>
+  </div>
+
+  <!-- 复活 -->
+  <div class="revive-modal" id="reviveModal">
+    <div class="revive-card">
+      <div class="revive-icon">💖</div>
+      <h2>复 活 机 会</h2>
+      <p>你的小鱼被吃掉了，是否消耗分数复活？<br>复活后无敌 3 秒</p>
+      <button class="revive-btn ad" id="reviveAd">📺 看广告复活（免费）</button>
+      <button class="revive-btn score" id="reviveScore">消耗 500 分复活</button>
+      <button class="revive-btn giveup" id="reviveGiveUp">放 弃</button>
+    </div>
+  </div>
+
+  <div class="replay-panel" id="replayPanel">
+    <div class="rp-title">💀 死 亡 回 放</div>
+    <div id="replayInfo">被神秘大鱼偷袭...</div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   深海进化 v3
+   - 精简特效，玩法优先
+   - 所有功能：菜单/音效/任务/体型压制/残骸/生态/陷阱/成就
+   - 技能：发射/吸力/诱捕/冲刺/护盾
+   - 难度/AI/死亡回放/情绪动画/音量独立
+   - 金鱼彩蛋
+   ============================================================ */
+
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+let W = 0, H = 0;
+let DPR = 1;
+const WORLD = { w: 2800, h: 2200 };
+
+/* 性能上限 */
+const MAX_PARTICLES = 150;
+const MAX_FISHES = 45;
+const MAX_DIVERS = 5;
+const MAX_MINES = 12;
+const MAX_POWERUPS = 4;
+const MAX_HEARTS = 3;
+const MAX_REMAINS = 8;
+const MAX_BUBBLES = 40;
+
+/* ============================================================
+   皮肤与成就
+   ============================================================ */
+const SKINS = [
+  { id:'classic', name:'小金鱼', emoji:'🐟', unlock:0,      type:'score', color:'#ffd54a', colorDark:'#e67e22', fin:'#ffb74d' },
+  { id:'blue',    name:'蓝战士', emoji:'🐟', unlock:2000,   type:'score', color:'#4fc3f7', colorDark:'#0277bd', fin:'#81d4fa' },
+  { id:'pink',    name:'粉公主', emoji:'🐠', unlock:5000,   type:'score', color:'#f48fb1', colorDark:'#c2185b', fin:'#f8bbd0' },
+  { id:'green',   name:'绿忍者', emoji:'🐡', unlock:10000,  type:'score', color:'#81c784', colorDark:'#2e7d32', fin:'#a5d6a7' },
+  { id:'purple',  name:'紫闪电', emoji:'🐟', unlock:20000,  type:'score', color:'#b39ddb', colorDark:'#512da8', fin:'#d1c4e9' },
+  { id:'red',     name:'赤焰兽', emoji:'🐠', unlock:35000,  type:'score', color:'#ff8a65', colorDark:'#d84315', fin:'#ffab91' },
+  { id:'gold',    name:'黄金龙', emoji:'🐡', unlock:60000,  type:'score', color:'#ffd700', colorDark:'#b8860b', fin:'#ffe082' },
+  { id:'rainbow', name:'彩虹神', emoji:'🦄', unlock:100000, type:'score', color:'#ff6ec7', colorDark:'#7b1fa2', fin:'#e1bee7' },
+  { id:'shark',   name:'🦈 霸主', emoji:'🦈', unlock:0, type:'achieve', achieveId:'boss5', color:'#90a4ae', colorDark:'#263238', fin:'#cfd8dc' },
+  { id:'dragon',  name:'🐉 无技', emoji:'🐉', unlock:0, type:'achieve', achieveId:'noskill', color:'#ffeb3b', colorDark:'#f57f17', fin:'#fff59d' },
+];
+let currentSkinId = localStorage.getItem('deepsea_skin') || 'classic';
+function getCurrentSkin(){ return SKINS.find(s => s.id === currentSkinId) || SKINS[0]; }
+
+const ACHIEVEMENTS = [
+  { id:'boss5',   name:'BOSS 猎手',   unlocked:false },
+  { id:'noskill', name:'无技之勇',   unlocked:false },
+  { id:'allbuff', name:'全能进食者', unlocked:false },
+];
+try {
+  const saved = JSON.parse(localStorage.getItem('deepsea_achievements') || '{}');
+  ACHIEVEMENTS.forEach(a => { a.unlocked = !!saved[a.id]; });
+} catch(e){}
+function saveAchievements(){
+  const obj = {};
+  ACHIEVEMENTS.forEach(a => { obj[a.id] = a.unlocked; });
+  localStorage.setItem('deepsea_achievements', JSON.stringify(obj));
+}
+
+function renderSkinPicker(){
+  const bestScore = parseInt(localStorage.getItem('deepsea_best') || '0', 10) || 0;
+  document.getElementById('skinGrid').innerHTML = SKINS.map(s => {
+    let locked;
+    if(s.type === 'achieve'){
+      const ach = ACHIEVEMENTS.find(a => a.id === s.achieveId);
+      locked = !ach || !ach.unlocked;
+    } else locked = bestScore < s.unlock;
+    const selected = s.id === currentSkinId;
+    return `<div class="skin-item ${locked?'locked':''} ${selected?'selected':''}" data-skin="${s.id}" 
+      style="background:${locked?'rgba(0,20,40,.6)':`radial-gradient(circle at 30% 30%, ${s.color}66, ${s.colorDark}aa)`}">
+      <span>${s.emoji}</span>
+      <span class="si-name">${locked ? (s.type==='achieve' ? '成就' : (s.unlock/1000)+'K') : s.name}</span>
+    </div>`;
+  }).join('');
+}
+document.getElementById('skinGrid').addEventListener('click', e => {
+  const el = e.target.closest('[data-skin]');
+  if(!el || el.classList.contains('locked')) return;
+  currentSkinId = el.dataset.skin;
+  localStorage.setItem('deepsea_skin', currentSkinId);
+  sfx.click();
+  renderSkinPicker();
+});
+
+/* ============================================================
+   难度
+   ============================================================ */
+const DIFFICULTY = {
+  easy:   { aiChase:0.5, spawnRate:1.3, bossRate:1.5, label:'简单' },
+  normal: { aiChase:1.0, spawnRate:1.0, bossRate:1.0, label:'普通' },
+  hard:   { aiChase:1.8, spawnRate:0.75, bossRate:0.6, label:'困难' },
+};
+let currentDiff = localStorage.getItem('deepsea_diff') || 'normal';
+document.querySelectorAll('[data-diff]').forEach(el => {
+  el.classList.toggle('selected', el.dataset.diff === currentDiff);
+  el.addEventListener('click', () => {
+    currentDiff = el.dataset.diff;
+    localStorage.setItem('deepsea_diff', currentDiff);
+    document.querySelectorAll('[data-diff]').forEach(x => x.classList.toggle('selected', x.dataset.diff === currentDiff));
+    sfx.click();
+  });
+});
+
+/* ============================================================
+   游戏状态
+   ============================================================ */
+const game = {
+  running: false,
+  paused: false,
+  score: 0,
+  level: 1,
+  eatenCount: 0,
+  kills: 0,
+  bossKills: 0,
+  best: parseInt(localStorage.getItem('deepsea_best') || '0', 10) || 0,
+  player: null,
+  fishes: [],
+  divers: [],
+  mines: [],
+  bosses: [],
+  bubbles: [],
+  particles: [],
+  bullets: [],
+  traps: [],
+  powerups: [],
+  hearts: [],
+  remains: [],
+  hazards: [],
+  goldenFish: null,
+  spawnTimer: 0,
+  powerupTimer: 300,
+  diverTimer: 180,
+  mineTimer: 120,
+  heartTimer: 400,
+  bossTimer: 900,
+  hazardTimer: 400,
+  goldenTimer: 1500,
+  cam: { x:0, y:0 },
+  screenShake: 0,
+  reviveUsed: false,
+  deathInfo: null,
+  usedSkill: false,
+  buffsCollected: new Set(),
+  smallFishCount: 0,
+  bigFishCount: 0,
+};
+
+/* 玩家 */
+const player = {
+  x:0, y:0, vx:0, vy:0,
+  size:18, targetSize:18,
+  angle:0,
+  targetX:0, targetY:0,
+  moving:false,
+  color:'#ffd54a', colorDark:'#e67e22', fin:'#ffb74d',
+  tailPhase:0,
+  alive:true, invincible:0,
+  hp:3, maxHp:3,
+  speedCD:0, speedActive:0,
+  shieldCD:0, shieldActive:0,
+  magnetCD:0, magnetActive:0,
+  fireCD:0, ammo:10, maxAmmo:10,
+  bubbleCD:0,
+  dashCD:0, dashActive:0,
+  suckCD:0, suckActive:0,
+  growActive:0,
+  invisibleActive:0,
+  doubleScoreActive:0,
+  growGlow:0,
+  emotion:'calm',
+  emotionTimer:0,
+};
+
+/* 鱼类配置 */
+const FISH_TYPES = [
+  { size:9,  speed:1.4, score:5,   color:'#7ee8fa', colorDark:'#29b6f6', fin:'#b3e5fc', weight:22, ai:'flee' },
+  { size:12, speed:1.2, score:8,   color:'#ffb74d', colorDark:'#ff7043', fin:'#ffcc80', weight:20, ai:'flee' },
+  { size:16, speed:1.0, score:12,  color:'#ffe082', colorDark:'#ffb300', fin:'#ffecb3', weight:16, ai:'wander' },
+  { size:20, speed:0.9, score:18,  color:'#81d4fa', colorDark:'#0288d1', fin:'#b3e5fc', weight:14, ai:'wander' },
+  { size:26, speed:0.85,score:25,  color:'#ce93d8', colorDark:'#8e24aa', fin:'#e1bee7', weight:12, ai:'chase' },
+  { size:32, speed:0.75,score:40,  color:'#ffab91', colorDark:'#d84315', fin:'#ffccbc', weight:9,  ai:'chase' },
+  { size:42, speed:0.65,score:80,  color:'#90a4ae', colorDark:'#37474f', fin:'#cfd8dc', weight:5,  ai:'chase' },
+  { size:52, speed:0.5, score:120, color:'#64b5f6', colorDark:'#0d47a1', fin:'#bbdefb', weight:3,  ai:'chase' },
+];
+const DIVER_TYPES = [
+  { size:22, speed:1.0, score:60,  hp:2, color:'#37474f', colorDark:'#1a1a1a', weight:60, ai:'wander' },
+  { size:26, speed:1.3, score:80,  hp:3, color:'#0288d1', colorDark:'#0d47a1', weight:30, ai:'chase' },
+  { size:30, speed:0.9, score:120, hp:4, color:'#2e7d32', colorDark:'#1b5e20', weight:10, ai:'chase' },
+];
+const POWERUP_TYPES = [
+  { id:'speed',     icon:'⚡', color:'#ffb74d', weight:22 },
+  { id:'shield',    icon:'🛡', color:'#4fc3f7', weight:18 },
+  { id:'magnet',    icon:'🧲', color:'#f06292', weight:18 },
+  { id:'grow',      icon:'📈', color:'#81c784', weight:12 },
+  { id:'invisible', icon:'👻', color:'#ba68c8', weight:12 },
+  { id:'double',    icon:'✨', color:'#ffd54f', weight:10 },
+  { id:'ammo',      icon:'💥', color:'#ff8a65', weight:8 },
+];
+
+/* 工具 */
+function rand(a,b){ return a + Math.random() * (b-a); }
+function randInt(a,b){ return Math.floor(rand(a,b+1)); }
+function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+function dist(x1,y1,x2,y2){ const dx=x1-x2,dy=y1-y2; return Math.sqrt(dx*dx+dy*dy); }
+function pickByWeight(arr){
+  const total = arr.reduce((s,t)=>s+t.weight,0);
+  let r = Math.random() * total;
+  for(const t of arr){ r -= t.weight; if(r <= 0) return t; }
+  return arr[0];
+}
+function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+
+/* ============================================================
+   音效系统（Web Audio API 合成，无外部资源）
+   ============================================================ */
+let audioCtx = null;
+let bgmNode = null, bgmGain = null, bgmPlaying = false;
+let bgmVolume = parseInt(localStorage.getItem('deepsea_bgm_vol') || '50', 10) / 100;
+let sfxVolume = parseInt(localStorage.getItem('deepsea_sfx_vol') || '70', 10) / 100;
+
+function ac(){
+  if(!audioCtx){ try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){} }
+  if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+function startBGM(){
+  if(bgmPlaying) return;
+  const c = ac(); if(!c) return;
+  bgmPlaying = true;
+  bgmGain = c.createGain();
+  bgmGain.gain.value = bgmVolume * 0.08;
+  bgmGain.connect(c.destination);
+  const osc1 = c.createOscillator();
+  const osc2 = c.createOscillator();
+  osc1.type = 'sine'; osc1.frequency.value = 55;
+  osc2.type = 'sine'; osc2.frequency.value = 82.5;
+  const lfo = c.createOscillator();
+  const lfoGain = c.createGain();
+  lfo.frequency.value = 0.08;
+  lfoGain.gain.value = 4;
+  lfo.connect(lfoGain);
+  lfoGain.connect(osc1.frequency);
+  const filter = c.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.value = 220;
+  osc1.connect(filter);
+  osc2.connect(filter);
+  filter.connect(bgmGain);
+  osc1.start(); osc2.start(); lfo.start();
+  bgmNode = { osc1, osc2, lfo };
+}
+function stopBGM(){
+  if(!bgmPlaying || !bgmNode) return;
+  try { bgmNode.osc1.stop(); bgmNode.osc2.stop(); bgmNode.lfo.stop(); } catch(e){}
+  bgmPlaying = false;
+  bgmNode = null;
+}
+function setBgmVolume(v){
+  bgmVolume = v / 100;
+  localStorage.setItem('deepsea_bgm_vol', String(v));
+  if(bgmGain) bgmGain.gain.value = bgmVolume * 0.08;
+}
+function setSfxVolume(v){
+  sfxVolume = v / 100;
+  localStorage.setItem('deepsea_sfx_vol', String(v));
+}
+function beep(freq, dur, type, vol){
+  const c = ac(); if(!c) return;
+  const t0 = c.currentTime;
+  const osc = c.createOscillator();
+  const gain = c.createGain();
+  osc.type = type || 'sine';
+  osc.frequency.setValueAtTime(freq, t0);
+  const v = (vol || 0.1) * sfxVolume;
+  if(v <= 0) return;
+  gain.gain.setValueAtTime(0, t0);
+  gain.gain.linearRampToValueAtTime(v, t0 + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  osc.connect(gain); gain.connect(c.destination);
+  osc.start(t0); osc.stop(t0 + dur + 0.03);
+}
+const sfx = {
+  eat(){ beep(880, 0.08, 'sine', 0.12); beep(1300, 0.1, 'sine', 0.08); },
+  levelup(){ [660,880,1100,1320].forEach((f,i)=>setTimeout(()=>beep(f,0.15,'sine',0.1), i*70)); },
+  die(){ beep(220, 0.3, 'sawtooth', 0.12); beep(160, 0.5, 'sawtooth', 0.1); },
+  click(){ beep(1200, 0.05, 'square', 0.05); },
+  skill(){ beep(660, 0.08, 'square', 0.08); beep(990, 0.12, 'square', 0.06); },
+  powerup(){ [880,1320,1760].forEach((f,i)=>setTimeout(()=>beep(f,0.12,'triangle',0.09), i*50)); },
+  fire(){ beep(300, 0.1, 'square', 0.1); beep(800, 0.15, 'sawtooth', 0.06); },
+  hurt(){ beep(400, 0.15, 'square', 0.12); beep(250, 0.2, 'sawtooth', 0.1); },
+  boss(){ beep(100, 0.5, 'sawtooth', 0.15); beep(80, 0.6, 'sawtooth', 0.12); },
+};
+
+/* ============================================================
+   尺寸
+   ============================================================ */
+function resize(){
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width = W * DPR;
+  canvas.height = H * DPR;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  WORLD.w = Math.max(2800, W * 6);
+  WORLD.h = Math.max(2200, H * 5);
+}
+window.addEventListener('resize', resize);
+window.addEventListener('orientationchange', () => setTimeout(resize, 200));
+resize();
+
+/* ============================================================
+   绘制：鱼
+   ============================================================ */
+function drawFish(fish, isPlayer){
+  const { x, y, size, angle, color, colorDark, fin, tailPhase } = fish;
+  let c = color, cd = colorDark, f = fin;
+  if(fish.locked && !isPlayer){ c = '#ff5252'; cd = '#b71c1c'; f = '#ff8a80'; }
+  /* 情绪：受惊抖动 */
+  let shakeX = 0, shakeY = 0;
+  if(fish.scared && !isPlayer){
+    shakeX = rand(-1.5, 1.5);
+    shakeY = rand(-1.5, 1.5);
+  }
+  ctx.save();
+  ctx.translate(x + shakeX, y + shakeY);
+  ctx.rotate(angle);
+
+  const levelFactor = isPlayer ? Math.min(2.2, 1 + (game.level - 1) * 0.12) : 1;
+  const tailWag = Math.sin(tailPhase) * size * 0.35;
+
+  /* 尾巴 */
+  ctx.beginPath();
+  ctx.moveTo(-size*0.85, 0);
+  ctx.quadraticCurveTo(-size*1.75*levelFactor, -size*0.7 + tailWag, -size*1.9*levelFactor, -size*0.05 + tailWag);
+  ctx.quadraticCurveTo(-size*1.75*levelFactor, size*0.7 + tailWag, -size*0.85, 0);
+  ctx.fillStyle = f; ctx.fill();
+  ctx.strokeStyle = cd; ctx.lineWidth = Math.max(1, size*0.06); ctx.stroke();
+
+  /* 背鳍 */
+  ctx.beginPath();
+  ctx.moveTo(-size*0.2, -size*0.75);
+  ctx.quadraticCurveTo(size*0.1, -size*1.35*levelFactor, size*0.5*levelFactor, -size*0.65);
+  ctx.quadraticCurveTo(size*0.2, -size*0.55, -size*0.2, -size*0.75);
+  ctx.fillStyle = f; ctx.fill();
+  ctx.strokeStyle = cd; ctx.lineWidth = Math.max(1, size*0.05); ctx.stroke();
+
+  /* 腹鳍 */
+  ctx.beginPath();
+  ctx.moveTo(-size*0.1, size*0.7);
+  ctx.quadraticCurveTo(size*0.15, size*1.2*levelFactor, size*0.45, size*0.6);
+  ctx.quadraticCurveTo(size*0.15, size*0.5, -size*0.1, size*0.7);
+  ctx.fillStyle = f; ctx.fill();
+  ctx.strokeStyle = cd; ctx.lineWidth = Math.max(1, size*0.05); ctx.stroke();
+
+  /* 身体 */
+  const g = ctx.createRadialGradient(-size*0.2, -size*0.3, size*0.1, 0, 0, size*1.2);
+  g.addColorStop(0, c);
+  g.addColorStop(1, cd);
+  ctx.beginPath();
+  ctx.ellipse(0, 0, size*1.05, size*0.75, 0, 0, Math.PI*2);
+  ctx.fillStyle = g; ctx.fill();
+  ctx.strokeStyle = cd; ctx.lineWidth = Math.max(1, size*0.07); ctx.stroke();
+
+  /* 高光 */
+  ctx.beginPath();
+  ctx.ellipse(-size*0.15, -size*0.35, size*0.45, size*0.18, -0.3, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(255,255,255,0.45)'; ctx.fill();
+
+  /* 玩家等级>=5 斑纹 */
+  if(isPlayer && game.level >= 5){
+    ctx.globalAlpha = 0.35;
+    for(let i=0;i<3;i++){
+      ctx.beginPath();
+      ctx.ellipse(-size*0.3 + i*size*0.35, size*0.1, size*0.15, size*0.08, 0, 0, Math.PI*2);
+      ctx.fillStyle = '#fff'; ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  /* 眼睛 */
+  const eyeX = size*0.5, eyeY = -size*0.15, eyeR = size*0.22;
+  ctx.beginPath(); ctx.arc(eyeX, eyeY, eyeR, 0, Math.PI*2);
+  ctx.fillStyle = '#fff'; ctx.fill();
+  ctx.strokeStyle = cd; ctx.lineWidth = Math.max(1, size*0.05); ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(eyeX + clamp(fish.vx*0.5, -eyeR*0.4, eyeR*0.4), eyeY + clamp(fish.vy*0.5, -eyeR*0.4, eyeR*0.4), eyeR*0.55, 0, Math.PI*2);
+  ctx.fillStyle = '#0a0a0a'; ctx.fill();
+  ctx.beginPath();
+  ctx.arc(eyeX - eyeR*0.15, eyeY - eyeR*0.2, eyeR*0.2, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.fill();
+
+  ctx.restore();
+}
+
+function drawDiver(d){
+  const { x, y, size, angle, color, colorDark, phase } = d;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(angle);
+  const swimWag = Math.sin(phase) * 0.4;
+  for(const s of [1,-1]){
+    ctx.save();
+    ctx.translate(-size*0.35, s*size*0.25);
+    ctx.rotate(s * swimWag);
+    ctx.beginPath();
+    ctx.roundRect(-size*0.9, -size*0.13, size*0.9, size*0.26, size*0.13);
+    ctx.fillStyle = colorDark; ctx.fill();
+    ctx.restore();
+  }
+  ctx.beginPath(); ctx.ellipse(0, 0, size*0.65, size*0.42, 0, 0, Math.PI*2);
+  ctx.fillStyle = color; ctx.fill();
+  ctx.strokeStyle = colorDark; ctx.lineWidth = Math.max(1, size*0.06); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(-size*0.3, 0, size*0.32, size*0.42, 0, 0, Math.PI*2);
+  ctx.fillStyle = '#ffb74d'; ctx.fill();
+  ctx.beginPath(); ctx.arc(size*0.55, 0, size*0.42, 0, Math.PI*2);
+  ctx.fillStyle = '#ffcc80'; ctx.fill();
+  ctx.strokeStyle = colorDark; ctx.lineWidth = Math.max(1, size*0.06); ctx.stroke();
+  ctx.beginPath(); ctx.arc(size*0.6, -size*0.08, size*0.22, 0, Math.PI*2);
+  ctx.fillStyle = 'rgba(100, 200, 255, 0.9)'; ctx.fill();
+  ctx.restore();
+}
+
+function drawBoss(b){
+  const { x, y, size, angle, phase, hp, maxHp, color, colorDark } = b;
+  ctx.save();
+  ctx.translate(x, y);
+
+  /* 危险光环 */
+  const pulse = 0.4 + Math.sin(phase*2)*0.2;
+  ctx.beginPath(); ctx.arc(0, 0, size*1.6, 0, Math.PI*2);
+  ctx.fillStyle = `rgba(255,60,60,${pulse*0.35})`; ctx.fill();
+
+  if(b.sucking){
+    ctx.beginPath(); ctx.arc(0, 0, b.suckRadius||0, 0, Math.PI*2);
+    ctx.strokeStyle = `rgba(255,100,100,${0.5 + Math.sin(phase*8)*0.3})`;
+    ctx.lineWidth = 4; ctx.stroke();
+  }
+
+  ctx.rotate(angle);
+
+  ctx.beginPath();
+  ctx.moveTo(-size*1.6, 0);
+  ctx.quadraticCurveTo(-size*2.8, -size*0.9, -size*3.2, 0);
+  ctx.quadraticCurveTo(-size*2.8, size*0.9, -size*1.6, 0);
+  ctx.fillStyle = colorDark; ctx.fill();
+  ctx.strokeStyle = '#000'; ctx.lineWidth = Math.max(2, size*0.08); ctx.stroke();
+
+  const g = ctx.createRadialGradient(-size*0.3, -size*0.3, size*0.3, 0, 0, size*1.6);
+  g.addColorStop(0, color); g.addColorStop(1, colorDark);
+  ctx.beginPath(); ctx.ellipse(0, 0, size*1.55, size*1.0, 0, 0, Math.PI*2);
+  ctx.fillStyle = g; ctx.fill();
+  ctx.strokeStyle = '#000'; ctx.lineWidth = Math.max(2, size*0.1); ctx.stroke();
+
+  for(let i=0;i<6;i++){
+    const a = -1.2 + (i/5)*2.4;
+    const ex = Math.cos(a)*size*1.55, ey = Math.sin(a)*size*1.0;
+    ctx.beginPath();
+    ctx.moveTo(ex*0.9, ey*0.9);
+    ctx.lineTo(ex*1.4, ey*1.4);
+    ctx.lineTo(ex*1.05, ey*0.95);
+    ctx.fillStyle = '#fff'; ctx.fill();
+    ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5; ctx.stroke();
+  }
+
+  for(const ey of [-size*0.28, size*0.28]){
+    ctx.beginPath(); ctx.arc(size*0.72, ey, size*0.22, 0, Math.PI*2);
+    ctx.fillStyle = '#ff0000'; ctx.fill();
+    ctx.beginPath(); ctx.arc(size*0.72, ey, size*0.1, 0, Math.PI*2);
+    ctx.fillStyle = '#fff'; ctx.fill();
+  }
+
+  /* 弱点 */
+  const weakX = 0, weakY = -size*0.3;
+  ctx.beginPath(); ctx.arc(weakX, weakY, size*0.35, 0, Math.PI*2);
+  ctx.fillStyle = `rgba(255,235,100,${0.5 + Math.sin(phase*6)*0.3})`; ctx.fill();
+  ctx.strokeStyle = '#ffd700'; ctx.lineWidth = 2.5; ctx.stroke();
+  ctx.fillStyle = '#fff';
+  ctx.font = `bold ${Math.round(size*0.3)}px sans-serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('★', weakX, weakY);
+
+  const barW = size*3.2, barH = 8;
+  ctx.save(); ctx.rotate(-angle);
+  ctx.fillStyle = 'rgba(0,0,0,0.75)';
+  ctx.fillRect(-barW/2, -size*1.6, barW, barH);
+  ctx.fillStyle = hp/maxHp > 0.5 ? '#ff5252' : hp/maxHp > 0.25 ? '#ff9800' : '#ff0000';
+  ctx.fillRect(-barW/2, -size*1.6, barW*(hp/maxHp), barH);
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
+  ctx.strokeRect(-barW/2, -size*1.6, barW, barH);
+  ctx.restore();
+
+  ctx.restore();
+}
+
+function drawMine(m){
+  const { x, y, size, phase, armed } = m;
+  ctx.save();
+  ctx.translate(x, y);
+  for(let i=0;i<8;i++){
+    const a = (i/8)*Math.PI*2 + phase*0.3;
+    const len = size * 1.3;
+    ctx.beginPath();
+    ctx.moveTo(Math.cos(a)*size*0.7, Math.sin(a)*size*0.7);
+    ctx.lineTo(Math.cos(a)*len, Math.sin(a)*len);
+    ctx.strokeStyle = '#333'; ctx.lineWidth = 3; ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(Math.cos(a)*len, Math.sin(a)*len, size*0.12, 0, Math.PI*2);
+    ctx.fillStyle = armed ? '#ff5252' : '#666'; ctx.fill();
+  }
+  ctx.beginPath(); ctx.arc(0, 0, size*0.75, 0, Math.PI*2);
+  ctx.fillStyle = '#1a1a1a'; ctx.fill();
+  ctx.strokeStyle = '#000'; ctx.lineWidth = 2; ctx.stroke();
+  if(armed && Math.sin(phase*4) > 0){
+    ctx.beginPath(); ctx.arc(0, 0, size*0.25, 0, Math.PI*2);
+    ctx.fillStyle = '#ff0000'; ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawPowerup(pu){
+  const bob = Math.sin(pu.phase) * 4;
+  ctx.save();
+  ctx.translate(pu.x, pu.y + bob);
+  ctx.beginPath(); ctx.arc(0, 0, 20, 0, Math.PI*2);
+  ctx.fillStyle = pu.color + 'aa'; ctx.fill();
+  ctx.font = '20px "PingFang SC", sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(pu.icon, 0, 0);
+  ctx.restore();
+}
+
+function drawHeart(h){
+  const bob = Math.sin(h.phase) * 5;
+  ctx.save();
+  ctx.translate(h.x, h.y + bob);
+  ctx.font = '26px "PingFang SC", sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('❤️', 0, 0);
+  ctx.restore();
+}
+
+function drawRemain(r){
+  const alpha = Math.max(0, r.life / r.maxLife);
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.translate(r.x, r.y);
+  ctx.font = `${Math.round(r.size*1.6)}px "PingFang SC", sans-serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('🦴', 0, 0);
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
+function drawHazard(h){
+  const phase = h.phase + Date.now()*0.001;
+  ctx.save();
+  ctx.translate(h.x, h.y);
+  if(h.type === 'seaweed'){
+    for(let i=0;i<5;i++){
+      const a = (i/5)*Math.PI*2;
+      const len = h.size * (0.9 + Math.sin(phase + i)*0.15);
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(Math.cos(a)*len, Math.sin(a)*len);
+      ctx.strokeStyle = 'rgba(45, 110, 45, 0.7)';
+      ctx.lineWidth = 4;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+    }
+  } else if(h.type === 'sand'){
+    ctx.beginPath(); ctx.arc(0, 0, h.size, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(180, 140, 90, ${0.35 + Math.sin(phase)*0.1})`;
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawGoldenFish(g){
+  const { x, y, size, angle, phase } = g;
+  ctx.save();
+  ctx.translate(x, y);
+  const pulse = 0.6 + Math.sin(phase*3)*0.4;
+  ctx.beginPath(); ctx.arc(0, 0, size*2, 0, Math.PI*2);
+  ctx.fillStyle = `rgba(255,215,0,${pulse*0.35})`; ctx.fill();
+  ctx.rotate(angle);
+  ctx.beginPath();
+  ctx.moveTo(-size*0.85, 0);
+  ctx.quadraticCurveTo(-size*1.9, -size*0.85, -size*2.1, 0);
+  ctx.quadraticCurveTo(-size*1.9, size*0.85, -size*0.85, 0);
+  ctx.fillStyle = '#ffd700'; ctx.fill();
+  ctx.strokeStyle = '#b8860b'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.beginPath();
+  ctx.ellipse(0, 0, size*1.15, size*0.85, 0, 0, Math.PI*2);
+  ctx.fillStyle = '#ffd700'; ctx.fill();
+  ctx.strokeStyle = '#8b6914'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.beginPath(); ctx.arc(size*0.55, -size*0.15, size*0.25, 0, Math.PI*2);
+  ctx.fillStyle = '#fff'; ctx.fill();
+  ctx.beginPath(); ctx.arc(size*0.55, -size*0.15, size*0.12, 0, Math.PI*2);
+  ctx.fillStyle = '#000'; ctx.fill();
+  ctx.restore();
+}
+
+/* ============================================================
+   创建实体
+   ============================================================ */
+function createPlayer(){
+  const skin = getCurrentSkin();
+  return {
+    x: WORLD.w/2, y: WORLD.h/2,
+    vx:0, vy:0,
+    size:18, targetSize:18,
+    angle:0,
+    targetX: WORLD.w/2, targetY: WORLD.h/2,
+    moving:false,
+    color: skin.color, colorDark: skin.colorDark, fin: skin.fin,
+    tailPhase:0, alive:true, invincible:0,
+    hp:3, maxHp:3,
+    speedCD:0, speedActive:0,
+    shieldCD:0, shieldActive:0,
+    magnetCD:0, magnetActive:0,
+    fireCD:0, ammo:10, maxAmmo:10,
+    bubbleCD:0, dashCD:0, dashActive:0,
+    suckCD:0, suckActive:0,
+    growActive:0, invisibleActive:0, doubleScoreActive:0,
+    growGlow:0,
+    emotion:'calm', emotionTimer:0,
+  };
+}
+
+function createFish(){
+  const t = pickByWeight(FISH_TYPES);
+  const p = game.player;
+  let x, y;
+  if(p){
+    const ang = Math.random() * Math.PI * 2;
+    const d = rand(500, 900);
+    x = clamp(p.x + Math.cos(ang)*d, 40, WORLD.w - 40);
+    y = clamp(p.y + Math.sin(ang)*d, 40, WORLD.h - 40);
+  } else {
+    x = rand(100, WORLD.w - 100);
+    y = rand(100, WORLD.h - 100);
+  }
+  const size = t.size * (1 + Math.min(1.0, (game.level - 1) * 0.05));
+  const a = Math.random() * Math.PI * 2;
+  const speed = t.speed * (0.8 + Math.random()*0.4);
+  return {
+    x, y,
+    vx: Math.cos(a)*speed, vy: Math.sin(a)*speed,
+    size, angle: a,
+    color: t.color, colorDark: t.colorDark, fin: t.fin,
+    tailPhase: Math.random()*Math.PI*2,
+    score: t.score,
+    wanderTimer: rand(60, 180),
+    ai: t.ai,
+    locked: false, scared: false,
+  };
+}
+
+function createDiver(){
+  const t = pickByWeight(DIVER_TYPES);
+  const p = game.player;
+  let x, y;
+  if(p){
+    const ang = Math.random() * Math.PI * 2;
+    const d = rand(600, 1100);
+    x = clamp(p.x + Math.cos(ang)*d, 40, WORLD.w - 40);
+    y = clamp(p.y + Math.sin(ang)*d, 40, WORLD.h - 40);
+  } else {
+    x = rand(200, WORLD.w - 200);
+    y = rand(200, WORLD.h - 200);
+  }
+  const a = Math.random() * Math.PI * 2;
+  const speed = t.speed * (0.8 + Math.random()*0.3);
+  return {
+    x, y,
+    vx: Math.cos(a)*speed, vy: Math.sin(a)*speed,
+    size: t.size, angle: a,
+    color: t.color, colorDark: t.colorDark,
+    phase: Math.random()*Math.PI*2,
+    score: t.score, hp: t.hp, maxHp: t.hp,
+    wanderTimer: rand(100, 240),
+    ai: t.ai,
+  };
+}
+
+function createMine(){
+  const p = game.player;
+  let x, y;
+  if(p){
+    const ang = Math.random() * Math.PI * 2;
+    const d = rand(400, 1200);
+    x = clamp(p.x + Math.cos(ang)*d, 60, WORLD.w - 60);
+    y = clamp(p.y + Math.sin(ang)*d, 60, WORLD.h - 60);
+  } else {
+    x = rand(100, WORLD.w - 100);
+    y = rand(100, WORLD.h - 100);
+  }
+  return {
+    x, y,
+    vx: rand(-0.2, 0.2), vy: rand(-0.2, 0.2),
+    size: 22,
+    phase: Math.random()*Math.PI*2,
+    armed: true, life: 1800,
+  };
+}
+
+function createBoss(){
+  const p = game.player;
+  if(!p) return null;
+  const ang = Math.random() * Math.PI * 2;
+  const d = rand(700, 1000);
+  const x = clamp(p.x + Math.cos(ang)*d, 100, WORLD.w - 100);
+  const y = clamp(p.y + Math.sin(ang)*d, 100, WORLD.h - 100);
+  const size = 70 + Math.min(50, game.level*3);
+  const a = Math.random() * Math.PI * 2;
+  return {
+    x, y,
+    vx: Math.cos(a)*0.6, vy: Math.sin(a)*0.6,
+    size, angle: a,
+    color:'#90a4ae', colorDark:'#263238',
+    phase: Math.random()*Math.PI*2,
+    score: 500,
+    hp: 10 + game.level*2, maxHp: 10 + game.level*2,
+    sucking: false, suckRadius: 0, suckTimer: rand(180, 360), suckPhase: 0,
+  };
+}
+
+function createPowerup(x, y){
+  const t = pickByWeight(POWERUP_TYPES);
+  return {
+    x, y,
+    vx: rand(-0.3, 0.3), vy: rand(-0.3, 0.3),
+    icon: t.icon, type: t.id, color: t.color,
+    life: 720, phase: Math.random()*Math.PI*2,
+  };
+}
+
+function createHeart(){
+  const p = game.player;
+  let x, y;
+  if(p){
+    const ang = Math.random() * Math.PI * 2;
+    const d = rand(300, 800);
+    x = clamp(p.x + Math.cos(ang)*d, 50, WORLD.w - 50);
+    y = clamp(p.y + Math.sin(ang)*d, 50, WORLD.h - 50);
+  } else {
+    x = rand(100, WORLD.w - 100);
+    y = rand(100, WORLD.h - 100);
+  }
+  return { x, y, vx: rand(-0.2, 0.2), vy: rand(-0.2, 0.2), phase: Math.random()*Math.PI*2, life: 900 };
+}
+
+function createRemain(x, y, score, size){
+  return {
+    x, y,
+    vx: rand(-0.3, 0.3), vy: rand(-0.3, 0.3),
+    size: Math.max(8, size*0.3),
+    score: Math.floor(score*0.5),
+    life: 300, maxLife: 300,
+  };
+}
+
+function createHazard(type){
+  const p = game.player;
+  let x, y;
+  if(p){
+    const ang = Math.random() * Math.PI * 2;
+    const d = rand(300, 1000);
+    x = clamp(p.x + Math.cos(ang)*d, 100, WORLD.w - 100);
+    y = clamp(p.y + Math.sin(ang)*d, 100, WORLD.h - 100);
+  } else {
+    x = rand(100, WORLD.w - 100);
+    y = rand(100, WORLD.h - 100);
+  }
+  return {
+    x, y,
+    size: type === 'seaweed' ? 45 : 90,
+    type, phase: Math.random()*Math.PI*2,
+    life: 900,
+  };
+}
+
+function createGoldenFish(){
+  const p = game.player;
+  if(!p) return null;
+  const ang = Math.random() * Math.PI * 2;
+  const d = rand(400, 700);
+  const x = clamp(p.x + Math.cos(ang)*d, 60, WORLD.w - 60);
+  const y = clamp(p.y + Math.sin(ang)*d, 60, WORLD.h - 60);
+  const a = Math.random() * Math.PI * 2;
+  return {
+    x, y,
+    vx: Math.cos(a)*4, vy: Math.sin(a)*4,
+    size: 16, angle: a,
+    phase: Math.random()*Math.PI*2,
+    life: 500,
+  };
+}
+
+/* ============================================================
+   粒子（带限制）
+   ============================================================ */
+function spawnParticles(x, y, color, count){
+  const n = Math.min(count || 6, 10);
+  for(let i=0; i<n; i++){
+    if(game.particles.length >= MAX_PARTICLES) return;
+    const a = Math.random() * Math.PI * 2;
+    const s = rand(1.5, 4);
+    game.particles.push({
+      x, y,
+      vx: Math.cos(a)*s, vy: Math.sin(a)*s,
+      life: 1, decay: 0.04,
+      size: rand(2, 5),
+      color,
+    });
+  }
+}
+
+/* ============================================================
+   摄像机
+   ============================================================ */
+function updateCamera(){
+  const p = game.player;
+  if(!p) return;
+  const tx = clamp(p.x - W/2, 0, WORLD.w - W);
+  const ty = clamp(p.y - H/2, 0, WORLD.h - H);
+  game.cam.x += (tx - game.cam.x) * 0.12;
+  game.cam.y += (ty - game.cam.y) * 0.12;
+}
+
+/* ============================================================
+   体型压制 AI
+   ============================================================ */
+function applySizeSuppression(f, p, pd, pdx, pdy){
+  /* 大鱼追小鱼：体型差越大速度越快 */
+  if(f.ai === 'chase' && f.size > p.size * 1.05 && p.invisibleActive <= 0){
+    if(pd < 550){
+      f.locked = true;
+      const ratio = f.size / p.size;
+      const boost = Math.min(2.0, 0.6 + ratio * 0.4);
+      f.vx += (pdx/pd) * 0.08 * boost * DIFFICULTY[currentDiff].aiChase;
+      f.vy += (pdy/pd) * 0.08 * boost * DIFFICULTY[currentDiff].aiChase;
+    } else f.locked = false;
+  }
+  /* 小鱼逃跑：体型差越大反应越快 */
+  if(f.ai === 'flee' && f.size < p.size * 1.1 && p.invisibleActive <= 0){
+    if(pd < 340){
+      f.scared = true;
+      const ratio = p.size / f.size;
+      const boost = Math.min(2.5, 0.8 + ratio * 0.3);
+      f.vx += (-pdx/pd) * 0.15 * boost;
+      f.vy += (-pdy/pd) * 0.15 * boost;
+    } else f.scared = false;
+  }
+}
+
+/* ============================================================
+   生态循环
+   ============================================================ */
+function updateEcosystem(){
+  const p = game.player;
+  if(!p) return;
+  let small = 0, big = 0;
+  for(const f of game.fishes){
+    if(f.size < p.size * 0.9) small++;
+    else big++;
+  }
+  game.smallFishCount = small;
+  game.bigFishCount = big;
+  /* 小鱼少时大鱼互相吞食（最多 2 对/帧） */
+  if(small < 8 && big > 3){
+    let processed = 0;
+    for(let i=0; i<game.fishes.length && processed < 2; i++){
+      const a = game.fishes[i];
+      if(a.size < p.size * 0.9) continue;
+      for(let j=0; j<game.fishes.length; j++){
+        if(i === j) continue;
+        const b = game.fishes[j];
+        if(a.size > b.size * 1.3 && dist(a.x, a.y, b.x, b.y) < a.size + b.size){
+          a.size += b.size * 0.05;
+          spawnParticles(b.x, b.y, b.color, 4);
+          game.fishes.splice(j, 1);
+          processed++;
+          if(j < i) i--;
+          break;
+        }
+      }
+    }
+  }
+}
+
+/* ============================================================
+   任务
+   ============================================================ */
+let quests = [];
+function initQuests(){
+  quests = [
+    { id:'eat50',   name:'吃 50 条小鱼', goal:50, prog:0, reward:300, done:false },
+    { id:'kill3',   name:'击杀 3 条大鱼', goal:3,  prog:0, reward:500, done:false },
+    { id:'magnet2', name:'吃 2 次磁力',  goal:2,  prog:0, reward:200, done:false },
+  ];
+  renderQuests();
+}
+function renderQuests(){
+  document.getElementById('questList').innerHTML = quests.map(q => `
+    <div class="quest-item ${q.done?'done':''}">
+      <div class="qi-name"><span>${q.name}</span><span>${q.prog}/${q.goal}</span></div>
+      <div class="qi-progress"><div class="qi-progress-fill" style="width:${Math.min(100, q.prog/q.goal*100)}%"></div></div>
+    </div>`).join('');
+}
+function addQuestProgress(id, amount){
+  const q = quests.find(x => x.id === id);
+  if(!q || q.done) return;
+  q.prog += amount;
+  if(q.prog >= q.goal){
+    q.done = true;
+    game.score += q.reward;
+    showAchievement(`📋 任务完成：${q.name} +${q.reward}`);
+    sfx.powerup();
+  }
+  renderQuests();
+}
+document.getElementById('questHeader').addEventListener('click', () => {
+  document.getElementById('questPanel').classList.toggle('collapsed');
+});
+
+/* ============================================================
+   更新
+   ============================================================ */
+function update(dt){
+  const p = game.player;
+  if(!p || !p.alive) return;
+
+  if(game.screenShake > 0) game.screenShake -= dt;
+  if(p.emotionTimer > 0) p.emotionTimer -= dt;
+  else p.emotion = 'calm';
+
+  /* 技能冷却 */
+  ['speed','shield','magnet','dash','suck'].forEach(k => {
+    if(p[k+'Active'] > 0) p[k+'Active'] -= dt;
+    if(p[k+'CD'] > 0) p[k+'CD'] -= dt;
+  });
+  if(p.fireCD > 0) p.fireCD -= dt;
+  if(p.bubbleCD > 0) p.bubbleCD -= dt;
+  if(p.invincible > 0) p.invincible -= dt;
+  if(p.growActive > 0) p.growActive -= dt;
+  if(p.invisibleActive > 0) p.invisibleActive -= dt;
+  if(p.doubleScoreActive > 0) p.doubleScoreActive -= dt;
+  if(p.growGlow > 0) p.growGlow -= dt;
+
+  const speedMul = p.speedActive > 0 ? 2.0 : (p.dashActive > 0 ? 3.5 : 1.0);
+  if(p.moving){
+    const dx = p.targetX - p.x, dy = p.targetY - p.y;
+    const d = Math.sqrt(dx*dx + dy*dy);
+    if(d > 2){
+      const speed = 5.0 * speedMul;
+      const ease = Math.min(1, d/100);
+      const nx = (dx/d) * speed * ease;
+      const ny = (dy/d) * speed * ease;
+      p.vx += (nx - p.vx) * 0.15;
+      p.vy += (ny - p.vy) * 0.15;
+    } else { p.vx *= 0.9; p.vy *= 0.9; }
+  } else { p.vx *= 0.92; p.vy *= 0.92; }
+
+  /* 陷阱减速 */
+  let inSand = false;
+  let inSeaweed = false;
+  for(const h of game.hazards){
+    const d = dist(h.x, h.y, p.x, p.y);
+    if(d < h.size + p.size*0.6){
+      if(h.type === 'sand') inSand = true;
+      if(h.type === 'seaweed') inSeaweed = true;
+    }
+  }
+  if(inSand){ p.vx *= 0.5; p.vy *= 0.5; }
+  if(inSeaweed){ p.vx *= 0.65; p.vy *= 0.65; }
+
+  p.x += p.vx * dt;
+  p.y += p.vy * dt;
+  p.x = clamp(p.x, p.size, WORLD.w - p.size);
+  p.y = clamp(p.y, p.size, WORLD.h - p.size);
+
+  if(Math.abs(p.vx) > 0.1 || Math.abs(p.vy) > 0.1){
+    const ta = Math.atan2(p.vy, p.vx);
+    let diff = ta - p.angle;
+    while(diff > Math.PI) diff -= Math.PI*2;
+    while(diff < -Math.PI) diff += Math.PI*2;
+    p.angle += diff * 0.2;
+  }
+
+  const growthTarget = p.targetSize * (p.growActive > 0 ? 1.4 : 1);
+  if(p.size < growthTarget) p.size += (growthTarget - p.size) * 0.08;
+  else if(p.size > growthTarget) p.size += (growthTarget - p.size) * 0.05;
+  p.tailPhase += 0.25 + Math.min(0.3, Math.abs(p.vx)*0.08 + Math.abs(p.vy)*0.08);
+
+  /* 冲刺撞碎 */
+  if(p.dashActive > 0){
+    for(let i = game.fishes.length - 1; i >= 0; i--){
+      const f = game.fishes[i];
+      if(f.size < p.size * 1.5 && dist(p.x, p.y, f.x, f.y) < p.size + f.size){
+        const gain = Math.floor(f.score * (p.doubleScoreActive > 0 ? 2 : 1));
+        game.score += gain;
+        game.kills++;
+        game.eatenCount++;
+        addQuestProgress('eat50', 1);
+        spawnParticles(f.x, f.y, f.color, 6);
+        game.fishes.splice(i, 1);
+      }
+    }
+  }
+
+  /* 吸力 */
+  if(p.suckActive > 0){
+    for(const f of game.fishes){
+      const dx = p.x - f.x, dy = p.y - f.y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if(d < 320 && d > 1){
+        const pull = (1 - d/320) * 0.7;
+        f.vx += (dx/d) * pull;
+        f.vy += (dy/d) * pull;
+      }
+    }
+    /* 吸力也会吸引大鱼（风险） */
+    for(const f of game.fishes){
+      if(f.size < p.size * 1.05) continue;
+      const dx = p.x - f.x, dy = p.y - f.y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if(d < 380 && d > 1){
+        const pull = (1 - d/380) * 0.5;
+        f.vx += (dx/d) * pull;
+        f.vy += (dy/d) * pull;
+      }
+    }
+  }
+
+  /* 磁铁 */
+  if(p.magnetActive > 0){
+    for(const f of game.fishes){
+      if(f.size >= p.size * 0.95) continue;
+      const dx = p.x - f.x, dy = p.y - f.y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if(d < 240 && d > 1){
+        const pull = (1 - d/240) * 0.6;
+        f.vx += (dx/d) * pull;
+        f.vy += (dy/d) * pull;
+      }
+    }
+  }
+
+  /* NPC 鱼 */
+  const diff = DIFFICULTY[currentDiff];
+  for(let i = game.fishes.length - 1; i >= 0; i--){
+    const f = game.fishes[i];
+    const pdx = p.x - f.x, pdy = p.y - f.y;
+    const pd = Math.sqrt(pdx*pdx + pdy*pdy) || 1;
+
+    /* 体型压制 AI */
+    applySizeSuppression(f, p, pd, pdx, pdy);
+
+    f.x += f.vx * dt;
+    f.y += f.vy * dt;
+    f.tailPhase += 0.2 * dt;
+
+    /* 速度限制 */
+    const curV = Math.sqrt(f.vx*f.vx + f.vy*f.vy);
+    const maxV = 3.5;
+    if(curV > maxV){ f.vx = (f.vx/curV) * maxV; f.vy = (f.vy/curV) * maxV; }
+    f.angle = Math.atan2(f.vy, f.vx);
+
+    const m = f.size;
+    if(f.x < m){ f.x = m; f.vx = Math.abs(f.vx); }
+    if(f.x > WORLD.w - m){ f.x = WORLD.w - m; f.vx = -Math.abs(f.vx); }
+    if(f.y < m){ f.y = m; f.vy = Math.abs(f.vy); }
+    if(f.y > WORLD.h - m){ f.y = WORLD.h - m; f.vy = -Math.abs(f.vy); }
+
+    /* 远处清理 */
+    if(dist(f.x, f.y, p.x, p.y) > Math.max(W, H) * 3){ game.fishes.splice(i, 1); continue; }
+
+    /* 大鱼吃小鱼（生态） */
+    if(f.size > 20 && game.smallFishCount < 10){
+      for(let j = game.fishes.length - 1; j >= 0; j--){
+        const o = game.fishes[j];
+        if(o === f || o.size >= f.size * 0.7) continue;
+        if(dist(f.x, f.y, o.x, o.y) < f.size + o.size){
+          f.size += o.size * 0.05;
+          spawnParticles(o.x, o.y, o.color, 4);
+          game.fishes.splice(j, 1);
+          if(j < i) i--;
+          break;
+        }
+      }
+    }
+
+    /* 与玩家碰撞 */
+    const d = dist(f.x, f.y, p.x, p.y);
+    if(d < (f.size + p.size) * 0.75){
+      if(p.size >= f.size * 0.9){
+        p.targetSize += f.size * 0.10;
+        const gain = Math.floor(f.score * (p.doubleScoreActive > 0 ? 2 : 1));
+        game.score += gain;
+        game.eatenCount++;
+        game.kills++;
+        addQuestProgress('eat50', 1);
+        if(f.size >= 20) addQuestProgress('kill3', 1);
+        sfx.eat();
+        spawnParticles(f.x, f.y, f.color, 8);
+        p.emotion = 'excited'; p.emotionTimer = 30;
+        showFloatScore(f.x, f.y, '+' + gain);
+        /* 大鱼的残骸 */
+        if(f.size >= 25 && game.remains.length < MAX_REMAINS){
+          game.remains.push(createRemain(f.x, f.y, f.score, f.size));
+        }
+        if(Math.random() < 0.15 && game.powerups.length < MAX_POWERUPS){
+          game.powerups.push(createPowerup(f.x, f.y));
+        }
+        if(game.eatenCount >= game.level * 5) levelUp();
+        game.fishes.splice(i, 1);
+        updateHUD();
+      } else {
+        if(p.shieldActive > 0 || p.invincible > 0){
+          const dx = f.x - p.x, dy = f.y - p.y;
+          const d2 = Math.sqrt(dx*dx+dy*dy) || 1;
+          f.vx += (dx/d2) * 2;
+          f.vy += (dy/d2) * 2;
+        } else {
+          game.deathInfo = { killer:'大鱼', size:f.size };
+          damagePlayer(1);
+          if(!p.alive) return;
+        }
+      }
+    }
+  }
+
+  /* 潜水员 */
+  for(let i = game.divers.length - 1; i >= 0; i--){
+    const d = game.divers[i];
+    const pdx = p.x - d.x, pdy = p.y - d.y;
+    const pd = Math.sqrt(pdx*pdx + pdy*pdy) || 1;
+    if(d.ai === 'chase' && pd < 450 && p.invisibleActive <= 0){
+      d.vx += (pdx/pd) * 0.06 * diff.aiChase;
+      d.vy += (pdy/pd) * 0.06 * diff.aiChase;
+    }
+    d.x += d.vx * dt;
+    d.y += d.vy * dt;
+    d.phase += 0.15 * dt;
+
+    const m = d.size;
+    if(d.x < m){ d.x = m; d.vx = Math.abs(d.vx); }
+    if(d.x > WORLD.w - m){ d.x = WORLD.w - m; d.vx = -Math.abs(d.vx); }
+    if(d.y < m){ d.y = m; d.vy = Math.abs(d.vy); }
+    if(d.y > WORLD.h - m){ d.y = WORLD.h - m; d.vy = -Math.abs(d.vy); }
+    d.angle = Math.atan2(d.vy, d.vx);
+
+    if(dist(d.x, d.y, p.x, p.y) > Math.max(W, H) * 3){ game.divers.splice(i, 1); continue; }
+
+    if(dist(d.x, d.y, p.x, p.y) < (d.size + p.size) * 0.7){
+      if(p.size >= d.size * 1.3){
+        p.targetSize += d.size * 0.15;
+        const gain = Math.floor(d.score * (p.doubleScoreActive > 0 ? 2 : 1));
+        game.score += gain;
+        game.kills++;
+        addQuestProgress('kill3', 1);
+        sfx.eat();
+        spawnParticles(d.x, d.y, d.color, 10);
+        if(game.remains.length < MAX_REMAINS){
+          game.remains.push(createRemain(d.x, d.y, d.score, d.size));
+        }
+        if(game.eatenCount >= game.level * 5) levelUp();
+        game.divers.splice(i, 1);
+        updateHUD();
+      } else {
+        if(p.shieldActive > 0 || p.invincible > 0){
+          const dx = d.x - p.x, dy = d.y - p.y;
+          const d2 = Math.sqrt(dx*dx+dy*dy) || 1;
+          d.vx += (dx/d2) * 2;
+          d.vy += (dy/d2) * 2;
+        } else {
+          game.deathInfo = { killer:'潜水员', size:d.size };
+          damagePlayer(1);
+          if(!p.alive) return;
+        }
+      }
+    }
+  }
+
+  /* BOSS */
+  for(let i = game.bosses.length - 1; i >= 0; i--){
+    const b = game.bosses[i];
+    const pdx = p.x - b.x, pdy = p.y - b.y;
+    const pd = Math.sqrt(pdx*pdx + pdy*pdy) || 1;
+    if(pd < 800) {
+      b.vx += (pdx/pd) * 0.05 * diff.aiChase;
+      b.vy += (pdy/pd) * 0.05 * diff.aiChase;
+    }
+    const curV = Math.sqrt(b.vx*b.vx + b.vy*b.vy);
+    if(curV > 1.2){ b.vx = (b.vx/curV) * 1.2; b.vy = (b.vy/curV) * 1.2; }
+    b.x += b.vx * dt;
+    b.y += b.vy * dt;
+    b.phase += 0.05 * dt;
+    b.angle = Math.atan2(b.vy, b.vx);
+
+    /* BOSS 吸力技能 */
+    b.suckTimer -= dt;
+    if(b.suckTimer <= 0 && !b.sucking){
+      b.sucking = true;
+      b.suckPhase = 0;
+      b.suckRadius = 0;
+      showSkillStatus('⚠️ BOSS 吞噬吸力！', '#ff5252');
+      if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
+    }
+    if(b.sucking){
+      b.suckPhase += dt;
+      b.suckRadius = Math.min(b.size * 5, b.suckRadius + dt * 3);
+      if(pd < b.suckRadius){
+        const pull = (1 - pd/b.suckRadius) * 0.8;
+        p.vx += (pdx/pd) * pull;
+        p.vy += (pdy/pd) * pull;
+      }
+      if(b.suckPhase > 180){
+        b.sucking = false;
+        b.suckTimer = rand(240, 480);
+      }
+    }
+
+    if(b.x < b.size){ b.x = b.size; b.vx = Math.abs(b.vx); }
+    if(b.x > WORLD.w - b.size){ b.x = WORLD.w - b.size; b.vx = -Math.abs(b.vx); }
+    if(b.y < b.size){ b.y = b.size; b.vy = Math.abs(b.vy); }
+    if(b.y > WORLD.h - b.size){ b.y = WORLD.h - b.size; b.vy = -Math.abs(b.vy); }
+
+    if(dist(b.x, b.y, p.x, p.y) < b.size + p.size * 0.6){
+      if(p.shieldActive > 0 || p.invincible > 0){
+        const dx = b.x - p.x, dy = b.y - p.y;
+        const d2 = Math.sqrt(dx*dx+dy*dy) || 1;
+        b.vx += (dx/d2) * 3;
+        b.vy += (dy/d2) * 3;
+      } else {
+        game.deathInfo = { killer:'BOSS', size:b.size };
+        damagePlayer(2);
+        if(!p.alive) return;
+      }
+    }
+  }
+
+  /* 炮弹 */
+  for(let i = game.bullets.length - 1; i >= 0; i--){
+    const b = game.bullets[i];
+    b.x += b.vx * dt;
+    b.y += b.vy * dt;
+    b.life -= dt;
+    if(b.life <= 0 || b.x < 0 || b.x > WORLD.w || b.y < 0 || b.y > WORLD.h){
+      game.bullets.splice(i, 1);
+      continue;
+    }
+    let hit = false;
+    for(let j = game.fishes.length - 1; j >= 0; j--){
+      const f = game.fishes[j];
+      if(dist(b.x, b.y, f.x, f.y) < f.size + b.size){
+        const gain = Math.floor(f.score * (p.doubleScoreActive > 0 ? 2 : 1));
+        game.score += gain;
+        game.kills++;
+        game.eatenCount++;
+        addQuestProgress('eat50', 1);
+        sfx.eat();
+        spawnParticles(f.x, f.y, f.color, 6);
+        game.fishes.splice(j, 1);
+        hit = true;
+        break;
+      }
+    }
+    if(!hit){
+      for(let j = game.bosses.length - 1; j >= 0; j--){
+        const boss = game.bosses[j];
+        if(dist(b.x, b.y, boss.x, boss.y) < boss.size + b.size){
+          const weakX = boss.x + Math.cos(boss.angle - Math.PI/2) * (-boss.size * 0.3);
+          const weakY = boss.y + Math.sin(boss.angle - Math.PI/2) * (-boss.size * 0.3);
+          const wd = dist(b.x, b.y, weakX, weakY);
+          const dmg = wd < boss.size * 0.4 ? 3 : 1;
+          if(wd < boss.size * 0.4){
+            showFloatScore(b.x, b.y, '暴击!');
+            if(boss.sucking){
+              boss.sucking = false;
+              boss.suckTimer = 300;
+              showSkillStatus('💥 打断吸力！', '#ffd700');
+            }
+          }
+          boss.hp -= dmg;
+          hit = true;
+          if(boss.hp <= 0){
+            const gain = boss.score * (p.doubleScoreActive > 0 ? 2 : 1);
+            game.score += gain;
+            game.kills++;
+            game.bossKills++;
+            addQuestProgress('kill3', 1);
+            sfx.eat();
+            for(let k=0; k<3; k++){
+              spawnParticles(boss.x + rand(-30,30), boss.y + rand(-30,30), '#ffb74d', 6);
+            }
+            showFloatScore(boss.x, boss.y, '+' + gain);
+            if(game.remains.length < MAX_REMAINS){
+              game.remains.push(createRemain(boss.x, boss.y, boss.score, boss.size));
+            }
+            game.bosses.splice(j, 1);
+            if(game.bossKills >= 5){
+              const ach = ACHIEVEMENTS.find(a => a.id === 'boss5');
+              if(ach && !ach.unlocked){
+                ach.unlocked = true;
+                saveAchievements();
+                showAchievement('🏆 成就解锁：BOSS 猎手');
+                renderSkinPicker();
+              }
+            }
+            updateHUD();
+          }
+          break;
+        }
+      }
+    }
+    if(hit){ game.bullets.splice(i, 1); }
+  }
+
+  /* 水雷 */
+  for(let i = game.mines.length - 1; i >= 0; i--){
+    const m = game.mines[i];
+    m.x += m.vx * dt;
+    m.y += m.vy * dt;
+    m.phase += 0.1 * dt;
+    m.life -= dt;
+    if(m.x < m.size){ m.x = m.size; m.vx *= -1; }
+    if(m.x > WORLD.w - m.size){ m.x = WORLD.w - m.size; m.vx *= -1; }
+    if(m.y < m.size){ m.y = m.size; m.vy *= -1; }
+    if(m.y > WORLD.h - m.size){ m.y = WORLD.h - m.size; m.vy *= -1; }
+    if(m.life <= 0 || dist(m.x, m.y, p.x, p.y) > Math.max(W, H) * 3){ game.mines.splice(i, 1); continue; }
+    if(dist(m.x, m.y, p.x, p.y) < m.size + p.size * 0.8){
+      sfx.hurt();
+      spawnParticles(m.x, m.y, '#ff5252', 10);
+      game.mines.splice(i, 1);
+      if(!(p.shieldActive > 0 || p.invincible > 0)){
+        damagePlayer(1);
+        if(!p.alive) return;
+      }
+    }
+  }
+
+  /* 道具 */
+  for(let i = game.powerups.length - 1; i >= 0; i--){
+    const pu = game.powerups[i];
+    pu.x += pu.vx * dt;
+    pu.y += pu.vy * dt;
+    pu.phase += 0.08 * dt;
+    pu.life -= dt;
+    if(pu.life <= 0){ game.powerups.splice(i, 1); continue; }
+    if(dist(pu.x, pu.y, p.x, p.y) < p.size + 22){
+      applyPowerup(pu.type);
+      game.buffsCollected.add(pu.type);
+      if(pu.type === 'magnet') addQuestProgress('magnet2', 1);
+      game.powerups.splice(i, 1);
+    }
+  }
+
+  /* 红心 */
+  for(let i = game.hearts.length - 1; i >= 0; i--){
+    const h = game.hearts[i];
+    h.x += h.vx * dt;
+    h.y += h.vy * dt;
+    h.phase += 0.08 * dt;
+    h.life -= dt;
+    if(h.life <= 0){ game.hearts.splice(i, 1); continue; }
+    if(dist(h.x, h.y, p.x, p.y) < p.size + 24){
+      if(p.hp < p.maxHp){ p.hp++; showSkillStatus('❤️ +1', '#ff6b8a'); }
+      else { game.score += 100; showSkillStatus('❤️ +100', '#ff6b8a'); }
+      sfx.powerup();
+      spawnParticles(h.x, h.y, '#ff6b8a', 6);
+      game.hearts.splice(i, 1);
+      updateHUD();
+    }
+  }
+
+  /* 残骸 */
+  for(let i = game.remains.length - 1; i >= 0; i--){
+    const r = game.remains[i];
+    r.x += r.vx * dt;
+    r.y += r.vy * dt;
+    r.life -= dt;
+    r.vx *= 0.98;
+    r.vy *= 0.98;
+    if(r.life <= 0){ game.remains.splice(i, 1); continue; }
+    /* 残骸吸引附近小鱼（制造捕猎机会） */
+    if(r.size > 20){
+      for(const f of game.fishes){
+        if(f.size >= p.size * 0.9) continue;
+        const dx = r.x - f.x, dy = r.y - f.y;
+        const d = Math.sqrt(dx*dx+dy*dy);
+        if(d < 200 && d > 1){
+          f.vx += (dx/d) * 0.05;
+          f.vy += (dy/d) * 0.05;
+        }
+      }
+    }
+    /* 玩家吃残骸 */
+    if(dist(r.x, r.y, p.x, p.y) < p.size + r.size){
+      const gain = Math.floor(r.score * (p.doubleScoreActive > 0 ? 2 : 1));
+      game.score += gain;
+      p.targetSize += r.size * 0.15;
+      p.growGlow = 15;
+      sfx.eat();
+      spawnParticles(r.x, r.y, '#ffb74d', 6);
+      showFloatScore(r.x, r.y, '+' + gain);
+      game.remains.splice(i, 1);
+      updateHUD();
+    }
+  }
+
+  /* 危险区 */
+  for(let i = game.hazards.length - 1; i >= 0; i--){
+    const h = game.hazards[i];
+    h.life -= dt;
+    h.phase += 0.05 * dt;
+    if(h.life <= 0){ game.hazards.splice(i, 1); continue; }
+  }
+
+  /* 泡泡陷阱 */
+  for(let i = game.traps.length - 1; i >= 0; i--){
+    const t = game.traps[i];
+    t.life -= dt;
+    if(t.life <= 0){ game.traps.splice(i, 1); continue; }
+    for(const f of game.fishes){
+      if(dist(t.x, t.y, f.x, f.y) < t.size + f.size){
+        f.vx *= 0.9;
+        f.vy *= 0.9;
+      }
+    }
+  }
+
+  /* 金鱼 */
+  if(game.goldenFish){
+    const g = game.goldenFish;
+    g.x += g.vx * dt;
+    g.y += g.vy * dt;
+    g.phase += 0.2 * dt;
+    g.life -= dt;
+    if(g.x < g.size){ g.x = g.size; g.vx *= -1; }
+    if(g.x > WORLD.w - g.size){ g.x = WORLD.w - g.size; g.vx *= -1; }
+    if(g.y < g.size){ g.y = g.size; g.vy *= -1; }
+    if(g.y > WORLD.h - g.size){ g.y = WORLD.h - g.size; g.vy *= -1; }
+    g.angle = Math.atan2(g.vy, g.vx);
+    if(g.life <= 0){ game.goldenFish = null; }
+    else if(dist(g.x, g.y, p.x, p.y) < p.size + g.size){
+      game.score += 5000;
+      p.targetSize += 30;
+      p.growGlow = 60;
+      sfx.powerup();
+      for(let k=0; k<3; k++){
+        spawnParticles(g.x + rand(-30,30), g.y + rand(-30,30), '#ffd700', 4);
+      }
+      showAchievement('⭐ 稀有金鱼！+5000');
+      game.goldenFish = null;
+      updateHUD();
+    }
+  }
+
+  updateEcosystem();
+
+  /* 生成 */
+  game.spawnTimer -= dt;
+  if(game.spawnTimer <= 0){
+    const base = Math.max(15, 40 - game.level * 2);
+    const ecoFactor = game.smallFishCount < 6 ? 0.6 : 1;
+    game.spawnTimer = randInt(base * diff.spawnRate * ecoFactor, base + 20);
+    if(game.fishes.length < MAX_FISHES) game.fishes.push(createFish());
+  }
+  game.diverTimer -= dt;
+  if(game.diverTimer <= 0){
+    game.diverTimer = randInt(300, 550);
+    if(game.divers.length < MAX_DIVERS) game.divers.push(createDiver());
+  }
+  game.mineTimer -= dt;
+  if(game.mineTimer <= 0){
+    game.mineTimer = randInt(200, 400);
+    if(game.mines.length < MAX_MINES) game.mines.push(createMine());
+  }
+  game.heartTimer -= dt;
+  if(game.heartTimer <= 0){
+    game.heartTimer = randInt(500, 900);
+    if(game.hearts.length < MAX_HEARTS) game.hearts.push(createHeart());
+  }
+  game.powerupTimer -= dt;
+  if(game.powerupTimer <= 0){
+    game.powerupTimer = randInt(300, 550);
+    if(game.powerups.length < MAX_POWERUPS){
+      const ang = Math.random() * Math.PI * 2;
+      const d = rand(250, 500);
+      const x = clamp(p.x + Math.cos(ang)*d, 40, WORLD.w - 40);
+      const y = clamp(p.y + Math.sin(ang)*d, 40, WORLD.h - 40);
+      game.powerups.push(createPowerup(x, y));
+    }
+  }
+  game.bossTimer -= dt;
+  if(game.bossTimer <= 0){
+    game.bossTimer = Math.max(600, 1500 - game.level * 40) * diff.bossRate;
+    if(game.bosses.length < 1){
+      const b = createBoss();
+      if(b){
+        game.bosses.push(b);
+        sfx.boss();
+        showSkillStatus('⚠️ BOSS 出现！', '#ff5252');
+        if(navigator.vibrate) navigator.vibrate([100, 80, 100]);
+      }
+    }
+  }
+  game.hazardTimer -= dt;
+  if(game.hazardTimer <= 0){
+    game.hazardTimer = randInt(500, 900);
+    if(game.hazards.length < 4){
+      game.hazards.push(createHazard(Math.random() < 0.5 ? 'seaweed' : 'sand'));
+    }
+  }
+  game.goldenTimer -= dt;
+  if(game.goldenTimer <= 0){
+    game.goldenTimer = randInt(1500, 2500);
+    if(!game.goldenFish && Math.random() < 0.4){
+      game.goldenFish = createGoldenFish();
+      if(game.goldenFish) showSkillStatus('⭐ 金鱼出现！', '#ffd700');
+    }
+  }
+
+  /* 粒子 */
+  for(let i = game.particles.length - 1; i >= 0; i--){
+    const pt = game.particles[i];
+    pt.x += pt.vx * dt;
+    pt.y += pt.vy * dt;
+    pt.vx *= 0.94;
+    pt.vy *= 0.94;
+    pt.life -= pt.decay * dt;
+    if(pt.life <= 0) game.particles.splice(i, 1);
+  }
+
+  updateCamera();
+  updateSkillUI();
+}
+
+function damagePlayer(dmg){
+  const p = game.player;
+  if(p.invincible > 0) return;
+  p.hp -= dmg;
+  p.invincible = 90;
+  sfx.hurt();
+  game.screenShake = 12;
+  if(navigator.vibrate) navigator.vibrate([80, 50, 80]);
+  showSkillStatus('💔 -' + dmg, '#ff5252');
+  if(p.hp <= 0) showReviveModal();
+  updateHUD();
+}
+
+/* ============================================================
+   复活
+   ============================================================ */
+function showReviveModal(){
+  const p = game.player;
+  p.alive = false;
+  game.paused = true;
+  document.getElementById('reviveModal').classList.add('show');
+}
+function doRevive(){
+  document.getElementById('reviveModal').classList.remove('show');
+  const p = game.player;
+  p.alive = true;
+  p.hp = p.maxHp;
+  p.invincible = 180;
+  game.reviveUsed = true;
+  game.paused = false;
+  sfx.powerup();
+  showSkillStatus('💖 复活成功！', '#ffd54f');
+  updateHUD();
+}
+
+/* ============================================================
+   技能
+   ============================================================ */
+function useSkill(type){
+  const p = game.player;
+  if(!p || !p.alive || !game.running || game.paused) return;
+  game.usedSkill = true;
+
+  if(type === 'fire'){
+    if(p.fireCD > 0) return;
+    if(p.ammo <= 0){ showSkillStatus('弹药不足', '#ff5252'); return; }
+    p.ammo--;
+    p.fireCD = 20;
+    let target = null, minDist = 700;
+    for(const f of game.fishes){
+      if(f.size <= p.size * 0.9) continue;
+      const d = dist(p.x, p.y, f.x, f.y);
+      if(d < minDist){ minDist = d; target = f; }
+    }
+    if(!target){
+      for(const b of game.bosses){
+        const d = dist(p.x, p.y, b.x, b.y);
+        if(d < minDist){ minDist = d; target = b; }
+      }
+    }
+    const ang = target ? Math.atan2(target.y - p.y, target.x - p.x) : p.angle;
+    const speed = 12;
+    const bx = p.x + Math.cos(ang) * p.size * 1.2;
+    const by = p.y + Math.sin(ang) * p.size * 1.2;
+    game.bullets.push({
+      x: bx, y: by,
+      vx: Math.cos(ang)*speed, vy: Math.sin(ang)*speed,
+      size: 8, life: 200,
+    });
+    sfx.fire();
+    showSkillStatus('💥 发射！', '#ff8a65');
+    if(navigator.vibrate) navigator.vibrate(20);
+  }
+  else if(type === 'bubble'){
+    if(p.bubbleCD > 0) return;
+    p.bubbleCD = 480;
+    const bx = p.x + Math.cos(p.angle) * 80;
+    const by = p.y + Math.sin(p.angle) * 80;
+    game.traps.push({ x: bx, y: by, size: 70, maxLife: 240, life: 240 });
+    sfx.skill();
+    showSkillStatus('🫧 诱捕泡泡！', '#80deea');
+    if(navigator.vibrate) navigator.vibrate(20);
+  }
+  else if(type === 'dash'){
+    if(p.dashCD > 0) return;
+    p.dashActive = 30;
+    p.dashCD = 480;
+    p.invincible = Math.max(p.invincible, 30);
+    sfx.skill();
+    showSkillStatus('💨 冲刺！', '#ffb74d');
+    if(navigator.vibrate) navigator.vibrate([15,15,15]);
+  }
+  else if(type === 'shield'){
+    if(p.shieldCD > 0) return;
+    p.shieldActive = 240;
+    p.shieldCD = 600;
+    sfx.skill();
+    showSkillStatus('🛡 护盾！', '#4fc3f7');
+    if(navigator.vibrate) navigator.vibrate(20);
+  }
+  else if(type === 'suck'){
+    if(p.suckCD > 0) return;
+    p.suckActive = 120;
+    p.suckCD = 600;
+    sfx.skill();
+    showSkillStatus('🌀 吸力释放！', '#ce93d8');
+    if(navigator.vibrate) navigator.vibrate([20,20,20]);
+  }
+}
+
+function applyPowerup(type){
+  const p = game.player;
+  sfx.powerup();
+  if(type === 'speed'){ p.speedActive = 360; showSkillStatus('⚡ 加速！', '#ffb74d'); }
+  else if(type === 'shield'){ p.shieldActive = 300; showSkillStatus('🛡 护盾！', '#4fc3f7'); }
+  else if(type === 'magnet'){ p.magnetActive = 420; showSkillStatus('🧲 磁铁！', '#f06292'); }
+  else if(type === 'grow'){ p.growActive = 420; showSkillStatus('📈 变大！', '#81c784'); }
+  else if(type === 'invisible'){ p.invisibleActive = 360; showSkillStatus('👻 隐身！', '#ba68c8'); }
+  else if(type === 'double'){ p.doubleScoreActive = 480; showSkillStatus('✨ 双倍得分！', '#ffd54f'); }
+  else if(type === 'ammo'){ p.ammo = Math.min(p.maxAmmo, p.ammo + 5); showSkillStatus('💥 +5 炮弹', '#ff8a65'); }
+  p.emotion = 'excited'; p.emotionTimer = 30;
+}
+
+function showSkillStatus(text, color){
+  const el = document.getElementById('skillStatus');
+  el.textContent = text;
+  el.style.color = color;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 900);
+}
+
+function showAchievement(text){
+  const el = document.getElementById('achievementToast');
+  el.textContent = text;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+/* ============================================================
+   HUD
+   ============================================================ */
+let lastScore = -1, lastLevel = -1, lastHp = -1;
+function updateHUD(){
+  const p = game.player;
+  if(!p) return;
+  if(lastScore !== game.score){ document.getElementById('hudScore').textContent = game.score; lastScore = game.score; }
+  if(lastLevel !== game.level){
+    document.getElementById('hudLevel').textContent = game.level;
+    lastLevel = game.level;
+    document.getElementById('hudIcon').textContent = game.level >= 8 ? '🐋' : game.level >= 6 ? '🦈' : game.level >= 4 ? '🐡' : '🐟';
+  }
+  if(lastHp !== p.hp){
+    document.getElementById('hpHarts').textContent = '❤️'.repeat(Math.max(0, p.hp)) + '🖤'.repeat(Math.max(0, p.maxHp - p.hp));
+    lastHp = p.hp;
+  }
+  const pct = Math.min(100, (game.eatenCount / (game.level * 5)) * 100);
+  document.getElementById('hudBarFill').style.width = pct + '%';
+}
+
+const skillLast = {};
+function updateSkillUI(){
+  const p = game.player;
+  if(!p) return;
+  const items = [
+    { key:'dash', btnId:'skillDash', cdElId:'cdDash', cd: p.dashCD },
+    { key:'shield', btnId:'skillShield', cdElId:'cdShield', cd: p.shieldCD },
+    { key:'fire', btnId:'skillFire', cdElId:'cdFire', cd: p.fireCD },
+    { key:'bubble', btnId:'skillBubble', cdElId:'cdBubble', cd: p.bubbleCD },
+    { key:'suck', btnId:'skillSuck', cdElId:'cdSuck', cd: p.suckCD },
+  ];
+  for(const s of items){
+    const display = Math.ceil(s.cd / 60);
+    if(skillLast[s.key] !== display){
+      skillLast[s.key] = display;
+      const btn = document.getElementById(s.btnId);
+      const cdEl = document.getElementById(s.cdElId);
+      if(s.cd > 0){ btn.classList.add('cooling'); cdEl.textContent = display; }
+      else { btn.classList.remove('cooling'); cdEl.textContent = '0'; }
+    }
+  }
+  document.getElementById('ammoBadge').textContent = p.ammo;
+}
+
+function showFloatScore(worldX, worldY, text){
+  const el = document.createElement('div');
+  el.textContent = text;
+  el.style.cssText = `position:absolute;left:${worldX - game.cam.x}px;top:${worldY - game.cam.y}px;transform:translate(-50%,-50%);color:#7effb0;font-weight:900;font-size:16px;z-index:40;pointer-events:none;text-shadow:0 0 10px rgba(126,255,176,.8);transition:all 1s;opacity:1;`;
+  document.getElementById('gameWrap').appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translate(-50%,-150%)'; }, 50);
+  setTimeout(() => el.remove(), 1000);
+}
+
+function levelUp(){
+  game.level++;
+  game.eatenCount = 0;
+  sfx.levelup();
+  showAchievement('⭐ 升级！Lv.' + game.level);
+  const p = game.player;
+  if(p){
+    p.ammo = Math.min(p.maxAmmo, p.ammo + 3);
+    p.growGlow = 40;
+    p.targetSize *= 1.05;
+  }
+  updateHUD();
+}
+
+/* ============================================================
+   渲染
+   ============================================================ */
+function render(){
+  ctx.clearRect(0, 0, W, H);
+  const camX = game.cam.x;
+  const camY = game.cam.y;
+
+  ctx.save();
+  ctx.translate(-camX, -camY);
+
+  /* 世界边界 */
+  ctx.strokeStyle = 'rgba(80, 180, 240, 0.35)';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(2, 2, WORLD.w - 4, WORLD.h - 4);
+
+  /* 危险区 */
+  for(const h of game.hazards){
+    if(h.x < camX - 200 || h.x > camX + W + 200 || h.y < camY - 200 || h.y > camY + H + 200) continue;
+    drawHazard(h);
+  }
+
+  /* 水雷 */
+  for(const m of game.mines){
+    if(m.x < camX - 80 || m.x > camX + W + 80 || m.y < camY - 80 || m.y > camY + H + 80) continue;
+    drawMine(m);
+  }
+
+  /* 残骸 */
+  for(const r of game.remains){
+    if(r.x < camX - 100 || r.x > camX + W + 100 || r.y < camY - 100 || r.y > camY + H + 100) continue;
+    drawRemain(r);
+  }
+
+  /* 道具 */
+  for(const pu of game.powerups){
+    if(pu.x < camX - 60 || pu.x > camX + W + 60 || pu.y < camY - 60 || pu.y > camY + H + 60) continue;
+    drawPowerup(pu);
+  }
+
+  /* 红心 */
+  for(const h of game.hearts){
+    if(h.x < camX - 60 || h.x > camX + W + 60 || h.y < camY - 60 || h.y > camY + H + 60) continue;
+    drawHeart(h);
+  }
+
+  /* 泡泡陷阱 */
+  for(const t of game.traps){
+    ctx.save(); ctx.translate(t.x, t.y);
+    ctx.beginPath(); ctx.arc(0, 0, t.size, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(140, 220, 255, 0.4)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(180, 240, 255, 0.9)'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.restore();
+  }
+
+  /* 金鱼 */
+  if(game.goldenFish){
+    const g = game.goldenFish;
+    if(!(g.x < camX - 100 || g.x > camX + W + 100 || g.y < camY - 100 || g.y > camY + H + 100)){
+      drawGoldenFish(g);
+    }
+  }
+
+  /* 鱼 */
+  const p = game.player;
+  for(const f of game.fishes){
+    if(f.x < camX - 100 || f.x > camX + W + 100 || f.y < camY - 100 || f.y > camY + H + 100) continue;
+    /* 危险红晕 */
+    if(p && f.size > p.size * 1.05 && p.invisibleActive <= 0){
+      ctx.beginPath(); ctx.arc(f.x, f.y, f.size * 1.4, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(255, 60, 60, 0.2)'; ctx.fill();
+    }
+    drawFish(f, false);
+  }
+
+  /* 潜水员 */
+  for(const d of game.divers){
+    if(d.x < camX - 100 || d.x > camX + W + 100 || d.y < camY - 100 || d.y > camY + H + 100) continue;
+    drawDiver(d);
+  }
+
+  /* BOSS */
+  for(const b of game.bosses){
+    if(b.x < camX - 200 || b.x > camX + W + 200 || b.y < camY - 200 || b.y > camY + H + 200) continue;
+    drawBoss(b);
+  }
+
+  /* 炮弹 */
+  for(const b of game.bullets){
+    if(b.x < camX - 50 || b.x > camX + W + 50 || b.y < camY - 50 || b.y > camY + H + 50) continue;
+    ctx.beginPath(); ctx.arc(b.x, b.y, b.size, 0, Math.PI*2);
+    ctx.fillStyle = '#fff8e1'; ctx.fill();
+  }
+
+  /* 玩家 */
+  if(p && p.alive){
+    if(p.invisibleActive > 0) ctx.globalAlpha = 0.4;
+    else if(p.invincible > 0 && Math.floor(p.invincible/4) % 2 === 0) ctx.globalAlpha = 0.5;
+
+    const glowColor = p.shieldActive > 0 ? 'rgba(79,195,247,0.4)' :
+                       p.speedActive > 0 ? 'rgba(255,183,77,0.35)' :
+                       p.magnetActive > 0 ? 'rgba(240,98,146,0.35)' :
+                       'rgba(255,220,100,0.3)';
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size*1.4, 0, Math.PI*2);
+    ctx.fillStyle = glowColor;
+    ctx.fill();
+
+    if(p.shieldActive > 0){
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.size*1.9, 0, Math.PI*2);
+      ctx.strokeStyle = 'rgba(79,195,247,0.8)'; ctx.lineWidth = 3; ctx.stroke();
+    }
+    if(p.suckActive > 0){
+      ctx.beginPath(); ctx.arc(p.x, p.y, 320, 0, Math.PI*2);
+      ctx.strokeStyle = 'rgba(206,147,216,0.5)'; ctx.lineWidth = 3;
+      ctx.setLineDash([12,8]); ctx.stroke(); ctx.setLineDash([]);
+    }
+
+    drawFish(p, true);
+    ctx.globalAlpha = 1;
+  }
+
+  /* 粒子 */
+  for(const pt of game.particles){
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, pt.size * pt.life, 0, Math.PI*2);
+    ctx.fillStyle = pt.color;
+    ctx.globalAlpha = pt.life;
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  ctx.restore();
+}
+
+/* ============================================================
+   开始/结束
+   ============================================================ */
+function startGame(){
+  resize();
+  game.running = true;
+  game.paused = false;
+  game.score = 0;
+  game.level = 1;
+  game.eatenCount = 0;
+  game.kills = 0;
+  game.bossKills = 0;
+  game.reviveUsed = false;
+  game.usedSkill = false;
+  game.screenShake = 0;
+  game.deathInfo = null;
+  game.fishes = [];
+  game.divers = [];
+  game.mines = [];
+  game.bosses = [];
+  game.bubbles = [];
+  game.particles = [];
+  game.bullets = [];
+  game.traps = [];
+  game.powerups = [];
+  game.hearts = [];
+  game.remains = [];
+  game.hazards = [];
+  game.goldenFish = null;
+  game.spawnTimer = 20;
+  game.powerupTimer = 300;
+  game.diverTimer = 180;
+  game.mineTimer = 120;
+  game.heartTimer = 400;
+  game.bossTimer = 900;
+  game.hazardTimer = 400;
+  game.goldenTimer = 1500;
+  game.buffsCollected = new Set();
+
+  game.player = createPlayer();
+  game.cam.x = clamp(game.player.x - W/2, 0, WORLD.w - W);
+  game.cam.y = clamp(game.player.y - H/2, 0, WORLD.h - H);
+
+  for(let i=0; i<12; i++){
+    const f = createFish();
+    while(f.size > game.player.size * 0.9){ Object.assign(f, createFish()); }
+    game.fishes.push(f);
+  }
+  for(let i=0; i<2; i++) game.divers.push(createDiver());
+  for(let i=0; i<3; i++) game.mines.push(createMine());
+  for(let i=0; i<2; i++) game.hearts.push(createHeart());
+
+  lastScore = -1; lastLevel = -1; lastHp = -1;
+  Object.keys(skillLast).forEach(k => delete skillLast[k]);
+
+  initQuests();
+  updateHUD();
+  document.getElementById('startOverlay').classList.add('hide');
+  document.getElementById('overOverlay').classList.add('hide');
+  document.getElementById('pauseOverlay').classList.add('hide');
+  document.getElementById('reviveModal').classList.remove('show');
+  document.getElementById('bottomTip').textContent = '拖动控制移动 · 右下角技能';
+  startBGM();
+}
+
+function gameOver(){
+  const p = game.player;
+  p.alive = false;
+  game.running = false;
+  sfx.die();
+  if(navigator.vibrate) navigator.vibrate([80, 60, 120]);
+
+  /* 检查成就 */
+  const newUnlocks = [];
+  if(!game.usedSkill){
+    const ach = ACHIEVEMENTS.find(a => a.id === 'noskill');
+    if(ach && !ach.unlocked){ ach.unlocked = true; newUnlocks.push('无技之勇'); }
+  }
+  if(game.buffsCollected.size >= POWERUP_TYPES.length){
+    const ach = ACHIEVEMENTS.find(a => a.id === 'allbuff');
+    if(ach && !ach.unlocked){ ach.unlocked = true; newUnlocks.push('全能进食者'); }
+  }
+  if(newUnlocks.length){ saveAchievements(); renderSkinPicker(); }
+
+  const isNew = game.score > game.best;
+  if(isNew){
+    game.best = game.score;
+    localStorage.setItem('deepsea_best', String(game.best));
+    renderSkinPicker();
+  }
+
+  /* 死亡回放 */
+  const info = game.deathInfo;
+  const replay = document.getElementById('replayPanel');
+  const infoEl = document.getElementById('replayInfo');
+  if(info) infoEl.textContent = `被 ${info.killer} 偷袭（体型 ${Math.round(info.size)}）`;
+  else infoEl.textContent = '被神秘海洋生物偷袭';
+  replay.classList.add('show');
+  setTimeout(() => replay.classList.remove('show'), 3000);
+
+  setTimeout(() => {
+    document.getElementById('overScore').textContent = game.score;
+    document.getElementById('overBest').textContent = game.best;
+    document.getElementById('overLevel').textContent = game.level;
+    document.getElementById('overKills').textContent = game.kills;
+    /* 解锁皮肤展示 */
+    const unlockShow = document.getElementById('unlockShow');
+    const unlockList = document.getElementById('unlockList');
+    if(newUnlocks.length){
+      unlockShow.style.display = 'block';
+      unlockList.innerHTML = newUnlocks.map(name => {
+        const ach = ACHIEVEMENTS.find(a => a.name === name);
+        const skin = SKINS.find(s => s.achieveId === (ach ? ach.id : ''));
+        return `<div class="unlock-skin" style="background:linear-gradient(135deg,${skin?.color||'#ffd700'},${skin?.colorDark||'#b8860b'})">${skin?.emoji||'🏆'}</div>`;
+      }).join('');
+    } else unlockShow.style.display = 'none';
+    document.getElementById('overOverlay').classList.remove('hide');
+  }, 600);
+}
+
+/* ============================================================
+   输入
+   ============================================================ */
+let pointerDown = false;
+function getPointerPos(e){
+  const rect = canvas.getBoundingClientRect();
+  let cx, cy;
+  if(e.touches && e.touches.length){ cx = e.touches[0].clientX; cy = e.touches[0].clientY; }
+  else if(e.changedTouches && e.changedTouches.length){ cx = e.changedTouches[0].clientX; cy = e.changedTouches[0].clientY; }
+  else { cx = e.clientX; cy = e.clientY; }
+  return { x: cx - rect.left, y: cy - rect.top };
+}
+function onStart(e){
+  if(!game.running || game.paused) return;
+  e.preventDefault();
+  pointerDown = true;
+  const pos = getPointerPos(e);
+  game.player.targetX = pos.x + game.cam.x;
+  game.player.targetY = pos.y + game.cam.y;
+  game.player.moving = true;
+}
+function onMove(e){
+  if(!pointerDown || !game.running || game.paused) return;
+  e.preventDefault();
+  const pos = getPointerPos(e);
+  game.player.targetX = pos.x + game.cam.x;
+  game.player.targetY = pos.y + game.cam.y;
+  game.player.moving = true;
+}
+function onEnd(){
+  pointerDown = false;
+  if(game.player) game.player.moving = false;
+}
+canvas.addEventListener('touchstart', onStart, { passive: false });
+canvas.addEventListener('touchmove', onMove, { passive: false });
+canvas.addEventListener('touchend', onEnd, { passive: false });
+canvas.addEventListener('touchcancel', onEnd, { passive: false });
+canvas.addEventListener('mousedown', onStart);
+canvas.addEventListener('mousemove', onMove);
+canvas.addEventListener('mouseup', onEnd);
+canvas.addEventListener('mouseleave', onEnd);
+
+/* ============================================================
+   按钮
+   ============================================================ */
+document.getElementById('btnStart').addEventListener('click', () => { ac(); sfx.click(); startGame(); });
+document.getElementById('btnRestart').addEventListener('click', () => { sfx.click(); startGame(); });
+document.getElementById('btnHome').addEventListener('click', () => {
+  sfx.click();
+  document.getElementById('overOverlay').classList.add('hide');
+  document.getElementById('startOverlay').classList.remove('hide');
+  stopBGM();
+  renderSkinPicker();
+});
+document.getElementById('btnPause').addEventListener('click', () => {
+  if(!game.running) return;
+  sfx.click();
+  game.paused = true;
+  document.getElementById('pauseOverlay').classList.remove('hide');
+});
+document.getElementById('btnResume').addEventListener('click', () => {
+  sfx.click();
+  game.paused = false;
+  document.getElementById('pauseOverlay').classList.add('hide');
+});
+document.getElementById('btnBackHome').addEventListener('click', () => {
+  sfx.click();
+  game.running = false;
+  game.paused = false;
+  document.getElementById('pauseOverlay').classList.add('hide');
+  document.getElementById('startOverlay').classList.remove('hide');
+  stopBGM();
+  renderSkinPicker();
+});
+
+document.getElementById('skillFire').addEventListener('click', e => { e.stopPropagation(); useSkill('fire'); });
+document.getElementById('skillSuck').addEventListener('click', e => { e.stopPropagation(); useSkill('suck'); });
+document.getElementById('skillBubble').addEventListener('click', e => { e.stopPropagation(); useSkill('bubble'); });
+document.getElementById('skillDash').addEventListener('click', e => { e.stopPropagation(); useSkill('dash'); });
+document.getElementById('skillShield').addEventListener('click', e => { e.stopPropagation(); useSkill('shield'); });
+
+document.getElementById('reviveAd').addEventListener('click', () => { sfx.click(); doRevive(); });
+document.getElementById('reviveScore').addEventListener('click', () => {
+  sfx.click();
+  if(game.score < 500) return;
+  game.score -= 500;
+  doRevive();
+});
+document.getElementById('reviveGiveUp').addEventListener('click', () => {
+  sfx.click();
+  document.getElementById('reviveModal').classList.remove('show');
+  game.paused = false;
+  gameOver();
+});
+
+/* 音量滑块 */
+function initVolumeSliders(){
+  const bgmSlider = document.getElementById('bgmVolume');
+  const sfxSlider = document.getElementById('sfxVolume');
+  bgmSlider.value = bgmVolume * 100;
+  sfxSlider.value = sfxVolume * 100;
+  document.getElementById('bgmVolumeVal').textContent = Math.round(bgmVolume * 100);
+  document.getElementById('sfxVolumeVal').textContent = Math.round(sfxVolume * 100);
+  bgmSlider.addEventListener('input', e => {
+    setBgmVolume(e.target.value);
+    document.getElementById('bgmVolumeVal').textContent = e.target.value;
+  });
+  sfxSlider.addEventListener('input', e => {
+    setSfxVolume(e.target.value);
+    document.getElementById('sfxVolumeVal').textContent = e.target.value;
+  });
+}
+initVolumeSliders();
+
+/* 键盘 */
+document.addEventListener('keydown', e => {
+  if(!game.running) return;
+  if(e.key === ' '){ e.preventDefault(); document.getElementById('btnPause').click(); }
+  if(e.key.toLowerCase() === 'j') useSkill('fire');
+  if(e.key.toLowerCase() === 'k') useSkill('suck');
+  if(e.key.toLowerCase() === 'l') useSkill('dash');
+  if(e.key.toLowerCase() === ';') useSkill('shield');
+  if(e.key.toLowerCase() === 'u') useSkill('bubble');
+});
+
+/* ============================================================
+   主循环
+   ============================================================ */
+let lastTime = performance.now();
+function loop(now){
+  try {
+    const dt = Math.min(50, now - lastTime) / 16.67;
+    lastTime = now;
+    if(game.running && !game.paused) update(dt);
+    if(game.player) render();
+  } catch(err){
+    console.error('loop error:', err);
+  }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* 初始化 */
+resize();
+renderSkinPicker();
+initQuests();
+
+function unlockAudio(){
+  ac();
+  document.removeEventListener('touchstart', unlockAudio);
+  document.removeEventListener('click', unlockAudio);
+}
+document.addEventListener('touchstart', unlockAudio, { passive: true });
+document.addEventListener('click', unlockAudio);
+</script>
+</body>
+</html>

@@ -28,6 +28,110 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,Blink
 .bottom-tip{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);left:0;right:0;z-index:10;text-align:center;pointer-events:none;}
 .bottom-tip span{display:inline-block;background:rgba(0,30,60,.55);border:1px solid rgba(120,220,255,.2);border-radius:20px;padding:5px 14px;font-size:11px;color:#7ed6ff;font-weight:500;}
 
+/* ============================================================
+   虚拟摇杆（转圈摇杆）
+   ============================================================ */
+.joystick{
+  position:absolute;
+  left:20px;
+  bottom:calc(env(safe-area-inset-bottom,0px) + 20px);
+  z-index:30;
+  width:130px;
+  height:130px;
+  border-radius:50%;
+  background:radial-gradient(circle at 50% 50%, rgba(0,229,255,.15) 0%, rgba(0,80,140,.25) 60%, rgba(0,30,60,.4) 100%);
+  border:2px solid rgba(120,220,255,.5);
+  box-shadow:0 0 24px rgba(0,180,255,.3), inset 0 0 20px rgba(0,180,255,.15);
+  pointer-events:auto;
+  touch-action:none;
+  transition:opacity .3s;
+}
+.joystick::before{
+  content:'';
+  position:absolute;
+  inset:8px;
+  border-radius:50%;
+  border:1px dashed rgba(120,220,255,.25);
+  pointer-events:none;
+}
+/* 方向指示点 */
+.joystick .dir-dot{
+  position:absolute;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:rgba(120,220,255,.4);
+  top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+}
+.joystick .dir-dot.n{ top:14px; }
+.joystick .dir-dot.s{ top:calc(100% - 14px); }
+.joystick .dir-dot.w{ left:14px; }
+.joystick .dir-dot.e{ left:calc(100% - 14px); }
+
+/* 摇杆中心旋钮 */
+.joystick-knob{
+  position:absolute;
+  top:50%; left:50%;
+  width:56px;
+  height:56px;
+  margin:-28px 0 0 -28px;
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, rgba(0,229,255,.9), rgba(0,120,200,.95) 60%, rgba(0,60,120,.95) 100%);
+  border:2px solid rgba(180,240,255,.9);
+  box-shadow:
+    0 0 20px rgba(0,229,255,.7),
+    0 4px 12px rgba(0,0,0,.5),
+    inset 0 2px 6px rgba(255,255,255,.4);
+  pointer-events:none;
+  transition:box-shadow .2s ease;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.joystick-knob::before{
+  content:'';
+  width:20px;
+  height:20px;
+  border-radius:50%;
+  background:radial-gradient(circle at 40% 30%, #fff, rgba(180,240,255,.8));
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.3);
+}
+.joystick.active .joystick-knob{
+  box-shadow:
+    0 0 32px rgba(0,229,255,1),
+    0 6px 16px rgba(0,0,0,.6),
+    inset 0 2px 6px rgba(255,255,255,.5);
+}
+.joystick.active{
+  border-color:rgba(180,240,255,.9);
+  box-shadow:0 0 36px rgba(0,229,255,.6), inset 0 0 24px rgba(0,229,255,.25);
+}
+/* 摇杆底部光圈（增强视觉） */
+.joystick-ring{
+  position:absolute;
+  inset:-4px;
+  border-radius:50%;
+  border:1px solid rgba(0,229,255,.2);
+  pointer-events:none;
+  animation:joystickPulse 2s ease-in-out infinite;
+}
+@keyframes joystickPulse{
+  0%,100%{ transform:scale(1); opacity:.4; }
+  50%{ transform:scale(1.08); opacity:.8; }
+}
+
+/* 手机隐藏拖动提示 */
+@media (max-width:900px){
+  .bottom-tip span{ font-size:10.5px; }
+}
+
+/* 桌面端弱化摇杆（不显示） */
+@media (min-width:1024px){
+  .joystick{ opacity:.55; }
+}
+
 /* 技能栏 */
 .skill-bar{position:absolute;right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 55px);z-index:20;display:flex;flex-direction:column;gap:8px;}
 .skill-btn{width:52px;height:52px;border-radius:50%;background:radial-gradient(circle at 30% 30%, rgba(0,229,255,.4), rgba(0,80,140,.85));border:2px solid rgba(120,220,255,.6);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;cursor:pointer;position:relative;overflow:hidden;}
@@ -74,7 +178,6 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,Blink
 .skin-item.selected{border-color:#00e5ff;background:rgba(0,100,160,.6);}
 .skin-item .si-name{font-size:8px;color:#7ed6ff;margin-top:2px;font-weight:600;}
 
-/* 结束 */
 .over-icon{font-size:60px;margin-bottom:8px;}
 .over-title{font-size:28px;font-weight:900;background:linear-gradient(180deg,#ff8a8a,#ff3b3b);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:4px;margin-bottom:14px;}
 .over-stats{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;justify-content:center;}
@@ -83,13 +186,11 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,Blink
 .over-stat .os-label{font-size:9px;color:#7fa8c8;letter-spacing:1px;}
 .over-stat.best .os-val{color:#ffd700;}
 
-/* 解锁皮肤展示 */
 .unlock-show{background:rgba(0,30,60,.6);border:1px solid rgba(255,215,0,.4);border-radius:12px;padding:10px 14px;margin-bottom:10px;text-align:center;}
 .unlock-show h4{font-size:11px;color:#ffd700;font-weight:800;letter-spacing:2px;margin-bottom:6px;}
 .unlock-list{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
 .unlock-skin{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;border:2px solid #ffd700;}
 
-/* 暂停 */
 .pause-card{background:linear-gradient(180deg,#1a3a5c,#0a1f33);border:2px solid #00e5ff;border-radius:20px;padding:22px 20px;max-width:340px;width:100%;}
 .pause-title{font-size:22px;color:#fff;font-weight:900;text-align:center;margin-bottom:16px;letter-spacing:4px;}
 .settings-block{background:rgba(0,20,40,.5);border:1px solid rgba(120,220,255,.2);border-radius:12px;padding:12px 14px;margin-bottom:12px;}
@@ -102,7 +203,6 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,Blink
 .volume-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:#00e5ff;cursor:pointer;}
 .volume-slider::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#00e5ff;cursor:pointer;border:none;}
 
-/* 复活 */
 .revive-modal{position:absolute;inset:0;z-index:110;display:none;align-items:center;justify-content:center;background:rgba(0,10,25,.85);padding:20px;}
 .revive-modal.show{display:flex;}
 .revive-card{background:linear-gradient(180deg,#1a3a5c,#0a1f33);border:2px solid #00e5ff;border-radius:20px;padding:22px 20px;max-width:340px;width:100%;text-align:center;}
@@ -114,7 +214,6 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,Blink
 .revive-btn.score{background:linear-gradient(180deg,#00e5ff,#0088cc);}
 .revive-btn.giveup{background:linear-gradient(180deg,#666,#333);font-size:12px;height:36px;}
 
-/* 任务面板 */
 .quest-panel{position:absolute;top:calc(env(safe-area-inset-top,0px) + 56px);right:10px;z-index:15;background:rgba(0,30,60,.75);border:1px solid rgba(120,220,255,.3);border-radius:12px;padding:8px 10px;min-width:140px;max-width:170px;pointer-events:auto;}
 .quest-panel.collapsed .quest-list{display:none;}
 .quest-header{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#ffd700;font-weight:800;letter-spacing:1px;cursor:pointer;}
@@ -127,11 +226,9 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,Blink
 .quest-item.done{color:#7effb0;}
 .quest-item.done .qi-progress-fill{background:linear-gradient(90deg,#4ade80,#22c55e);}
 
-/* 成就通知 */
 .achievement-toast{position:absolute;top:20%;left:50%;transform:translate(-50%,-50%) scale(.5);z-index:60;pointer-events:none;opacity:0;background:linear-gradient(135deg,rgba(255,215,0,.95),rgba(255,138,0,.95));border-radius:14px;padding:10px 20px;color:#5a3200;font-size:13px;font-weight:900;transition:all .3s;}
 .achievement-toast.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
 
-/* 死亡回放提示 */
 .replay-panel{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:120;background:rgba(0,10,25,.9);border:2px solid #ff5252;border-radius:14px;padding:12px 18px;color:#fff;font-size:12px;font-weight:700;text-align:center;display:none;}
 .replay-panel.show{display:block;}
 .replay-panel .rp-title{color:#ff5252;font-size:11px;font-weight:900;letter-spacing:3px;margin-bottom:4px;}
@@ -142,6 +239,8 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,Blink
   .skill-btn{width:46px;height:46px;}
   .skill-btn.fire{width:52px;height:52px;}
   .quest-panel{min-width:120px;max-width:150px;}
+  .joystick{ width:110px; height:110px; left:14px; bottom:calc(env(safe-area-inset-bottom,0px) + 14px); }
+  .joystick-knob{ width:48px; height:48px; margin:-24px 0 0 -24px; }
 }
 </style>
 </head>
@@ -149,6 +248,16 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,Blink
 
 <div id="gameWrap">
   <canvas id="gameCanvas"></canvas>
+
+  <!-- 虚拟摇杆 -->
+  <div class="joystick" id="joystick">
+    <div class="joystick-ring"></div>
+    <div class="dir-dot n"></div>
+    <div class="dir-dot s"></div>
+    <div class="dir-dot w"></div>
+    <div class="dir-dot e"></div>
+    <div class="joystick-knob" id="joystickKnob"></div>
+  </div>
 
   <div class="hud">
     <div class="hud-box">
@@ -213,10 +322,9 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,Blink
   <div class="achievement-toast" id="achievementToast"></div>
 
   <div class="bottom-tip">
-    <span id="bottomTip">拖动控制移动 · 右下角技能</span>
+    <span id="bottomTip">左侧摇杆移动 · 右下角技能</span>
   </div>
 
-  <!-- 开始界面 -->
   <div class="overlay" id="startOverlay">
     <div class="game-logo">深海进化</div>
     <div class="game-sub">DEEP SEA EVOLUTION</div>
@@ -238,7 +346,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,Blink
 
     <div class="rules">
       <h3>玩 法 说 明</h3>
-      <div>👆 拖动屏幕控制小鱼</div>
+      <div>🕹️ 左侧虚拟摇杆控制小鱼</div>
       <div>🐟 吃小鱼成长，躲大鱼</div>
       <div>🦈 大鱼越大追得越快</div>
       <div>🦴 吃残骸快速涨体型</div>
@@ -247,7 +355,6 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,Blink
     </div>
   </div>
 
-  <!-- 暂停 -->
   <div class="overlay hide" id="pauseOverlay">
     <div class="pause-card">
       <div class="pause-title">⏸ 游 戏 暂 停</div>
@@ -269,7 +376,6 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,Blink
     </div>
   </div>
 
-  <!-- 结束 -->
   <div class="overlay hide" id="overOverlay">
     <div class="over-icon">💀</div>
     <div class="over-title">游 戏 结 束</div>
@@ -291,17 +397,14 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,Blink
         <div class="os-label">击杀数</div>
       </div>
     </div>
-
     <div class="unlock-show" id="unlockShow" style="display:none;">
       <h4>🎉 解锁新皮肤</h4>
       <div class="unlock-list" id="unlockList"></div>
     </div>
-
     <button class="btn-start" id="btnRestart">再 来 一 局</button>
     <button class="btn-start" id="btnHome" style="padding:10px 40px;font-size:14px;background:linear-gradient(180deg,#666,#333);">返 回 主 页</button>
   </div>
 
-  <!-- 复活 -->
   <div class="revive-modal" id="reviveModal">
     <div class="revive-card">
       <div class="revive-icon">💖</div>
@@ -321,12 +424,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,Blink
 
 <script>
 /* ============================================================
-   深海进化 v3
-   - 精简特效，玩法优先
-   - 所有功能：菜单/音效/任务/体型压制/残骸/生态/陷阱/成就
-   - 技能：发射/吸力/诱捕/冲刺/护盾
-   - 难度/AI/死亡回放/情绪动画/音量独立
-   - 金鱼彩蛋
+   深海进化 v4 - 增加虚拟摇杆
    ============================================================ */
 
 const canvas = document.getElementById('gameCanvas');
@@ -336,7 +434,6 @@ let W = 0, H = 0;
 let DPR = 1;
 const WORLD = { w: 2800, h: 2200 };
 
-/* 性能上限 */
 const MAX_PARTICLES = 150;
 const MAX_FISHES = 45;
 const MAX_DIVERS = 5;
@@ -344,7 +441,6 @@ const MAX_MINES = 12;
 const MAX_POWERUPS = 4;
 const MAX_HEARTS = 3;
 const MAX_REMAINS = 8;
-const MAX_BUBBLES = 40;
 
 /* ============================================================
    皮肤与成就
@@ -404,9 +500,7 @@ document.getElementById('skinGrid').addEventListener('click', e => {
   renderSkinPicker();
 });
 
-/* ============================================================
-   难度
-   ============================================================ */
+/* 难度 */
 const DIFFICULTY = {
   easy:   { aiChase:0.5, spawnRate:1.3, bossRate:1.5, label:'简单' },
   normal: { aiChase:1.0, spawnRate:1.0, bossRate:1.0, label:'普通' },
@@ -423,51 +517,23 @@ document.querySelectorAll('[data-diff]').forEach(el => {
   });
 });
 
-/* ============================================================
-   游戏状态
-   ============================================================ */
+/* 游戏状态 */
 const game = {
-  running: false,
-  paused: false,
-  score: 0,
-  level: 1,
-  eatenCount: 0,
-  kills: 0,
-  bossKills: 0,
+  running: false, paused: false,
+  score: 0, level: 1, eatenCount: 0, kills: 0, bossKills: 0,
   best: parseInt(localStorage.getItem('deepsea_best') || '0', 10) || 0,
   player: null,
-  fishes: [],
-  divers: [],
-  mines: [],
-  bosses: [],
-  bubbles: [],
-  particles: [],
-  bullets: [],
-  traps: [],
-  powerups: [],
-  hearts: [],
-  remains: [],
-  hazards: [],
+  fishes: [], divers: [], mines: [], bosses: [], particles: [], bullets: [],
+  traps: [], powerups: [], hearts: [], remains: [], hazards: [],
   goldenFish: null,
-  spawnTimer: 0,
-  powerupTimer: 300,
-  diverTimer: 180,
-  mineTimer: 120,
-  heartTimer: 400,
-  bossTimer: 900,
-  hazardTimer: 400,
-  goldenTimer: 1500,
+  spawnTimer: 0, powerupTimer: 300, diverTimer: 180, mineTimer: 120,
+  heartTimer: 400, bossTimer: 900, hazardTimer: 400, goldenTimer: 1500,
   cam: { x:0, y:0 },
-  screenShake: 0,
-  reviveUsed: false,
-  deathInfo: null,
-  usedSkill: false,
+  screenShake: 0, reviveUsed: false, deathInfo: null, usedSkill: false,
   buffsCollected: new Set(),
-  smallFishCount: 0,
-  bigFishCount: 0,
+  smallFishCount: 0, bigFishCount: 0,
 };
 
-/* 玩家 */
 const player = {
   x:0, y:0, vx:0, vy:0,
   size:18, targetSize:18,
@@ -482,15 +548,10 @@ const player = {
   shieldCD:0, shieldActive:0,
   magnetCD:0, magnetActive:0,
   fireCD:0, ammo:10, maxAmmo:10,
-  bubbleCD:0,
-  dashCD:0, dashActive:0,
+  bubbleCD:0, dashCD:0, dashActive:0,
   suckCD:0, suckActive:0,
-  growActive:0,
-  invisibleActive:0,
-  doubleScoreActive:0,
+  growActive:0, invisibleActive:0, doubleScoreActive:0,
   growGlow:0,
-  emotion:'calm',
-  emotionTimer:0,
 };
 
 /* 鱼类配置 */
@@ -532,9 +593,7 @@ function pickByWeight(arr){
 }
 function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
 
-/* ============================================================
-   音效系统（Web Audio API 合成，无外部资源）
-   ============================================================ */
+/* 音效 */
 let audioCtx = null;
 let bgmNode = null, bgmGain = null, bgmPlaying = false;
 let bgmVolume = parseInt(localStorage.getItem('deepsea_bgm_vol') || '50', 10) / 100;
@@ -613,9 +672,7 @@ const sfx = {
   boss(){ beep(100, 0.5, 'sawtooth', 0.15); beep(80, 0.6, 'sawtooth', 0.12); },
 };
 
-/* ============================================================
-   尺寸
-   ============================================================ */
+/* 尺寸 */
 function resize(){
   DPR = Math.min(window.devicePixelRatio || 1, 2);
   W = window.innerWidth;
@@ -633,18 +690,97 @@ window.addEventListener('orientationchange', () => setTimeout(resize, 200));
 resize();
 
 /* ============================================================
+   虚拟摇杆（转圈摇杆）
+   ============================================================ */
+const joystick = {
+  el: document.getElementById('joystick'),
+  knob: document.getElementById('joystickKnob'),
+  active: false,
+  centerX: 0,
+  centerY: 0,
+  radius: 0,      // 摇杆半径
+  knobRadius: 28, // 旋钮半径
+  dx: 0, dy: 0,   // 归一化方向 (-1~1)
+  pointerId: null,
+  init(){
+    this.updateCenter();
+    window.addEventListener('resize', () => this.updateCenter());
+    this.el.addEventListener('touchstart', e => this.onStart(e), { passive: false });
+    this.el.addEventListener('touchmove', e => this.onMove(e), { passive: false });
+    this.el.addEventListener('touchend', e => this.onEnd(e), { passive: false });
+    this.el.addEventListener('touchcancel', e => this.onEnd(e), { passive: false });
+    this.el.addEventListener('mousedown', e => this.onStart(e));
+    window.addEventListener('mousemove', e => this.onMove(e));
+    window.addEventListener('mouseup', e => this.onEnd(e));
+  },
+  updateCenter(){
+    const rect = this.el.getBoundingClientRect();
+    this.centerX = rect.left + rect.width / 2;
+    this.centerY = rect.top + rect.height / 2;
+    this.radius = rect.width / 2 - 8;
+  },
+  onStart(e){
+    e.preventDefault();
+    if(!game.running || game.paused) return;
+    this.active = true;
+    this.el.classList.add('active');
+    if(e.touches && e.touches[0]){
+      this.pointerId = e.touches[0].identifier;
+    }
+    this.updateCenter();
+    this.update(e);
+  },
+  onMove(e){
+    if(!this.active) return;
+    e.preventDefault();
+    this.update(e);
+  },
+  onEnd(e){
+    if(!this.active) return;
+    this.active = false;
+    this.el.classList.remove('active');
+    this.pointerId = null;
+    this.dx = 0;
+    this.dy = 0;
+    this.knob.style.transform = 'translate(0px, 0px)';
+  },
+  update(e){
+    let cx, cy;
+    if(e.touches && e.touches.length){
+      let t = e.touches[0];
+      for(let i=0;i<e.touches.length;i++){
+        if(e.touches[i].identifier === this.pointerId){ t = e.touches[i]; break; }
+      }
+      cx = t.clientX; cy = t.clientY;
+    } else {
+      cx = e.clientX; cy = e.clientY;
+    }
+    let dx = cx - this.centerX;
+    let dy = cy - this.centerY;
+    const d = Math.sqrt(dx*dx + dy*dy);
+    const maxR = this.radius;
+    if(d > maxR){
+      dx = dx / d * maxR;
+      dy = dy / d * maxR;
+    }
+    /* 归一化方向 (-1 ~ 1) */
+    this.dx = dx / maxR;
+    this.dy = dy / maxR;
+    /* 更新旋钮位置 */
+    this.knob.style.transform = `translate(${dx}px, ${dy}px)`;
+  }
+};
+joystick.init();
+
+/* ============================================================
    绘制：鱼
    ============================================================ */
 function drawFish(fish, isPlayer){
   const { x, y, size, angle, color, colorDark, fin, tailPhase } = fish;
   let c = color, cd = colorDark, f = fin;
   if(fish.locked && !isPlayer){ c = '#ff5252'; cd = '#b71c1c'; f = '#ff8a80'; }
-  /* 情绪：受惊抖动 */
   let shakeX = 0, shakeY = 0;
-  if(fish.scared && !isPlayer){
-    shakeX = rand(-1.5, 1.5);
-    shakeY = rand(-1.5, 1.5);
-  }
+  if(fish.scared && !isPlayer){ shakeX = rand(-1.5, 1.5); shakeY = rand(-1.5, 1.5); }
   ctx.save();
   ctx.translate(x + shakeX, y + shakeY);
   ctx.rotate(angle);
@@ -652,7 +788,6 @@ function drawFish(fish, isPlayer){
   const levelFactor = isPlayer ? Math.min(2.2, 1 + (game.level - 1) * 0.12) : 1;
   const tailWag = Math.sin(tailPhase) * size * 0.35;
 
-  /* 尾巴 */
   ctx.beginPath();
   ctx.moveTo(-size*0.85, 0);
   ctx.quadraticCurveTo(-size*1.75*levelFactor, -size*0.7 + tailWag, -size*1.9*levelFactor, -size*0.05 + tailWag);
@@ -660,7 +795,6 @@ function drawFish(fish, isPlayer){
   ctx.fillStyle = f; ctx.fill();
   ctx.strokeStyle = cd; ctx.lineWidth = Math.max(1, size*0.06); ctx.stroke();
 
-  /* 背鳍 */
   ctx.beginPath();
   ctx.moveTo(-size*0.2, -size*0.75);
   ctx.quadraticCurveTo(size*0.1, -size*1.35*levelFactor, size*0.5*levelFactor, -size*0.65);
@@ -668,7 +802,6 @@ function drawFish(fish, isPlayer){
   ctx.fillStyle = f; ctx.fill();
   ctx.strokeStyle = cd; ctx.lineWidth = Math.max(1, size*0.05); ctx.stroke();
 
-  /* 腹鳍 */
   ctx.beginPath();
   ctx.moveTo(-size*0.1, size*0.7);
   ctx.quadraticCurveTo(size*0.15, size*1.2*levelFactor, size*0.45, size*0.6);
@@ -676,21 +809,17 @@ function drawFish(fish, isPlayer){
   ctx.fillStyle = f; ctx.fill();
   ctx.strokeStyle = cd; ctx.lineWidth = Math.max(1, size*0.05); ctx.stroke();
 
-  /* 身体 */
   const g = ctx.createRadialGradient(-size*0.2, -size*0.3, size*0.1, 0, 0, size*1.2);
-  g.addColorStop(0, c);
-  g.addColorStop(1, cd);
+  g.addColorStop(0, c); g.addColorStop(1, cd);
   ctx.beginPath();
   ctx.ellipse(0, 0, size*1.05, size*0.75, 0, 0, Math.PI*2);
   ctx.fillStyle = g; ctx.fill();
   ctx.strokeStyle = cd; ctx.lineWidth = Math.max(1, size*0.07); ctx.stroke();
 
-  /* 高光 */
   ctx.beginPath();
   ctx.ellipse(-size*0.15, -size*0.35, size*0.45, size*0.18, -0.3, 0, Math.PI*2);
   ctx.fillStyle = 'rgba(255,255,255,0.45)'; ctx.fill();
 
-  /* 玩家等级>=5 斑纹 */
   if(isPlayer && game.level >= 5){
     ctx.globalAlpha = 0.35;
     for(let i=0;i<3;i++){
@@ -701,7 +830,6 @@ function drawFish(fish, isPlayer){
     ctx.globalAlpha = 1;
   }
 
-  /* 眼睛 */
   const eyeX = size*0.5, eyeY = -size*0.15, eyeR = size*0.22;
   ctx.beginPath(); ctx.arc(eyeX, eyeY, eyeR, 0, Math.PI*2);
   ctx.fillStyle = '#fff'; ctx.fill();
@@ -748,33 +876,26 @@ function drawBoss(b){
   const { x, y, size, angle, phase, hp, maxHp, color, colorDark } = b;
   ctx.save();
   ctx.translate(x, y);
-
-  /* 危险光环 */
   const pulse = 0.4 + Math.sin(phase*2)*0.2;
   ctx.beginPath(); ctx.arc(0, 0, size*1.6, 0, Math.PI*2);
   ctx.fillStyle = `rgba(255,60,60,${pulse*0.35})`; ctx.fill();
-
   if(b.sucking){
     ctx.beginPath(); ctx.arc(0, 0, b.suckRadius||0, 0, Math.PI*2);
     ctx.strokeStyle = `rgba(255,100,100,${0.5 + Math.sin(phase*8)*0.3})`;
     ctx.lineWidth = 4; ctx.stroke();
   }
-
   ctx.rotate(angle);
-
   ctx.beginPath();
   ctx.moveTo(-size*1.6, 0);
   ctx.quadraticCurveTo(-size*2.8, -size*0.9, -size*3.2, 0);
   ctx.quadraticCurveTo(-size*2.8, size*0.9, -size*1.6, 0);
   ctx.fillStyle = colorDark; ctx.fill();
   ctx.strokeStyle = '#000'; ctx.lineWidth = Math.max(2, size*0.08); ctx.stroke();
-
   const g = ctx.createRadialGradient(-size*0.3, -size*0.3, size*0.3, 0, 0, size*1.6);
   g.addColorStop(0, color); g.addColorStop(1, colorDark);
   ctx.beginPath(); ctx.ellipse(0, 0, size*1.55, size*1.0, 0, 0, Math.PI*2);
   ctx.fillStyle = g; ctx.fill();
   ctx.strokeStyle = '#000'; ctx.lineWidth = Math.max(2, size*0.1); ctx.stroke();
-
   for(let i=0;i<6;i++){
     const a = -1.2 + (i/5)*2.4;
     const ex = Math.cos(a)*size*1.55, ey = Math.sin(a)*size*1.0;
@@ -785,15 +906,12 @@ function drawBoss(b){
     ctx.fillStyle = '#fff'; ctx.fill();
     ctx.strokeStyle = '#000'; ctx.lineWidth = 1.5; ctx.stroke();
   }
-
   for(const ey of [-size*0.28, size*0.28]){
     ctx.beginPath(); ctx.arc(size*0.72, ey, size*0.22, 0, Math.PI*2);
     ctx.fillStyle = '#ff0000'; ctx.fill();
     ctx.beginPath(); ctx.arc(size*0.72, ey, size*0.1, 0, Math.PI*2);
     ctx.fillStyle = '#fff'; ctx.fill();
   }
-
-  /* 弱点 */
   const weakX = 0, weakY = -size*0.3;
   ctx.beginPath(); ctx.arc(weakX, weakY, size*0.35, 0, Math.PI*2);
   ctx.fillStyle = `rgba(255,235,100,${0.5 + Math.sin(phase*6)*0.3})`; ctx.fill();
@@ -802,7 +920,6 @@ function drawBoss(b){
   ctx.font = `bold ${Math.round(size*0.3)}px sans-serif`;
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText('★', weakX, weakY);
-
   const barW = size*3.2, barH = 8;
   ctx.save(); ctx.rotate(-angle);
   ctx.fillStyle = 'rgba(0,0,0,0.75)';
@@ -812,7 +929,6 @@ function drawBoss(b){
   ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
   ctx.strokeRect(-barW/2, -size*1.6, barW, barH);
   ctx.restore();
-
   ctx.restore();
 }
 
@@ -924,9 +1040,7 @@ function drawGoldenFish(g){
   ctx.restore();
 }
 
-/* ============================================================
-   创建实体
-   ============================================================ */
+/* 创建实体 */
 function createPlayer(){
   const skin = getCurrentSkin();
   return {
@@ -947,7 +1061,6 @@ function createPlayer(){
     suckCD:0, suckActive:0,
     growActive:0, invisibleActive:0, doubleScoreActive:0,
     growGlow:0,
-    emotion:'calm', emotionTimer:0,
   };
 }
 
@@ -1121,9 +1234,6 @@ function createGoldenFish(){
   };
 }
 
-/* ============================================================
-   粒子（带限制）
-   ============================================================ */
 function spawnParticles(x, y, color, count){
   const n = Math.min(count || 6, 10);
   for(let i=0; i<n; i++){
@@ -1140,9 +1250,6 @@ function spawnParticles(x, y, color, count){
   }
 }
 
-/* ============================================================
-   摄像机
-   ============================================================ */
 function updateCamera(){
   const p = game.player;
   if(!p) return;
@@ -1152,11 +1259,8 @@ function updateCamera(){
   game.cam.y += (ty - game.cam.y) * 0.12;
 }
 
-/* ============================================================
-   体型压制 AI
-   ============================================================ */
+/* 体型压制 AI */
 function applySizeSuppression(f, p, pd, pdx, pdy){
-  /* 大鱼追小鱼：体型差越大速度越快 */
   if(f.ai === 'chase' && f.size > p.size * 1.05 && p.invisibleActive <= 0){
     if(pd < 550){
       f.locked = true;
@@ -1166,7 +1270,6 @@ function applySizeSuppression(f, p, pd, pdx, pdy){
       f.vy += (pdy/pd) * 0.08 * boost * DIFFICULTY[currentDiff].aiChase;
     } else f.locked = false;
   }
-  /* 小鱼逃跑：体型差越大反应越快 */
   if(f.ai === 'flee' && f.size < p.size * 1.1 && p.invisibleActive <= 0){
     if(pd < 340){
       f.scared = true;
@@ -1178,9 +1281,6 @@ function applySizeSuppression(f, p, pd, pdx, pdy){
   }
 }
 
-/* ============================================================
-   生态循环
-   ============================================================ */
 function updateEcosystem(){
   const p = game.player;
   if(!p) return;
@@ -1191,7 +1291,6 @@ function updateEcosystem(){
   }
   game.smallFishCount = small;
   game.bigFishCount = big;
-  /* 小鱼少时大鱼互相吞食（最多 2 对/帧） */
   if(small < 8 && big > 3){
     let processed = 0;
     for(let i=0; i<game.fishes.length && processed < 2; i++){
@@ -1213,9 +1312,7 @@ function updateEcosystem(){
   }
 }
 
-/* ============================================================
-   任务
-   ============================================================ */
+/* 任务 */
 let quests = [];
 function initQuests(){
   quests = [
@@ -1249,17 +1346,14 @@ document.getElementById('questHeader').addEventListener('click', () => {
 });
 
 /* ============================================================
-   更新
+   更新（玩家使用摇杆输入）
    ============================================================ */
 function update(dt){
   const p = game.player;
   if(!p || !p.alive) return;
 
   if(game.screenShake > 0) game.screenShake -= dt;
-  if(p.emotionTimer > 0) p.emotionTimer -= dt;
-  else p.emotion = 'calm';
 
-  /* 技能冷却 */
   ['speed','shield','magnet','dash','suck'].forEach(k => {
     if(p[k+'Active'] > 0) p[k+'Active'] -= dt;
     if(p[k+'CD'] > 0) p[k+'CD'] -= dt;
@@ -1272,8 +1366,19 @@ function update(dt){
   if(p.doubleScoreActive > 0) p.doubleScoreActive -= dt;
   if(p.growGlow > 0) p.growGlow -= dt;
 
+  /* ★ 玩家移动：优先使用摇杆输入 */
   const speedMul = p.speedActive > 0 ? 2.0 : (p.dashActive > 0 ? 3.5 : 1.0);
-  if(p.moving){
+  const stickActive = joystick.active && (Math.abs(joystick.dx) > 0.08 || Math.abs(joystick.dy) > 0.08);
+
+  if(stickActive){
+    const maxSpeed = 5.5 * speedMul;
+    const targetVx = joystick.dx * maxSpeed;
+    const targetVy = joystick.dy * maxSpeed;
+    p.vx += (targetVx - p.vx) * 0.25;
+    p.vy += (targetVy - p.vy) * 0.25;
+    p.moving = true;
+  } else if(p.moving && p.targetX !== 0){
+    /* 兼容拖动模式（桌面端仍可用） */
     const dx = p.targetX - p.x, dy = p.targetY - p.y;
     const d = Math.sqrt(dx*dx + dy*dy);
     if(d > 2){
@@ -1284,11 +1389,13 @@ function update(dt){
       p.vx += (nx - p.vx) * 0.15;
       p.vy += (ny - p.vy) * 0.15;
     } else { p.vx *= 0.9; p.vy *= 0.9; }
-  } else { p.vx *= 0.92; p.vy *= 0.92; }
+  } else {
+    p.vx *= 0.92;
+    p.vy *= 0.92;
+  }
 
   /* 陷阱减速 */
-  let inSand = false;
-  let inSeaweed = false;
+  let inSand = false, inSeaweed = false;
   for(const h of game.hazards){
     const d = dist(h.x, h.y, p.x, p.y);
     if(d < h.size + p.size*0.6){
@@ -1344,7 +1451,6 @@ function update(dt){
         f.vy += (dy/d) * pull;
       }
     }
-    /* 吸力也会吸引大鱼（风险） */
     for(const f of game.fishes){
       if(f.size < p.size * 1.05) continue;
       const dx = p.x - f.x, dy = p.y - f.y;
@@ -1378,14 +1484,12 @@ function update(dt){
     const pdx = p.x - f.x, pdy = p.y - f.y;
     const pd = Math.sqrt(pdx*pdx + pdy*pdy) || 1;
 
-    /* 体型压制 AI */
     applySizeSuppression(f, p, pd, pdx, pdy);
 
     f.x += f.vx * dt;
     f.y += f.vy * dt;
     f.tailPhase += 0.2 * dt;
 
-    /* 速度限制 */
     const curV = Math.sqrt(f.vx*f.vx + f.vy*f.vy);
     const maxV = 3.5;
     if(curV > maxV){ f.vx = (f.vx/curV) * maxV; f.vy = (f.vy/curV) * maxV; }
@@ -1397,10 +1501,8 @@ function update(dt){
     if(f.y < m){ f.y = m; f.vy = Math.abs(f.vy); }
     if(f.y > WORLD.h - m){ f.y = WORLD.h - m; f.vy = -Math.abs(f.vy); }
 
-    /* 远处清理 */
     if(dist(f.x, f.y, p.x, p.y) > Math.max(W, H) * 3){ game.fishes.splice(i, 1); continue; }
 
-    /* 大鱼吃小鱼（生态） */
     if(f.size > 20 && game.smallFishCount < 10){
       for(let j = game.fishes.length - 1; j >= 0; j--){
         const o = game.fishes[j];
@@ -1415,7 +1517,6 @@ function update(dt){
       }
     }
 
-    /* 与玩家碰撞 */
     const d = dist(f.x, f.y, p.x, p.y);
     if(d < (f.size + p.size) * 0.75){
       if(p.size >= f.size * 0.9){
@@ -1428,9 +1529,7 @@ function update(dt){
         if(f.size >= 20) addQuestProgress('kill3', 1);
         sfx.eat();
         spawnParticles(f.x, f.y, f.color, 8);
-        p.emotion = 'excited'; p.emotionTimer = 30;
         showFloatScore(f.x, f.y, '+' + gain);
-        /* 大鱼的残骸 */
         if(f.size >= 25 && game.remains.length < MAX_REMAINS){
           game.remains.push(createRemain(f.x, f.y, f.score, f.size));
         }
@@ -1523,7 +1622,6 @@ function update(dt){
     b.phase += 0.05 * dt;
     b.angle = Math.atan2(b.vy, b.vx);
 
-    /* BOSS 吸力技能 */
     b.suckTimer -= dt;
     if(b.suckTimer <= 0 && !b.sucking){
       b.sucking = true;
@@ -1708,7 +1806,6 @@ function update(dt){
     r.vx *= 0.98;
     r.vy *= 0.98;
     if(r.life <= 0){ game.remains.splice(i, 1); continue; }
-    /* 残骸吸引附近小鱼（制造捕猎机会） */
     if(r.size > 20){
       for(const f of game.fishes){
         if(f.size >= p.size * 0.9) continue;
@@ -1720,7 +1817,6 @@ function update(dt){
         }
       }
     }
-    /* 玩家吃残骸 */
     if(dist(r.x, r.y, p.x, p.y) < p.size + r.size){
       const gain = Math.floor(r.score * (p.doubleScoreActive > 0 ? 2 : 1));
       game.score += gain;
@@ -1875,9 +1971,6 @@ function damagePlayer(dmg){
   updateHUD();
 }
 
-/* ============================================================
-   复活
-   ============================================================ */
 function showReviveModal(){
   const p = game.player;
   p.alive = false;
@@ -1897,9 +1990,7 @@ function doRevive(){
   updateHUD();
 }
 
-/* ============================================================
-   技能
-   ============================================================ */
+/* 技能 */
 function useSkill(type){
   const p = game.player;
   if(!p || !p.alive || !game.running || game.paused) return;
@@ -1982,7 +2073,6 @@ function applyPowerup(type){
   else if(type === 'invisible'){ p.invisibleActive = 360; showSkillStatus('👻 隐身！', '#ba68c8'); }
   else if(type === 'double'){ p.doubleScoreActive = 480; showSkillStatus('✨ 双倍得分！', '#ffd54f'); }
   else if(type === 'ammo'){ p.ammo = Math.min(p.maxAmmo, p.ammo + 5); showSkillStatus('💥 +5 炮弹', '#ff8a65'); }
-  p.emotion = 'excited'; p.emotionTimer = 30;
 }
 
 function showSkillStatus(text, color){
@@ -2004,9 +2094,7 @@ function showAchievement(text){
   setTimeout(() => el.classList.remove('show'), 1800);
 }
 
-/* ============================================================
-   HUD
-   ============================================================ */
+/* HUD */
 let lastScore = -1, lastLevel = -1, lastHp = -1;
 function updateHUD(){
   const p = game.player;
@@ -2072,9 +2160,7 @@ function levelUp(){
   updateHUD();
 }
 
-/* ============================================================
-   渲染
-   ============================================================ */
+/* 渲染 */
 function render(){
   ctx.clearRect(0, 0, W, H);
   const camX = game.cam.x;
@@ -2083,42 +2169,30 @@ function render(){
   ctx.save();
   ctx.translate(-camX, -camY);
 
-  /* 世界边界 */
   ctx.strokeStyle = 'rgba(80, 180, 240, 0.35)';
   ctx.lineWidth = 4;
   ctx.strokeRect(2, 2, WORLD.w - 4, WORLD.h - 4);
 
-  /* 危险区 */
   for(const h of game.hazards){
     if(h.x < camX - 200 || h.x > camX + W + 200 || h.y < camY - 200 || h.y > camY + H + 200) continue;
     drawHazard(h);
   }
-
-  /* 水雷 */
   for(const m of game.mines){
     if(m.x < camX - 80 || m.x > camX + W + 80 || m.y < camY - 80 || m.y > camY + H + 80) continue;
     drawMine(m);
   }
-
-  /* 残骸 */
   for(const r of game.remains){
     if(r.x < camX - 100 || r.x > camX + W + 100 || r.y < camY - 100 || r.y > camY + H + 100) continue;
     drawRemain(r);
   }
-
-  /* 道具 */
   for(const pu of game.powerups){
     if(pu.x < camX - 60 || pu.x > camX + W + 60 || pu.y < camY - 60 || pu.y > camY + H + 60) continue;
     drawPowerup(pu);
   }
-
-  /* 红心 */
   for(const h of game.hearts){
     if(h.x < camX - 60 || h.x > camX + W + 60 || h.y < camY - 60 || h.y > camY + H + 60) continue;
     drawHeart(h);
   }
-
-  /* 泡泡陷阱 */
   for(const t of game.traps){
     ctx.save(); ctx.translate(t.x, t.y);
     ctx.beginPath(); ctx.arc(0, 0, t.size, 0, Math.PI*2);
@@ -2126,8 +2200,6 @@ function render(){
     ctx.strokeStyle = 'rgba(180, 240, 255, 0.9)'; ctx.lineWidth = 2; ctx.stroke();
     ctx.restore();
   }
-
-  /* 金鱼 */
   if(game.goldenFish){
     const g = game.goldenFish;
     if(!(g.x < camX - 100 || g.x > camX + W + 100 || g.y < camY - 100 || g.y > camY + H + 100)){
@@ -2135,38 +2207,29 @@ function render(){
     }
   }
 
-  /* 鱼 */
   const p = game.player;
   for(const f of game.fishes){
     if(f.x < camX - 100 || f.x > camX + W + 100 || f.y < camY - 100 || f.y > camY + H + 100) continue;
-    /* 危险红晕 */
     if(p && f.size > p.size * 1.05 && p.invisibleActive <= 0){
       ctx.beginPath(); ctx.arc(f.x, f.y, f.size * 1.4, 0, Math.PI*2);
       ctx.fillStyle = 'rgba(255, 60, 60, 0.2)'; ctx.fill();
     }
     drawFish(f, false);
   }
-
-  /* 潜水员 */
   for(const d of game.divers){
     if(d.x < camX - 100 || d.x > camX + W + 100 || d.y < camY - 100 || d.y > camY + H + 100) continue;
     drawDiver(d);
   }
-
-  /* BOSS */
   for(const b of game.bosses){
     if(b.x < camX - 200 || b.x > camX + W + 200 || b.y < camY - 200 || b.y > camY + H + 200) continue;
     drawBoss(b);
   }
-
-  /* 炮弹 */
   for(const b of game.bullets){
     if(b.x < camX - 50 || b.x > camX + W + 50 || b.y < camY - 50 || b.y > camY + H + 50) continue;
     ctx.beginPath(); ctx.arc(b.x, b.y, b.size, 0, Math.PI*2);
     ctx.fillStyle = '#fff8e1'; ctx.fill();
   }
 
-  /* 玩家 */
   if(p && p.alive){
     if(p.invisibleActive > 0) ctx.globalAlpha = 0.4;
     else if(p.invincible > 0 && Math.floor(p.invincible/4) % 2 === 0) ctx.globalAlpha = 0.5;
@@ -2177,8 +2240,7 @@ function render(){
                        'rgba(255,220,100,0.3)';
     ctx.beginPath();
     ctx.arc(p.x, p.y, p.size*1.4, 0, Math.PI*2);
-    ctx.fillStyle = glowColor;
-    ctx.fill();
+    ctx.fillStyle = glowColor; ctx.fill();
 
     if(p.shieldActive > 0){
       ctx.beginPath(); ctx.arc(p.x, p.y, p.size*1.9, 0, Math.PI*2);
@@ -2189,12 +2251,10 @@ function render(){
       ctx.strokeStyle = 'rgba(206,147,216,0.5)'; ctx.lineWidth = 3;
       ctx.setLineDash([12,8]); ctx.stroke(); ctx.setLineDash([]);
     }
-
     drawFish(p, true);
     ctx.globalAlpha = 1;
   }
 
-  /* 粒子 */
   for(const pt of game.particles){
     ctx.beginPath();
     ctx.arc(pt.x, pt.y, pt.size * pt.life, 0, Math.PI*2);
@@ -2207,9 +2267,7 @@ function render(){
   ctx.restore();
 }
 
-/* ============================================================
-   开始/结束
-   ============================================================ */
+/* 开始/结束 */
 function startGame(){
   resize();
   game.running = true;
@@ -2227,7 +2285,6 @@ function startGame(){
   game.divers = [];
   game.mines = [];
   game.bosses = [];
-  game.bubbles = [];
   game.particles = [];
   game.bullets = [];
   game.traps = [];
@@ -2268,7 +2325,7 @@ function startGame(){
   document.getElementById('overOverlay').classList.add('hide');
   document.getElementById('pauseOverlay').classList.add('hide');
   document.getElementById('reviveModal').classList.remove('show');
-  document.getElementById('bottomTip').textContent = '拖动控制移动 · 右下角技能';
+  document.getElementById('bottomTip').textContent = '左侧摇杆移动 · 右下角技能';
   startBGM();
 }
 
@@ -2279,7 +2336,6 @@ function gameOver(){
   sfx.die();
   if(navigator.vibrate) navigator.vibrate([80, 60, 120]);
 
-  /* 检查成就 */
   const newUnlocks = [];
   if(!game.usedSkill){
     const ach = ACHIEVEMENTS.find(a => a.id === 'noskill');
@@ -2298,7 +2354,6 @@ function gameOver(){
     renderSkinPicker();
   }
 
-  /* 死亡回放 */
   const info = game.deathInfo;
   const replay = document.getElementById('replayPanel');
   const infoEl = document.getElementById('replayInfo');
@@ -2312,7 +2367,6 @@ function gameOver(){
     document.getElementById('overBest').textContent = game.best;
     document.getElementById('overLevel').textContent = game.level;
     document.getElementById('overKills').textContent = game.kills;
-    /* 解锁皮肤展示 */
     const unlockShow = document.getElementById('unlockShow');
     const unlockList = document.getElementById('unlockList');
     if(newUnlocks.length){
@@ -2327,9 +2381,7 @@ function gameOver(){
   }, 600);
 }
 
-/* ============================================================
-   输入
-   ============================================================ */
+/* 桌面拖动（保留兼容） */
 let pointerDown = false;
 function getPointerPos(e){
   const rect = canvas.getBoundingClientRect();
@@ -2339,8 +2391,10 @@ function getPointerPos(e){
   else { cx = e.clientX; cy = e.clientY; }
   return { x: cx - rect.left, y: cy - rect.top };
 }
-function onStart(e){
+function onCanvasStart(e){
   if(!game.running || game.paused) return;
+  /* 如果摇杆正在激活，不处理画布拖动 */
+  if(joystick.active) return;
   e.preventDefault();
   pointerDown = true;
   const pos = getPointerPos(e);
@@ -2348,30 +2402,25 @@ function onStart(e){
   game.player.targetY = pos.y + game.cam.y;
   game.player.moving = true;
 }
-function onMove(e){
-  if(!pointerDown || !game.running || game.paused) return;
+function onCanvasMove(e){
+  if(!pointerDown || joystick.active || !game.running || game.paused) return;
   e.preventDefault();
   const pos = getPointerPos(e);
   game.player.targetX = pos.x + game.cam.x;
   game.player.targetY = pos.y + game.cam.y;
   game.player.moving = true;
 }
-function onEnd(){
+function onCanvasEnd(){
   pointerDown = false;
-  if(game.player) game.player.moving = false;
 }
-canvas.addEventListener('touchstart', onStart, { passive: false });
-canvas.addEventListener('touchmove', onMove, { passive: false });
-canvas.addEventListener('touchend', onEnd, { passive: false });
-canvas.addEventListener('touchcancel', onEnd, { passive: false });
-canvas.addEventListener('mousedown', onStart);
-canvas.addEventListener('mousemove', onMove);
-canvas.addEventListener('mouseup', onEnd);
-canvas.addEventListener('mouseleave', onEnd);
+canvas.addEventListener('touchstart', onCanvasStart, { passive: false });
+canvas.addEventListener('touchmove', onCanvasMove, { passive: false });
+canvas.addEventListener('touchend', onCanvasEnd, { passive: false });
+canvas.addEventListener('mousedown', onCanvasStart);
+canvas.addEventListener('mousemove', onCanvasMove);
+canvas.addEventListener('mouseup', onCanvasEnd);
 
-/* ============================================================
-   按钮
-   ============================================================ */
+/* 按钮 */
 document.getElementById('btnStart').addEventListener('click', () => { ac(); sfx.click(); startGame(); });
 document.getElementById('btnRestart').addEventListener('click', () => { sfx.click(); startGame(); });
 document.getElementById('btnHome').addEventListener('click', () => {
@@ -2422,7 +2471,6 @@ document.getElementById('reviveGiveUp').addEventListener('click', () => {
   gameOver();
 });
 
-/* 音量滑块 */
 function initVolumeSliders(){
   const bgmSlider = document.getElementById('bgmVolume');
   const sfxSlider = document.getElementById('sfxVolume');
@@ -2441,7 +2489,6 @@ function initVolumeSliders(){
 }
 initVolumeSliders();
 
-/* 键盘 */
 document.addEventListener('keydown', e => {
   if(!game.running) return;
   if(e.key === ' '){ e.preventDefault(); document.getElementById('btnPause').click(); }
@@ -2452,9 +2499,7 @@ document.addEventListener('keydown', e => {
   if(e.key.toLowerCase() === 'u') useSkill('bubble');
 });
 
-/* ============================================================
-   主循环
-   ============================================================ */
+/* 主循环 */
 let lastTime = performance.now();
 function loop(now){
   try {
@@ -2469,7 +2514,6 @@ function loop(now){
 }
 requestAnimationFrame(loop);
 
-/* 初始化 */
 resize();
 renderSkinPicker();
 initQuests();

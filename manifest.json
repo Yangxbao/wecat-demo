@@ -1,0 +1,12 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "微信叛逆版",
+  "orientation": "any",
+  "scope": "./",
+  "short_name": "微信叛逆版",
+  "start_url": "./index.html",
+  "theme_color": "#EDEDED",
+  "lang": "zh"
+}

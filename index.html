@@ -1,0 +1,2826 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no,email=no,address=no">
+<meta name="theme-color" content="#EDEDED">
+<title>微信</title>
+<style>
+/* ========== 基础重置 ========== */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --green:#07C160;
+  --bg:#EDEDED;
+  --card:#FFFFFF;
+  --line:#E6E6E6;
+  --text:#191919;
+  --sub:#9A9A9A;
+  --blue:#576B95;
+  --sb:env(safe-area-inset-bottom,0px);
+}
+html,body{height:100%;width:100%;overflow:hidden;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:#0b0b0b;color:var(--text);
+  display:flex;align-items:center;justify-content:center;
+  -webkit-font-smoothing:antialiased;user-select:none;
+}
+button,input,textarea{font-family:inherit;font-size:inherit;color:inherit;border:0;background:none;outline:none;}
+button{cursor:pointer;}
+
+/* ========== 手机外壳 ========== */
+.phone{
+  position:relative;width:100%;max-width:420px;
+  height:100vh;height:100dvh;max-height:912px;
+  background:var(--bg);overflow:hidden;display:flex;flex-direction:column;
+}
+@media(min-width:440px) and (min-height:720px){
+  .phone{border-radius:40px;box-shadow:0 24px 70px rgba(0,0,0,.8),0 0 0 10px #1c1c1e,0 0 0 12px #2b2b2e;}
+}
+
+/* ========== 状态栏 ========== */
+.statusbar{
+  position:absolute;top:0;left:0;right:0;height:44px;z-index:600;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:6px 24px 0;font-size:14px;font-weight:600;color:#191919;
+  pointer-events:none;transition:color .25s;
+}
+.statusbar.light{color:#fff;}
+.sb-right{display:flex;align-items:center;gap:5px;}
+.sb-icon{display:block;}
+
+/* ========== 页面容器 ========== */
+.screen{position:absolute;inset:0;overflow:hidden;}
+.tab-page{position:absolute;inset:0;background:var(--bg);display:none;flex-direction:column;}
+.tab-page.active{display:flex;}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
+
+/* 导航栏 */
+.nav{
+  flex:0 0 auto;height:88px;padding-top:44px;background:#EDEDED;
+  display:flex;align-items:center;justify-content:center;position:relative;z-index:10;
+}
+.nav.white{background:#fff;}
+.nav.dark{background:#1c1c1e;color:#fff;}
+.nav-title{font-size:17px;font-weight:600;}
+.nav-left,.nav-right{position:absolute;bottom:0;height:44px;display:flex;align-items:center;padding:0 6px;}
+.nav-left{left:0;}
+.nav-right{right:0;}
+.nav-back{width:38px;height:44px;display:flex;align-items:center;justify-content:center;}
+.icon-btn{width:40px;height:44px;display:flex;align-items:center;justify-content:center;}
+
+/* 搜索条 */
+.searchbar{padding:0 12px 8px;background:#EDEDED;flex:0 0 auto;}
+.sb-input{height:34px;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center;gap:5px;color:#9a9a9a;font-size:14px;}
+
+/* ========== 列表单元格 ========== */
+.cell{display:flex;align-items:center;padding:10px 14px;background:#fff;position:relative;}
+.cell:active{background:#e9e9e9;}
+.cell::after{content:'';position:absolute;left:72px;right:0;bottom:0;height:1px;background:var(--line);transform:scaleY(.6);}
+.cell.no-line::after{display:none;}
+.avatar{width:46px;height:46px;border-radius:5px;flex:0 0 46px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:17px;font-weight:500;overflow:hidden;}
+.cell-body{flex:1;min-width:0;margin-left:12px;display:flex;flex-direction:column;gap:5px;}
+.cell-top{display:flex;align-items:center;justify-content:space-between;}
+.cell-name{font-size:16px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cell-time{font-size:12px;color:#b2b2b2;flex:0 0 auto;margin-left:8px;}
+.cell-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.cell-msg{font-size:13px;color:#9a9a9a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+.badge{min-width:18px;height:18px;border-radius:9px;background:#FA5151;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;padding:0 5px;flex:0 0 auto;}
+.badge.dot{min-width:9px;width:9px;height:9px;padding:0;}
+
+/* 头像图片通用 */
+.av-img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block;}
+
+/* ========== 底部 Tab ========== */
+.tabbar{
+  position:absolute;left:0;right:0;bottom:0;z-index:60;
+  height:calc(52px + var(--sb));padding-bottom:var(--sb);
+  background:#F7F7F7;border-top:1px solid #DCDCDC;display:flex;
+}
+.tabbar .tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:#7F7F7F;font-size:10px;position:relative;}
+.tabbar .tab svg{width:26px;height:26px;}
+.tabbar .tab.active{color:#07C160;}
+.tabbar .tab .dot{position:absolute;top:5px;left:calc(50% + 8px);width:9px;height:9px;border-radius:50%;background:#FA5151;display:none;}
+.tabbar .tab .dot.show{display:block;}
+
+/* ========== 二级页面 ========== */
+.subpage{
+  position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;
+  transform:translateX(100%);transition:transform .3s cubic-bezier(.25,.8,.4,1);will-change:transform;
+}
+.subpage.active{transform:translateX(0);}
+
+/* ========== 聊天页 ========== */
+.chat-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#EDEDED;padding-bottom:10px;}
+.chat-time{text-align:center;margin:14px 0 6px;font-size:12px;color:#9B9B9B;}
+.msg{display:flex;padding:6px 12px;align-items:flex-start;}
+.msg .av{width:38px;height:38px;border-radius:5px;flex:0 0 38px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;overflow:hidden;}
+.bubble{
+  margin:0 10px;max-width:64%;padding:9px 12px;border-radius:5px;background:#fff;
+  font-size:16px;line-height:1.45;word-break:break-word;position:relative;
+  animation:pop .18s ease;box-shadow:0 1px 1px rgba(0,0,0,.03);
+}
+@keyframes pop{from{transform:scale(.86);opacity:0}to{transform:scale(1);opacity:1}}
+.msg.me{flex-direction:row-reverse;}
+.msg.me .bubble{background:#95EC69;}
+.bubble::after{content:'';position:absolute;top:11px;width:0;height:0;border:6px solid transparent;}
+.msg.them .bubble::after{left:-11px;border-right-color:#fff;}
+.msg.me .bubble::after{right:-11px;border-left-color:#95EC69;}
+/* 转账卡片 */
+.tr-card{display:flex;align-items:center;margin:0 10px;border-radius:5px;background:#FA9D3B;color:#fff;padding:12px 14px;min-width:176px;position:relative;animation:pop .18s ease;}
+.tr-ico{width:34px;height:34px;border-radius:50%;border:1.5px solid rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;margin-right:10px;flex:0 0 34px;}
+.tr-t{font-size:15px;font-weight:500;}
+.tr-a{font-size:12px;opacity:.9;margin-top:3px;}
+.tr-card::after{content:'';position:absolute;top:11px;width:0;height:0;border:6px solid transparent;}
+.msg.them .tr-card::after{left:-11px;border-right-color:#FA9D3B;}
+.msg.me .tr-card::after{right:-11px;border-left-color:#FA9D3B;}
+
+.chat-inputbar{
+  flex:0 0 auto;background:#F7F7F7;border-top:1px solid #DCDCDC;
+  padding:8px 10px calc(8px + var(--sb));display:flex;align-items:center;gap:8px;
+}
+.chat-inputbar input{flex:1;height:36px;background:#fff;border-radius:4px;padding:0 10px;font-size:16px;min-width:0;}
+.ib-btn{width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#4A4A4A;flex:0 0 auto;}
+.panel{height:0;overflow:hidden;background:#F7F7F7;transition:height .25s ease;flex:0 0 auto;}
+.panel.open{height:214px;}
+.panel-inner{height:214px;padding:14px 12px;overflow-y:auto;}
+.emoji-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:10px;font-size:24px;text-align:center;}
+.emoji-grid span:active{transform:scale(1.25);}
+.plus-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px 0;}
+.plus-item{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:#7A7A7A;}
+.plus-ico{width:56px;height:56px;border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;border:1px solid #efefef;}
+
+/* ========== 分组列表 ========== */
+.group{margin-top:10px;background:#fff;}
+.group-title{font-size:13px;color:#888;padding:6px 16px;background:#EDEDED;}
+.row{display:flex;align-items:center;padding:14px 16px;background:#fff;position:relative;}
+.row:active{background:#eee;}
+.row::after{content:'';position:absolute;left:16px;right:0;bottom:0;height:1px;background:var(--line);transform:scaleY(.6);}
+.row:last-child::after{display:none;}
+.row-ico{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;margin-right:12px;flex:0 0 26px;}
+.row-title{flex:1;font-size:16px;}
+.row-val{font-size:14px;color:#9A9A9A;margin-right:6px;max-width:52%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.row-arrow{width:8px;height:8px;border-right:1.6px solid #C7C7CC;border-top:1.6px solid #C7C7CC;transform:rotate(45deg);flex:0 0 auto;}
+
+/* ========== 我 ========== */
+.me-card{background:#fff;display:flex;align-items:center;padding:22px 16px 20px;}
+.me-card:active{background:#f2f2f2;}
+.me-avatar{width:64px;height:64px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:26px;font-weight:500;overflow:hidden;flex:0 0 64px;}
+.me-info{flex:1;margin-left:16px;min-width:0;}
+.me-name{font-size:20px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.me-id{font-size:14px;color:#9A9A9A;margin-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.qr-mini{width:16px;height:16px;opacity:.5;margin-left:6px;display:inline-block;vertical-align:-2px;}
+
+/* ========== 服务网格 ========== */
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:22px 0;padding:20px 8px;background:#fff;}
+.grid-item{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.grid-item:active{opacity:.7;}
+.grid-ico{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:19px;font-weight:600;}
+.grid-label{font-size:12px;color:#333;}
+
+/* ========== 钱包 ========== */
+.wallet-head{background:linear-gradient(135deg,#07C160,#05A94F);color:#fff;padding:22px 20px 26px;}
+.wallet-label{font-size:13px;opacity:.9;}
+.wallet-bal{font-size:38px;font-weight:600;margin-top:8px;letter-spacing:-1px;}
+.wallet-btns{display:flex;gap:12px;margin-top:18px;}
+.wallet-btn{flex:1;height:38px;border-radius:19px;background:rgba(255,255,255,.22);color:#fff;font-size:15px;display:flex;align-items:center;justify-content:center;}
+.wallet-btn:active{background:rgba(255,255,255,.35);}
+
+/* ========== 账单 ========== */
+.bill{display:flex;align-items:center;padding:14px 16px;background:#fff;position:relative;}
+.bill::after{content:'';position:absolute;left:16px;right:0;bottom:0;height:1px;background:var(--line);transform:scaleY(.6);}
+.bill-l{flex:1;min-width:0;}
+.bill-name{font-size:16px;}
+.bill-time{font-size:12px;color:#9A9A9A;margin-top:5px;}
+.bill-amt{font-size:17px;font-weight:500;}
+.empty{text-align:center;color:#b0b0b0;font-size:14px;padding:50px 0;}
+
+/* ========== 收付款码 ========== */
+.paycode-wrap{background:#fff;margin-top:10px;padding:20px 0 26px;display:flex;flex-direction:column;align-items:center;}
+.paycode-title{font-size:15px;color:#333;display:flex;align-items:center;gap:6px;}
+#qrCanvas{width:190px;height:190px;margin:16px 0 4px;border:1px solid #f0f0f0;border-radius:6px;}
+.charge-bar{background:#fff;border-radius:8px;padding:14px 10px;margin:0 18px 8px;width:290px;display:flex;align-items:center;justify-content:center;}
+#barCanvas{width:270px;height:74px;}
+.paycode-bal{margin-top:14px;font-size:14px;color:#333;display:flex;align-items:center;gap:8px;}
+.paycode-bal b{color:#07C160;font-size:16px;}
+.paycode-tip{margin-top:8px;font-size:12px;color:#a8a8a8;}
+
+/* ========== 支付页 ========== */
+.pay-page{flex:1;display:flex;flex-direction:column;background:#fff;}
+.pay-main{flex:1;display:flex;flex-direction:column;align-items:center;padding-top:36px;background:#fff;}
+.pay-amt{font-size:42px;font-weight:600;letter-spacing:-1.5px;}
+.pay-amt small{font-size:22px;font-weight:500;margin-right:2px;}
+.pay-merchant{margin-top:16px;font-size:15px;color:#4a4a4a;display:flex;align-items:center;gap:6px;}
+.pay-merchant .dot-g{width:7px;height:7px;border-radius:50%;background:#07C160;}
+.pay-lines{width:100%;margin-top:30px;border-top:1px solid #f0f0f0;}
+.pay-line{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #f0f0f0;font-size:15px;color:#333;}
+.pay-line .lbl{color:#666;}
+.pay-line .val{color:#191919;display:flex;align-items:center;gap:6px;}
+.pay-btn{
+  margin:22px 16px calc(22px + var(--sb));height:48px;border-radius:6px;background:#07C160;color:#fff;
+  font-size:17px;display:flex;align-items:center;justify-content:center;font-weight:500;
+}
+.pay-btn:active{background:#06AD56;}
+
+/* ========== 扫码页 ========== */
+.scan-body{flex:1;background:#141414;display:flex;flex-direction:column;align-items:center;position:relative;overflow:hidden;}
+.scan-frame{width:230px;height:230px;margin-top:16vh;position:relative;box-shadow:0 0 0 2000px rgba(0,0,0,.35);}
+.scan-corner{position:absolute;width:26px;height:26px;border:3px solid #07C160;}
+.scan-corner.tl{top:0;left:0;border-right:0;border-bottom:0;}
+.scan-corner.tr{top:0;right:0;border-left:0;border-bottom:0;}
+.scan-corner.bl{bottom:0;left:0;border-right:0;border-top:0;}
+.scan-corner.br{bottom:0;right:0;border-left:0;border-top:0;}
+.scan-line{position:absolute;left:6px;right:6px;height:2px;background:linear-gradient(90deg,transparent,#07C160,transparent);box-shadow:0 0 10px #07C160;animation:scanmove 2.2s linear infinite;}
+@keyframes scanmove{0%{top:6px}50%{top:222px}100%{top:6px}}
+.scan-tip{margin-top:70px;color:#b9b9b9;font-size:14px;}
+.scan-actions{display:flex;gap:40px;margin-top:34px;color:#e8e8e8;font-size:13px;}
+.scan-actions div{display:flex;flex-direction:column;align-items:center;gap:8px;}
+
+/* ========== 金额键盘页 ========== */
+.amt-body{flex:1;background:#fff;padding-top:26px;}
+.amt-label{text-align:center;font-size:14px;color:#666;}
+.amt-value{
+  display:flex;align-items:flex-end;justify-content:center;gap:2px;
+  padding:18px 20px 10px;border-bottom:1px solid #ECECEC;margin:14px 18px 0;
+}
+.amt-value .cny{font-size:26px;font-weight:500;padding-bottom:8px;}
+.amt-value .num{font-size:46px;font-weight:500;letter-spacing:-1px;line-height:1;}
+.amt-balance{text-align:center;font-size:13px;color:#9A9A9A;margin-top:14px;}
+.amt-bottom{flex:0 0 auto;background:#fff;padding-bottom:var(--sb);}
+.amt-confirm{margin:0 16px 12px;height:46px;border-radius:6px;background:#07C160;color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:500;}
+.amt-confirm:active{background:#06AD56;}
+
+/* ========== 键盘 ========== */
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#D5D5D5;border-top:1px solid #D5D5D5;}
+.keypad button{background:#fff;height:52px;font-size:24px;display:flex;align-items:center;justify-content:center;font-weight:400;}
+.keypad button:active{background:#d6d6d6;}
+.keypad button svg{width:26px;height:26px;}
+
+/* ========== 遮罩 / 弹层 ========== */
+.mask{position:absolute;inset:0;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .25s;z-index:280;}
+.mask.show{opacity:1;pointer-events:auto;}
+.sheet{
+  position:absolute;left:0;right:0;bottom:0;background:#EDEDED;z-index:290;
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.25,.8,.4,1);
+  padding-bottom:var(--sb);border-radius:12px 12px 0 0;overflow:hidden;
+  max-height:88%;display:flex;flex-direction:column;
+}
+.sheet.show{transform:translateY(0);}
+.pwd-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #DCDCDC;flex:0 0 auto;}
+.pwd-head .pwd-title{font-size:16px;font-weight:500;}
+.pwd-head .pwd-x{width:52px;text-align:center;font-size:16px;color:#888;}
+.pwd-head .pwd-x.green{color:#07C160;font-weight:500;}
+.pwd-amt{text-align:center;font-size:28px;font-weight:600;margin-top:20px;}
+.pwd-tip{text-align:center;font-size:12px;color:#a5a5a5;margin-top:8px;}
+.pwd-dots{
+  display:flex;width:250px;height:46px;margin:18px auto 22px;
+  border:1px solid #D0D0D0;border-radius:6px;overflow:hidden;background:#fff;
+}
+.pwd-dots i{flex:1;position:relative;border-right:1px solid #E2E2E2;font-style:normal;}
+.pwd-dots i:last-child{border-right:0;}
+.pwd-dots i.on::after{content:'';position:absolute;left:50%;top:50%;width:9px;height:9px;border-radius:50%;background:#191919;transform:translate(-50%,-50%);}
+.pwd-dots.shake{animation:shake .35s;}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+
+/* ========== 支付成功 ========== */
+.success{
+  position:absolute;inset:0;z-index:400;display:none;flex-direction:column;align-items:center;
+  background:linear-gradient(170deg,#f2fff8 0%,#ffffff 45%,#e9fff3 100%);
+}
+.success.show{display:flex;}
+#coin3d{position:absolute;inset:0;width:100%;height:100%;}
+.succ-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;padding-top:15vh;width:100%;}
+.succ-check{
+  width:74px;height:74px;border-radius:50%;background:#07C160;color:#fff;font-size:42px;
+  display:flex;align-items:center;justify-content:center;
+  animation:checkIn .55s cubic-bezier(.2,1.5,.5,1);box-shadow:0 10px 26px rgba(7,193,96,.35);
+}
+@keyframes checkIn{0%{transform:scale(0)}70%{transform:scale(1.12)}100%{transform:scale(1)}}
+.succ-title{font-size:20px;font-weight:600;margin-top:18px;color:#1a1a1a;}
+.succ-amt{font-size:34px;font-weight:600;margin-top:10px;letter-spacing:-1px;}
+.succ-sub{font-size:14px;color:#8a8a8a;margin-top:8px;}
+.succ-btn{margin-top:34px;width:200px;height:46px;border-radius:23px;background:#07C160;color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:500;box-shadow:0 8px 20px rgba(7,193,96,.28);}
+.succ-btn:active{background:#06AD56;}
+
+/* ========== 朋友圈 ========== */
+.moments-cover{height:270px;background:linear-gradient(160deg,#4b6cb7,#182848);position:relative;}
+.moments-cover .cover-name{position:absolute;right:16px;bottom:-14px;display:flex;align-items:flex-end;gap:12px;}
+.moments-cover .cover-name span{color:#fff;font-size:17px;font-weight:500;padding-bottom:26px;text-shadow:0 1px 4px rgba(0,0,0,.4);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cover-avatar{width:66px;height:66px;border-radius:9px;border:3px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff;font-size:26px;font-weight:500;overflow:hidden;flex:0 0 66px;}
+.post{display:flex;padding:18px 14px 0;background:#fff;}
+.post-av{width:42px;height:42px;border-radius:5px;flex:0 0 42px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;overflow:hidden;}
+.post-body{flex:1;margin-left:12px;min-width:0;padding-bottom:16px;border-bottom:1px solid #F0F0F0;}
+.post-name{color:#576B95;font-size:15px;font-weight:500;}
+.post-text{font-size:15px;line-height:1.45;margin-top:6px;color:#191919;word-break:break-word;}
+.post-imgs{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:9px;max-width:236px;}
+.post-imgs.one{grid-template-columns:1fr;max-width:150px;}
+.post-imgs.two{grid-template-columns:repeat(2,1fr);max-width:160px;}
+.post-imgs > div{position:relative;padding-top:100%;border-radius:4px;overflow:hidden;}
+.post-imgs .fill{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:24px;}
+.post-imgs img.fill{width:100%;height:100%;object-fit:cover;}
+.post-meta{display:flex;align-items:center;justify-content:space-between;margin-top:9px;font-size:12px;color:#9a9a9a;}
+.post-actions{display:flex;gap:16px;color:#576B95;font-size:13px;}
+.post-actions span:active{opacity:.6;}
+.post-actions span.liked{color:#E64340;}
+.post-likes{margin-top:9px;background:#F7F7F7;border-radius:4px;padding:7px 10px;font-size:13px;color:#576B95;line-height:1.7;}
+.post-likes .cmt b{color:#576B95;font-weight:500;}
+.post-likes .cmt{color:#333;}
+
+/* ========== 发表朋友圈 ========== */
+#postText{width:100%;min-height:120px;border:0;padding:16px;font-size:16px;line-height:1.55;resize:none;background:#fff;display:block;}
+#postText::placeholder{color:#c2c2c2;}
+.post-picked{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:6px 16px 16px;background:#fff;}
+.picked-item{position:relative;padding-top:100%;border-radius:8px;overflow:hidden;background:#f2f2f2;}
+.picked-item .fill{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:24px;}
+.picked-item img.fill{width:100%;height:100%;object-fit:cover;}
+.picked-item .del{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;z-index:3;}
+.add-tile{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:28px;color:#c9c9c9;border:1px dashed #dcdcdc;border-radius:8px;background:#fafafa;}
+.pick-sec{background:#fff;padding:0 16px 16px;}
+.pick-title{font-size:13px;color:#8a8a8a;margin:14px 0 10px;}
+.emoji-pick{display:grid;grid-template-columns:repeat(8,1fr);gap:10px;}
+.emoji-pick > div{aspect-ratio:1;border-radius:8px;background:#F4F4F4;display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid transparent;}
+.emoji-pick > div.sel{border-color:#07C160;background:#E9FBF1;}
+
+/* ========== 个人信息 / 头像弹层 ========== */
+.avatar-sm{width:46px;height:46px;border-radius:5px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:17px;overflow:hidden;margin-right:4px;}
+.avatar-preview{width:88px;height:88px;border-radius:12px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:34px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.14);}
+.btn-upload{width:100%;height:44px;border-radius:22px;background:#07C160;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;margin-bottom:6px;}
+.btn-upload:active{background:#06AD56;}
+.avatar-panel{padding:18px 16px 26px;background:#fff;overflow-y:auto;flex:1;}
+.color-pick{display:grid;grid-template-columns:repeat(8,1fr);gap:10px;padding-bottom:8px;}
+.color-pick > div{aspect-ratio:1;border-radius:50%;border:3px solid transparent;}
+.color-pick > div.sel{border-color:#07C160;box-shadow:inset 0 0 0 2px #fff;}
+.edit-wrap{padding:18px 16px 26px;background:#fff;}
+.edit-input{width:100%;height:46px;background:#F7F7F7;border-radius:6px;padding:0 12px;font-size:16px;border:1px solid #EEE;}
+.edit-hint{font-size:12px;color:#aaa;margin-top:10px;}
+
+/* ========== 通话界面 ========== */
+.call-overlay{
+  position:absolute;inset:0;z-index:450;display:none;flex-direction:column;align-items:center;
+  color:#fff;overflow:hidden;background:#26262b;
+}
+.call-overlay.show{display:flex;}
+.call-bg{position:absolute;inset:-12%;background-size:cover;background-position:center;filter:blur(42px) brightness(.5);transform:scale(1.18);}
+.call-info{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;padding-top:15vh;width:100%;}
+.call-avatar{
+  width:104px;height:104px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+  font-size:44px;color:#fff;overflow:hidden;box-shadow:0 14px 34px rgba(0,0,0,.45);
+  animation:pulseAv 2.6s ease-in-out infinite;
+}
+@keyframes pulseAv{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
+.call-name{font-size:24px;font-weight:600;margin-top:24px;text-shadow:0 2px 8px rgba(0,0,0,.4);}
+.call-status{font-size:15px;opacity:.82;margin-top:10px;letter-spacing:.6px;}
+.call-actions{
+  position:relative;z-index:2;margin-top:auto;display:flex;justify-content:space-around;
+  width:100%;padding:0 28px calc(48px + var(--sb));
+}
+.call-btn{display:flex;flex-direction:column;align-items:center;gap:9px;font-size:12px;opacity:.95;width:78px;}
+.call-btn .circle{
+  width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.18);
+  display:flex;align-items:center;justify-content:center;transition:background .2s,color .2s;
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+}
+.call-btn .circle svg{width:27px;height:27px;}
+.call-btn.active .circle{background:#fff;color:#222;}
+.call-btn.hangup .circle{background:#E64340;}
+.call-btn:active .circle{transform:scale(.94);}
+.call-self{
+  position:absolute;top:78px;right:16px;width:98px;height:142px;border-radius:12px;overflow:hidden;
+  z-index:3;background:#111;display:none;box-shadow:0 10px 24px rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.15);
+}
+.call-overlay.video .call-self{display:flex;}
+.call-self .mini{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:34px;color:#fff;}
+
+/* ========== 提示 Toast ========== */
+.toast{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.9);
+  background:rgba(0,0,0,.82);color:#fff;padding:13px 20px;border-radius:8px;
+  font-size:14px;max-width:74%;text-align:center;z-index:700;
+  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;line-height:1.45;
+}
+.toast.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
+
+/* ========== 字母索引 ========== */
+.indexbar{position:absolute;right:2px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;z-index:5;}
+.indexbar span{font-size:11px;color:#7a7a7a;padding:1px 6px;font-weight:500;}
+</style>
+</head>
+<body>
+
+<div class="phone" id="phone">
+
+  <!-- ==================== 状态栏 ==================== -->
+  <div class="statusbar" id="statusbar">
+    <div class="sb-left"><span id="clock">9:41</span></div>
+    <div class="sb-right">
+      <svg class="sb-icon" width="18" height="12" viewBox="0 0 18 12" fill="currentColor">
+        <rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="6" rx="1"/>
+        <rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/>
+      </svg>
+      <svg class="sb-icon" width="17" height="12" viewBox="0 0 17 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+        <path d="M1.6 4.3a10.6 10.6 0 0 1 13.8 0"/><path d="M4.4 7.2a6.4 6.4 0 0 1 8.2 0"/>
+        <circle cx="8.5" cy="10" r="1.1" fill="currentColor" stroke="none"/>
+      </svg>
+      <svg class="sb-icon" width="26" height="12" viewBox="0 0 26 12">
+        <rect x="0.5" y="0.5" width="21" height="11" rx="3" fill="none" stroke="currentColor" stroke-opacity=".38"/>
+        <rect x="2" y="2" width="18" height="8" rx="2" fill="currentColor"/>
+        <path d="M23.4 4v4c1-.3 1.6-.9 1.6-2s-.6-1.7-1.6-2z" fill="currentColor" fill-opacity=".45"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ==================== 主页面（Tab） ==================== -->
+  <div class="screen" id="screen">
+
+    <!-- ---------- 微信 ---------- -->
+    <section class="tab-page active" id="tab-chats">
+      <div class="nav">
+        <div class="nav-title">微信</div>
+        <div class="nav-right">
+          <button class="icon-btn" id="btnSearchTop">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="2" stroke-linecap="round">
+              <circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/>
+            </svg>
+          </button>
+          <button class="icon-btn" id="btnPlusTop">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="2" stroke-linecap="round">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="searchbar">
+        <div class="sb-input">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9a9a9a" stroke-width="2.2" stroke-linecap="round">
+            <circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/>
+          </svg>
+          <span>搜索</span>
+        </div>
+      </div>
+      <div class="scroll" id="chatList"></div>
+    </section>
+
+    <!-- ---------- 通讯录 ---------- -->
+    <section class="tab-page" id="tab-contacts">
+      <div class="nav">
+        <div class="nav-title">通讯录</div>
+        <div class="nav-right">
+          <button class="icon-btn" id="btnAddFriend">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="1.9" stroke-linecap="round">
+              <circle cx="10" cy="8" r="4"/><path d="M3 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/><path d="M19 5v6M16 8h6"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="searchbar">
+        <div class="sb-input">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9a9a9a" stroke-width="2.2" stroke-linecap="round">
+            <circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/>
+          </svg>
+          <span>搜索</span>
+        </div>
+      </div>
+      <div class="scroll" id="contactList" style="position:relative;"></div>
+    </section>
+
+    <!-- ---------- 发现 ---------- -->
+    <section class="tab-page" id="tab-discover">
+      <div class="nav"><div class="nav-title">发现</div></div>
+      <div class="scroll" id="discoverList"></div>
+    </section>
+
+    <!-- ---------- 我 ---------- -->
+    <section class="tab-page" id="tab-me">
+      <div class="nav" style="background:#EDEDED;"></div>
+      <div class="scroll" id="meList"></div>
+    </section>
+
+  </div>
+
+  <!-- ==================== 底部 Tab 栏 ==================== -->
+  <nav class="tabbar" id="tabbar">
+    <div class="tab active" data-tab="chats">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
+        <path d="M9 4.3c-3.9 0-7 2.5-7 5.6 0 1.7.9 3.3 2.4 4.3l-.6 2 2.4-1.2c.9.2 1.8.4 2.8.4.4 0 .8 0 1.2-.1"/>
+        <path d="M22 15.4c0-2.5-2.4-4.5-5.4-4.5s-5.4 2-5.4 4.5 2.4 4.5 5.4 4.5c.6 0 1.2-.1 1.7-.2l1.9 1-.5-1.6c1.4-.8 2.3-2.2 2.3-3.7z"/>
+      </svg>
+      <span>微信</span>
+      <i class="dot" id="tabDotChat"></i>
+    </div>
+    <div class="tab" data-tab="contacts">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round">
+        <rect x="3" y="3.5" width="18" height="17" rx="2.5"/><circle cx="12" cy="10" r="2.8"/>
+        <path d="M6.9 17.6c.9-2 2.9-3.2 5.1-3.2s4.2 1.2 5.1 3.2"/>
+      </svg>
+      <span>通讯录</span>
+    </div>
+    <div class="tab" data-tab="discover">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/><path d="M15.6 8.4 13.5 13.5 8.4 15.6l2.1-5.1z"/>
+      </svg>
+      <span>发现</span>
+      <i class="dot" id="discoverDot"></i>
+    </div>
+    <div class="tab" data-tab="me">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round">
+        <circle cx="12" cy="8" r="3.6"/><path d="M4.8 20c0-3.6 3.2-6.2 7.2-6.2s7.2 2.6 7.2 6.2"/>
+      </svg>
+      <span>我</span>
+    </div>
+  </nav>
+
+  <!-- ==================== 二级页面：聊天 ==================== -->
+  <div class="subpage" id="page-chat">
+    <div class="nav">
+      <div class="nav-left">
+        <button class="nav-back" data-back>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>
+        </button>
+      </div>
+      <div class="nav-title" id="chatTitle">聊天</div>
+      <div class="nav-right">
+        <button class="icon-btn" id="chatCallVoice" title="语音通话">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="1.8" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a12 12 0 0 0 5 5L15 13l5 2v4a1.6 1.6 0 0 1-1.8 1.6C10.6 20 4 13.4 3.4 5.8A1.6 1.6 0 0 1 5 4z"/></svg>
+        </button>
+        <button class="icon-btn" id="chatCallVideo" title="视频通话">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2.5"/><path d="M16 11l5-3v8l-5-3z"/></svg>
+        </button>
+        <button class="icon-btn" id="chatMore">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="chat-scroll" id="chatScroll"></div>
+    <div class="panel" id="emojiPanel"><div class="panel-inner"><div class="emoji-grid" id="emojiGrid"></div></div></div>
+    <div class="panel" id="plusPanel"><div class="panel-inner"><div class="plus-grid" id="plusGrid"></div></div></div>
+    <div class="chat-inputbar">
+      <button class="ib-btn" id="ibVoice">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 10v4M8 6v12M12 3v18M16 6v12M20 10v4"/></svg>
+      </button>
+      <input id="msgInput" type="text" placeholder="" autocomplete="off">
+      <button class="ib-btn" id="ibEmoji">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="1.1" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="1.1" fill="currentColor" stroke="none"/><path d="M8.4 14.4a4.4 4.4 0 0 0 7.2 0" stroke-linecap="round"/></svg>
+      </button>
+      <button class="ib-btn" id="ibPlus">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== 二级页面：朋友圈 ==================== -->
+  <div class="subpage" id="page-moments">
+    <div class="nav white" style="position:absolute;left:0;right:0;top:0;background:transparent;z-index:20;">
+      <div class="nav-left">
+        <button class="nav-back" data-back style="color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>
+        </button>
+      </div>
+      <div class="nav-right">
+        <button class="icon-btn" id="momentCamera" style="color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5);">
+          <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 8.5A2.5 2.5 0 0 1 5.5 6h1.8l1.2-2h7l1.2 2h1.8A2.5 2.5 0 0 1 21 8.5v9A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5z"/>
+            <circle cx="12" cy="13" r="3.4"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="scroll" id="momentsScroll" style="background:#fff;padding-bottom:30px;"></div>
+  </div>
+
+  <!-- ==================== 二级页面：发表朋友圈 ==================== -->
+  <div class="subpage" id="page-post">
+    <div class="nav white">
+      <div class="nav-left">
+        <button class="nav-back" data-back>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>
+        </button>
+      </div>
+      <div class="nav-title">发表朋友圈</div>
+      <div class="nav-right">
+        <button id="btnPublish" style="color:#07C160;font-size:16px;font-weight:500;padding:0 14px;height:44px;">发表</button>
+      </div>
+    </div>
+    <div class="scroll" style="background:#fff;">
+      <textarea id="postText" placeholder="这一刻的想法..."></textarea>
+      <div class="post-picked" id="postPicked"></div>
+      <div class="pick-sec">
+        <div class="pick-title">从相册选择图片（最多 9 张）</div>
+        <button class="btn-upload" id="btnUploadPost">＋ 从相册选择</button>
+        <input type="file" id="postFile" accept="image/*" multiple style="display:none">
+        <div class="pick-title">或选择一个表情配图</div>
+        <div class="emoji-pick" id="postEmojiPick"></div>
+      </div>
+      <div class="group" style="margin-top:10px;">
+        <div class="row"><div class="row-title">所在位置</div><div class="row-val">北京市 · 朝阳区</div><div class="row-arrow"></div></div>
+        <div class="row"><div class="row-title">谁可以看</div><div class="row-val">公开</div><div class="row-arrow"></div></div>
+      </div>
+      <div style="height:40px;"></div>
+    </div>
+  </div>
+
+  <!-- ==================== 二级页面：个人信息 ==================== -->
+  <div class="subpage" id="page-profile">
+    <div class="nav white">
+      <div class="nav-left">
+        <button class="nav-back" data-back>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>
+        </button>
+      </div>
+      <div class="nav-title">个人信息</div>
+    </div>
+    <div class="scroll" id="profileScroll"></div>
+  </div>
+
+  <!-- ==================== 二级页面：钱包 ==================== -->
+  <div class="subpage" id="page-wallet">
+    <div class="nav white">
+      <div class="nav-left">
+        <button class="nav-back" data-back>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>
+        </button>
+      </div>
+      <div class="nav-title">钱包</div>
+    </div>
+    <div class="scroll" id="walletScroll"></div>
+  </div>
+
+  <!-- ==================== 二级页面：服务 ==================== -->
+  <div class="subpage" id="page-service">
+    <div class="nav white">
+      <div class="nav-left">
+        <button class="nav-back" data-back>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>
+        </button>
+      </div>
+      <div class="nav-title">服务</div>
+    </div>
+    <div class="scroll" id="serviceScroll"></div>
+  </div>
+
+  <!-- ==================== 二级页面：账单 ==================== -->
+  <div class="subpage" id="page-bills">
+    <div class="nav white">
+      <div class="nav-left">
+        <button class="nav-back" data-back>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>
+        </button>
+      </div>
+      <div class="nav-title">账单</div>
+    </div>
+    <div class="scroll" id="billScroll"></div>
+  </div>
+
+  <!-- ==================== 二级页面：收付款 ==================== -->
+  <div class="subpage" id="page-paycode">
+    <div class="nav white">
+      <div class="nav-left">
+        <button class="nav-back" data-back>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>
+        </button>
+      </div>
+      <div class="nav-title">收付款</div>
+    </div>
+    <div class="scroll">
+      <div class="paycode-wrap">
+        <div class="paycode-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#07C160" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM20 14v3M17 20h4"/></svg>
+          向商家付款
+        </div>
+        <canvas id="qrCanvas" width="380" height="380"></canvas>
+        <div class="charge-bar"><canvas id="barCanvas" width="540" height="150"></canvas></div>
+        <div class="paycode-bal">零钱 <b id="paycodeBal">¥0.00</b></div>
+        <div class="paycode-tip">数字支付 · 安全便捷（界面演示）</div>
+        <button class="succ-btn" id="btnSimPay" style="margin-top:20px;width:220px;height:44px;font-size:15px;border-radius:22px;">模拟向商家付款</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 二级页面：扫一扫 ==================== -->
+  <div class="subpage" id="page-scan" data-dark="1">
+    <div class="nav dark">
+      <div class="nav-left">
+        <button class="nav-back" data-back>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>
+        </button>
+      </div>
+      <div class="nav-title">扫一扫</div>
+    </div>
+    <div class="scan-body">
+      <div class="scan-frame">
+        <span class="scan-corner tl"></span><span class="scan-corner tr"></span>
+        <span class="scan-corner bl"></span><span class="scan-corner br"></span>
+        <div class="scan-line"></div>
+      </div>
+      <div class="scan-tip">将二维码放入框内，即可自动扫描</div>
+      <div class="scan-actions">
+        <div>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M8 6l1.5-2h5L16 6"/><circle cx="12" cy="12.5" r="3.2"/></svg>
+          <span>扫码</span>
+        </div>
+        <div>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 8V4h4M20 8V4h-4M4 16v4h4M20 16v4h-4"/><path d="M7 12h10"/></svg>
+          <span>翻译</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 二级页面：支付确认 ==================== -->
+  <div class="subpage" id="page-pay">
+    <div class="nav white" style="background:#fff;">
+      <div class="nav-left">
+        <button class="nav-back" data-back>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 6 18 18M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <div class="nav-title">微信支付</div>
+    </div>
+    <div class="pay-page">
+      <div class="pay-main">
+        <div class="pay-amt" id="payAmount"><small>¥</small>0.00</div>
+        <div class="pay-merchant"><span class="dot-g"></span><span id="payMerchant">商家</span></div>
+        <div class="pay-lines">
+          <div class="pay-line"><span class="lbl">付款方式</span><span class="val">零钱 <b id="payBalance" style="color:#07C160;">¥0.00</b>
+            <i style="width:7px;height:7px;border-right:1.6px solid #C7C7CC;border-top:1.6px solid #C7C7CC;transform:rotate(45deg);display:inline-block;"></i></span></div>
+          <div class="pay-line"><span class="lbl">商品说明</span><span class="val" id="payDesc">消费付款</span></div>
+        </div>
+        <button class="pay-btn" id="btnConfirmPay" style="width:calc(100% - 32px);">立即支付</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 二级页面：金额键盘 ==================== -->
+  <div class="subpage" id="page-amount">
+    <div class="nav white">
+      <div class="nav-left">
+        <button class="nav-back" data-back>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>
+        </button>
+      </div>
+      <div class="nav-title" id="amountTitle">转账</div>
+    </div>
+    <div class="amt-body">
+      <div class="amt-label" id="amountLabel">转账金额</div>
+      <div class="amt-value">
+        <span class="cny">¥</span><span class="num" id="amountNum">0.00</span>
+      </div>
+      <div class="amt-balance" id="amountBalance">零钱余额 ¥0.00</div>
+    </div>
+    <div class="amt-bottom">
+      <button class="amt-confirm" id="amountConfirm">确认转账</button>
+      <div class="keypad" id="amountKeypad"></div>
+    </div>
+  </div>
+
+  <!-- ==================== 二级页面：设置 ==================== -->
+  <div class="subpage" id="page-settings">
+    <div class="nav white">
+      <div class="nav-left">
+        <button class="nav-back" data-back>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>
+        </button>
+      </div>
+      <div class="nav-title">设置</div>
+    </div>
+    <div class="scroll" id="settingsScroll"></div>
+  </div>
+
+  <!-- ==================== 通话界面 ==================== -->
+  <div class="call-overlay" id="callOverlay">
+    <div class="call-bg" id="callBg"></div>
+    <div class="call-self"><div class="mini" id="callSelfMini">我</div></div>
+    <div class="call-info">
+      <div class="call-avatar" id="callAvatar">张</div>
+      <div class="call-name" id="callName">好友</div>
+      <div class="call-status" id="callStatus">正在呼叫...</div>
+    </div>
+    <div class="call-actions">
+      <div class="call-btn" id="callMute">
+        <div class="circle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0"/><path d="M12 18v3"/>
+          </svg>
+        </div>
+        <span>静音</span>
+      </div>
+      <div class="call-btn hangup" id="callHangup">
+        <div class="circle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
+            <path d="M5 4h4l2 5-2.5 1.5a12 12 0 0 0 5 5L15 13l5 2v4a1.6 1.6 0 0 1-1.8 1.6C10.6 20 4 13.4 3.4 5.8A1.6 1.6 0 0 1 5 4z" transform="rotate(135 12 12)"/>
+          </svg>
+        </div>
+        <span>挂断</span>
+      </div>
+      <div class="call-btn" id="callSpeaker">
+        <div class="circle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 9.5h3.2L12 6v12l-4.8-3.5H4z"/><path d="M16 9.2a4 4 0 0 1 0 5.6"/><path d="M18.6 6.6a7.6 7.6 0 0 1 0 10.8"/>
+          </svg>
+        </div>
+        <span>免提</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 遮罩 & 支付密码弹层 ==================== -->
+  <div class="mask" id="mask"></div>
+
+  <div class="sheet" id="pwdSheet">
+    <div class="pwd-head">
+      <span class="pwd-x" id="pwdClose">✕</span>
+      <span class="pwd-title">请输入支付密码</span>
+      <span class="pwd-x" style="visibility:hidden;">✕</span>
+    </div>
+    <div class="pwd-amt" id="pwdAmt">¥0.00</div>
+    <div class="pwd-tip">演示密码：123456</div>
+    <div class="pwd-dots" id="pwdDots"></div>
+    <div class="keypad" id="pwdKeypad"></div>
+  </div>
+
+  <!-- ==================== 文本编辑弹层（个人信息） ==================== -->
+  <div class="sheet" id="editSheet">
+    <div class="pwd-head">
+      <span class="pwd-x" id="editCancel">取消</span>
+      <span class="pwd-title" id="editTitle">修改信息</span>
+      <span class="pwd-x green" id="editSave">保存</span>
+    </div>
+    <div class="edit-wrap">
+      <input class="edit-input" id="editInput" type="text" autocomplete="off">
+      <div class="edit-hint" id="editHint"></div>
+    </div>
+  </div>
+
+  <!-- ==================== 头像选择弹层 ==================== -->
+  <div class="sheet" id="avatarSheet">
+    <div class="pwd-head">
+      <span class="pwd-x" id="avatarCancel">取消</span>
+      <span class="pwd-title">选择头像</span>
+      <span class="pwd-x green" id="avatarSave">完成</span>
+    </div>
+    <div class="avatar-panel">
+      <div class="avatar-preview" id="avatarPreview">😎</div>
+      <button class="btn-upload" id="btnUploadAvatar">从相册选择图片</button>
+      <input type="file" id="avatarFile" accept="image/*" style="display:none">
+      <button class="btn-upload" id="btnClearAvatar" style="background:#F2F2F2;color:#333;margin-top:10px;">恢复为表情头像</button>
+      <div class="pick-title">选择表情头像</div>
+      <div class="emoji-pick" id="avatarEmojiPick"></div>
+      <div class="pick-title">选择背景色</div>
+      <div class="color-pick" id="avatarColorPick"></div>
+    </div>
+  </div>
+
+  <!-- ==================== 支付成功（含 Three.js 3D 金币） ==================== -->
+  <div class="success" id="successOverlay">
+    <canvas id="coin3d"></canvas>
+    <div class="succ-content">
+      <div class="succ-check">✓</div>
+      <div class="succ-title" id="succTitle">支付成功</div>
+      <div class="succ-amt" id="succAmount">¥0.00</div>
+      <div class="succ-sub" id="succSub">商户</div>
+      <button class="succ-btn" id="succDone">完成</button>
+    </div>
+  </div>
+
+  <!-- ==================== Toast ==================== -->
+  <div class="toast" id="toast"></div>
+
+</div>
+
+<!-- Three.js 通过 CDN 引入，用于支付成功的 3D 金币动画 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* =========================================================
+   0. 通用工具
+   ========================================================= */
+const $  = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+
+// 金额格式化（千分位 + 两位小数）
+function money(n){
+  return Number(n).toLocaleString('zh-CN',{minimumFractionDigits:2, maximumFractionDigits:2});
+}
+// 当前时间字符串
+function nowStr(){
+  const d = new Date();
+  const p = x => String(x).padStart(2,'0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+// 连点节流
+let lastTapTime = 0;
+function canTap(ms){
+  const t = Date.now();
+  if(t - lastTapTime < (ms || 180)) return false;
+  lastTapTime = t;
+  return true;
+}
+// HTML 转义
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+// 安全读写 localStorage
+function loadJSON(key, def){
+  try{
+    const v = localStorage.getItem(key);
+    if(v) return Object.assign({}, def, JSON.parse(v));
+  }catch(e){}
+  return JSON.parse(JSON.stringify(def));
+}
+function safeSet(key, val){
+  try{ localStorage.setItem(key, val); return true; }
+  catch(e){ toast('本地存储空间不足，内容可能无法长期保存'); return false; }
+}
+
+/* =========================================================
+   1. 音效（Web Audio API 实时合成，不依赖任何音频文件）
+   ========================================================= */
+let audioCtx = null;
+function ac(){
+  if(!audioCtx){
+    try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){}
+  }
+  if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+function beep(freq, dur, type, vol, delay){
+  const c = ac(); if(!c) return;
+  const t0 = c.currentTime + (delay || 0);
+  const osc = c.createOscillator();
+  const gain = c.createGain();
+  osc.type = type || 'sine';
+  osc.frequency.setValueAtTime(freq, t0);
+  gain.gain.setValueAtTime(0, t0);
+  gain.gain.linearRampToValueAtTime(vol || 0.12, t0 + 0.012);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  osc.connect(gain); gain.connect(c.destination);
+  osc.start(t0); osc.stop(t0 + dur + 0.03);
+}
+const sfx = {
+  tap(){ beep(1500, .04, 'square', .035); },
+  key(){ beep(1700, .03, 'square', .05); },
+  send(){ beep(940, .07, 'sine', .1); beep(1300, .1, 'sine', .075, .05); },
+  recv(){ beep(700, .09, 'sine', .11); beep(1040, .13, 'sine', .085, .08); },
+  ok(){ [660, 880, 1180].forEach((f, i) => beep(f, .2, 'sine', .1, i * .07)); },
+  coin(){ [1046, 1318, 1568, 2093].forEach((f, i) => beep(f, .38, 'triangle', .085, i * .06)); },
+  err(){ beep(170, .22, 'sawtooth', .09); },
+  swipe(){ beep(560, .1, 'sine', .055); },
+  ring(){ // 回铃音（双音循环）
+    beep(440, .4, 'sine', .065);
+    beep(480, .4, 'sine', .065);
+  },
+  connect(){ [880, 1174, 1568].forEach((f, i) => beep(f, .16, 'sine', .09, i * .06)); },
+  hangup(){ beep(520, .12, 'sine', .08); beep(360, .18, 'sine', .07, .1); }
+};
+function vib(ms){ if(navigator.vibrate) navigator.vibrate(ms || 12); }
+
+/* =========================================================
+   2. 数据层
+   ========================================================= */
+const AVATAR_COLORS = ['#4B8BF5','#F5A623','#07C160','#E85D75','#8E6BF2','#38B2AC','#F2705C','#5B8DEF','#33B1A5','#C86DD7'];
+function colorOf(name){
+  let h = 0;
+  for(let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) % 997;
+  return AVATAR_COLORS[h % AVATAR_COLORS.length];
+}
+
+// 默认个人资料
+const DEFAULT_PROFILE = {
+  name: 'Claude 用户',
+  wxid: 'claude_demo_2024',
+  avatar: '',                 // 上传的头像（base64 dataURL）
+  emoji: '😎',                // 预设表情头像
+  bg: '#4B8BF5',              // 头像背景色
+  gender: '男',
+  region: '北京 · 朝阳',
+  sign: '这个人很懒，什么都没留下'
+};
+
+const store = {
+  profile: loadJSON('wx_profile', DEFAULT_PROFILE),
+  balance: (() => {
+    const v = localStorage.getItem('wx_balance');
+    return v === null ? 8888.88 : parseFloat(v);
+  })(),
+  bills: (() => {
+    try{
+      const v = localStorage.getItem('wx_bills');
+      if(v) return JSON.parse(v);
+    }catch(e){}
+    return [
+      { time: '2024-05-12 09:24', name: '星巴克咖啡（国贸店）', amount: -38.00 },
+      { time: '2024-05-11 19:02', name: '收到 张伟 的转账', amount: 200.00 },
+      { time: '2024-05-10 12:31', name: '美团外卖', amount: -26.50 },
+      { time: '2024-05-09 08:15', name: '零钱充值', amount: 1000.00 }
+    ];
+  })(),
+  password: '123456',
+  moments: null,               // 朋友圈数据（下方初始化）
+  momentUnread: parseInt(localStorage.getItem('wx_moment_unread') || '0', 10) || 0
+};
+
+function saveStore(){
+  safeSet('wx_balance', String(store.balance));
+  safeSet('wx_bills', JSON.stringify(store.bills));
+}
+function saveProfile(){
+  safeSet('wx_profile', JSON.stringify(store.profile));
+}
+function addBill(name, amount){
+  store.bills.unshift({ time: nowStr(), name: name, amount: amount });
+  if(store.bills.length > 60) store.bills.pop();
+  saveStore();
+  renderBills();
+  renderWallet();
+}
+
+/* =========================================================
+   3. 头像渲染工具
+   ========================================================= */
+// 渲染任意头像（profile 对象：{name, avatar, emoji, bg}）
+function avatarHTML(p, cls, extraStyle){
+  const bg = (p && p.bg) || '#4B8BF5';
+  let inner;
+  if(p && p.avatar){
+    inner = `<img class="av-img" src="${p.avatar}" alt="">`;
+  }else{
+    inner = (p && p.emoji) ? p.emoji : ((p && p.name) ? p.name.slice(0,1) : '我');
+  }
+  return `<div class="${cls}" style="background:${bg};${extraStyle || ''}">${inner}</div>`;
+}
+// 好友头像（按姓名生成纯色方块）
+function friendAvatarHTML(name, cls){
+  return `<div class="${cls}" style="background:${colorOf(name)}">${escapeHtml(name.slice(0,1))}</div>`;
+}
+// 生成“我”的头像对象
+function meObj(){
+  return {
+    name: store.profile.name,
+    avatar: store.profile.avatar,
+    emoji: store.profile.emoji,
+    bg: store.profile.bg
+  };
+}
+
+/* =========================================================
+   4. 会话数据
+   ========================================================= */
+const chats = {};
+function addChat(id, name, msgs){
+  chats[id] = { id, name, avatar: name.slice(0,1), color: colorOf(name), msgs: msgs || [], unread: 0, time: '' };
+  return chats[id];
+}
+addChat('c1', '张伟', [
+  { t: 'time', text: '上午 9:20' },
+  { f: 'them', k: 'text', text: '早啊，今天天气不错' },
+  { f: 'me',   k: 'text', text: '早上好！' },
+  { f: 'them', k: 'text', text: '晚上一起吃饭吗？' }
+]);
+chats.c1.time = '上午 9:24'; chats.c1.unread = 2;
+
+addChat('c2', '李雷', [
+  { t: 'time', text: '昨天 18:30' },
+  { f: 'them', k: 'text', text: '方案我看过了，大体没问题' },
+  { f: 'me',   k: 'text', text: '好嘞，我今天改完发你' }
+]);
+chats.c2.time = '昨天';
+
+addChat('c3', '微信团队', [
+  { t: 'time', text: '上午 10:00' },
+  { f: 'them', k: 'text', text: '欢迎使用微信！本页面为高仿界面演示。' },
+  { f: 'them', k: 'text', text: '可前往「我 - 服务 - 收付款」体验余额支付流程。' },
+  { f: 'them', k: 'text', text: '在聊天页点击右上角可发起语音／视频通话。' }
+]);
+chats.c3.time = '上午 10:00';
+
+addChat('c4', '林晓', [
+  { t: 'time', text: '星期一' },
+  { f: 'them', k: 'text', text: '周末去哪玩了？' },
+  { f: 'me',   k: 'text', text: '在家躺着哈哈' }
+]);
+chats.c4.time = '星期一';
+
+addChat('c5', '产品交流群', [
+  { t: 'time', text: '11:02' },
+  { f: 'them', k: 'text', text: '【王芳】新版本下周上线' },
+  { f: 'them', k: 'text', text: '【周杰】收到 👌' }
+]);
+chats.c5.time = '11:02'; chats.c5.unread = 5;
+
+addChat('c6', '孙悦', [
+  { t: 'time', text: '星期二' },
+  { f: 'them', k: 'text', text: '文件已发你邮箱了' }
+]);
+chats.c6.time = '星期二';
+
+// 通讯录
+const CONTACT_SEED = 'A安琪|B白露|C陈晨|C曹阳|D丁一|D邓紫|F范冰|G高远|G郭靖|H韩梅|H何洁|J蒋雯|J金城|K孔明|L李雷|L林晓|L刘洋|M马冬|N倪妮|O欧阳|P潘石|Q钱进|Q秦岚|R任达|S孙悦|T唐嫣|W王芳|W吴磊|X徐静|X谢娜|Y杨幂|Y姚明|Z张伟|Z赵敏|Z周杰';
+const contacts = CONTACT_SEED.split('|').map(s => ({
+  letter: s[0],
+  name: s.slice(1),
+  color: colorOf(s.slice(1))
+}));
+
+// 自动回复语料
+const REPLIES = [
+  '哈哈，好的 👌', '收到！', '嗯嗯，我看看', '稍等我确认一下',
+  '这个想法不错', '哈哈哈笑死我了', '晚点聊哈，先忙了', '好呀，就这么定了',
+  '我也这么觉得', '图片/文件稍后发你'
+];
+
+/* =========================================================
+   5. 朋友圈数据（含持久化）
+   ========================================================= */
+function defaultMoments(){
+  const now = Date.now();
+  return [
+    {
+      id: 'm1', author: '张伟', isMe: false, ts: now - 3600e3,
+      text: '周末爬了个山，山顶的云海太治愈了 ⛰️',
+      imgs: [{ k: 'emoji', v: '🏔' }, { k: 'emoji', v: '☁️' }, { k: 'emoji', v: '🌤' }],
+      likes: ['李雷', '林晓', '王芳'],
+      comments: [{ name: '林晓', text: '太美了吧！' }, { name: '李雷', text: '下次带我一个' }]
+    },
+    {
+      id: 'm2', author: '林晓', isMe: false, ts: now - 3 * 3600e3,
+      text: '新学的咖啡拉花，第一次成功 ☕',
+      imgs: [{ k: 'emoji', v: '☕' }],
+      likes: ['张伟', '孙悦'],
+      comments: [{ name: '孙悦', text: '好厉害呀' }]
+    },
+    {
+      id: 'm3', author: '李雷', isMe: false, ts: now - 26 * 3600e3,
+      text: '项目终于上线了，感谢团队每一位同学 💪',
+      imgs: [{ k: 'emoji', v: '💻' }, { k: 'emoji', v: '🎉' }, { k: 'emoji', v: '📊' },
+             { k: 'emoji', v: '🚀' }, { k: 'emoji', v: '🏆' }, { k: 'emoji', v: '✨' }],
+      likes: ['张伟', '陈晨', '王芳', '周杰'],
+      comments: [{ name: '王芳', text: '恭喜恭喜！' }]
+    },
+    {
+      id: 'm4', author: '孙悦', isMe: false, ts: now - 30 * 3600e3,
+      text: '今日份的晚霞 🌇',
+      imgs: [{ k: 'emoji', v: '🌇' }, { k: 'emoji', v: '🌆' }],
+      likes: ['林晓'],
+      comments: []
+    }
+  ];
+}
+(function initMoments(){
+  try{
+    const v = localStorage.getItem('wx_moments');
+    if(v){ store.moments = JSON.parse(v); }
+  }catch(e){}
+  if(!store.moments || !Array.isArray(store.moments) || !store.moments.length){
+    store.moments = defaultMoments();
+  }
+})();
+function saveMoments(){ safeSet('wx_moments', JSON.stringify(store.moments)); }
+
+// 相对时间
+function relTime(ts){
+  const d = Date.now() - ts;
+  if(d < 60e3) return '刚刚';
+  if(d < 3600e3) return Math.floor(d / 60e3) + '分钟前';
+  if(d < 86400e3) return Math.floor(d / 3600e3) + '小时前';
+  if(d < 7 * 86400e3) return Math.floor(d / 86400e3) + '天前';
+  const dt = new Date(ts);
+  return (dt.getMonth() + 1) + '月' + dt.getDate() + '日';
+}
+
+/* =========================================================
+   6. 页面导航
+   ========================================================= */
+const stack = [];
+let zTop = 70;
+
+function openSub(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.style.zIndex = ++zTop;
+  void el.offsetWidth;
+  el.classList.add('active');
+  stack.push(el);
+  syncStatusbar();
+  sfx.swipe();
+  // 进入朋友圈时清空互动小红点
+  if(id === 'page-moments'){
+    store.momentUnread = 0;
+    safeSet('wx_moment_unread', '0');
+    updateDiscoverDot();
+  }
+}
+function backSub(){
+  const el = stack.pop();
+  if(!el) return;
+  el.classList.remove('active');
+  el.style.zIndex = '';
+  syncStatusbar();
+  sfx.tap();
+  if(el.id === 'page-chat') closePanels();
+}
+function closeAllSub(){
+  while(stack.length){
+    const el = stack.pop();
+    el.classList.remove('active');
+    el.style.zIndex = '';
+  }
+  syncStatusbar();
+}
+function syncStatusbar(){
+  const top = stack[stack.length - 1];
+  $('#statusbar').classList.toggle('light', !!(top && top.dataset.dark === '1'));
+}
+function switchTab(name){
+  $$('.tab-page').forEach(p => p.classList.toggle('active', p.id === 'tab-' + name));
+  $$('.tabbar .tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  closeAllSub();
+}
+$$('.tabbar .tab').forEach(t => {
+  t.addEventListener('click', () => {
+    if(t.classList.contains('active')) return;
+    sfx.tap(); vib(8);
+    switchTab(t.dataset.tab);
+  });
+});
+document.addEventListener('click', e => {
+  const back = e.target.closest('[data-back]');
+  if(back) backSub();
+});
+
+/* =========================================================
+   7. 微信（会话列表）
+   ========================================================= */
+function lastText(c){
+  for(let i = c.msgs.length - 1; i >= 0; i--){
+    const m = c.msgs[i];
+    if(m.k === 'text') return m.text;
+    if(m.k === 'transfer') return '[转账]';
+  }
+  return '';
+}
+function renderChatList(){
+  const list = Object.values(chats);
+  $('#chatList').innerHTML = list.map(c => `
+    <div class="cell" data-chatid="${c.id}">
+      ${friendAvatarHTML(c.name, 'avatar')}
+      <div class="cell-body">
+        <div class="cell-top">
+          <span class="cell-name">${escapeHtml(c.name)}</span>
+          <span class="cell-time">${c.time || ''}</span>
+        </div>
+        <div class="cell-bottom">
+          <span class="cell-msg">${escapeHtml(lastText(c))}</span>
+          ${c.unread ? `<span class="badge">${c.unread > 99 ? '99+' : c.unread}</span>` : ''}
+        </div>
+      </div>
+    </div>`).join('');
+  const total = list.reduce((s, c) => s + (c.unread || 0), 0);
+  $('#tabDotChat').classList.toggle('show', total > 0);
+}
+$('#chatList').addEventListener('click', e => {
+  const cell = e.target.closest('[data-chatid]');
+  if(!cell) return;
+  sfx.tap(); vib(8);
+  openChat(cell.dataset.chatid);
+});
+
+/* =========================================================
+   8. 聊天详情
+   ========================================================= */
+let currentChatId = null;
+
+function openChat(id){
+  const c = chats[id];
+  if(!c) return;
+  currentChatId = id;
+  c.unread = 0;
+  $('#chatTitle').textContent = c.name;
+  renderMessages();
+  renderChatList();
+  openSub('page-chat');
+  setTimeout(() => { const s = $('#chatScroll'); s.scrollTop = s.scrollHeight; }, 80);
+}
+function renderMessages(){
+  const c = chats[currentChatId];
+  if(!c) return;
+  $('#chatScroll').innerHTML = c.msgs.map(m => {
+    if(m.t === 'time') return `<div class="chat-time">${escapeHtml(m.text)}</div>`;
+    const isMe = m.f === 'me';
+    const av = isMe
+      ? avatarHTML(meObj(), 'av')
+      : friendAvatarHTML(c.name, 'av');
+    let body;
+    if(m.k === 'transfer'){
+      body = `<div class="tr-card">
+        <div class="tr-ico">¥</div>
+        <div><div class="tr-t">转账</div><div class="tr-a">¥${money(m.amount)}</div></div>
+      </div>`;
+    }else{
+      body = `<div class="bubble">${escapeHtml(m.text)}</div>`;
+    }
+    return `<div class="msg ${isMe ? 'me' : 'them'}">${av}${body}</div>`;
+  }).join('');
+}
+function scrollChatBottom(){
+  const s = $('#chatScroll');
+  s.scrollTop = s.scrollHeight;
+}
+function sendMessage(){
+  const input = $('#msgInput');
+  const text = input.value.trim();
+  if(!text){ toast('请输入内容'); return; }
+  const c = chats[currentChatId];
+  if(!c) return;
+  c.msgs.push({ f: 'me', k: 'text', text: text });
+  c.time = '刚刚';
+  input.value = '';
+  renderMessages();
+  scrollChatBottom();
+  renderChatList();
+  sfx.send(); vib(10);
+  autoReply(c);
+}
+function autoReply(c){
+  const delay = 800 + Math.random() * 900;
+  setTimeout(() => {
+    c.msgs.push({ f: 'them', k: 'text', text: REPLIES[Math.floor(Math.random() * REPLIES.length)] });
+    c.time = '刚刚';
+    if(currentChatId === c.id){
+      renderMessages();
+      scrollChatBottom();
+    }else{
+      c.unread = (c.unread || 0) + 1;
+    }
+    renderChatList();
+    sfx.recv();
+  }, delay);
+}
+
+$('#ibPlus').addEventListener('click', () => {
+  sfx.tap();
+  const em = $('#emojiPanel'), pl = $('#plusPanel');
+  em.classList.remove('open');
+  pl.classList.toggle('open');
+  if(pl.classList.contains('open')) setTimeout(scrollChatBottom, 260);
+});
+$('#ibEmoji').addEventListener('click', () => {
+  sfx.tap();
+  const em = $('#emojiPanel'), pl = $('#plusPanel');
+  pl.classList.remove('open');
+  em.classList.toggle('open');
+  if(em.classList.contains('open')) setTimeout(scrollChatBottom, 260);
+});
+function closePanels(){
+  $('#emojiPanel').classList.remove('open');
+  $('#plusPanel').classList.remove('open');
+}
+$('#msgInput').addEventListener('keydown', e => {
+  if(e.key === 'Enter') sendMessage();
+});
+$('#msgInput').addEventListener('focus', () => {
+  closePanels();
+  setTimeout(scrollChatBottom, 300);
+});
+$('#ibVoice').addEventListener('click', () => { toast('长按说话（演示）'); sfx.tap(); });
+$('#chatMore').addEventListener('click', () => { toast('聊天设置（演示）'); sfx.tap(); });
+
+/* =========================================================
+   9. 通话功能（语音 / 视频）
+   ========================================================= */
+const callState = {
+  active: false, type: 'voice', chatId: null,
+  seconds: 0, connected: false,
+  ringTimer: null, tickTimer: null, answerTimer: null
+};
+
+function fmtDur(sec){
+  const m = String(Math.floor(sec / 60)).padStart(2, '0');
+  const s = String(sec % 60).padStart(2, '0');
+  return m + ':' + s;
+}
+
+function startCall(chatId, type){
+  const c = chats[chatId];
+  if(!c) return;
+  if(callState.active) return;
+
+  closePanels();
+  callState.active = true;
+  callState.type = type;
+  callState.chatId = chatId;
+  callState.seconds = 0;
+  callState.connected = false;
+
+  const overlay = $('#callOverlay');
+  overlay.classList.toggle('video', type === 'video');
+  overlay.classList.add('show');
+  $('#statusbar').classList.add('light');
+
+  // 背景（用好友姓名生成渐变色，避免外部图片）
+  const bg = $('#callBg');
+  const col = c.color;
+  bg.style.background = `radial-gradient(circle at 30% 25%, ${col}, #1b1b20 70%)`;
+
+  // 头像
+  const av = $('#callAvatar');
+  av.outerHTML = friendAvatarHTML(c.name, 'call-avatar').replace('class="call-avatar"', 'class="call-avatar" id="callAvatar"');
+  // 自视窗（视频通话时显示“我”）
+  $('#callSelfMini').outerHTML = `<div class="mini" id="callSelfMini" style="background:${store.profile.bg};">${
+    store.profile.avatar ? `<img class="av-img" src="${store.profile.avatar}">` : (store.profile.emoji || store.profile.name.slice(0,1))
+  }</div>`;
+
+  $('#callName').textContent = c.name;
+  $('#callStatus').textContent = type === 'video' ? '正在等待对方接受邀请...' : '正在呼叫...';
+  $('#callMute').classList.remove('active');
+  $('#callSpeaker').classList.remove('active');
+
+  // 回铃音循环
+  clearInterval(callState.ringTimer);
+  sfx.ring();
+  callState.ringTimer = setInterval(() => { if(!callState.connected) sfx.ring(); }, 2600);
+  vib([20, 120, 20]);
+
+  // 模拟对方接听（2.6 ~ 4.6 秒）
+  const answerDelay = 2600 + Math.random() * 2000;
+  callState.answerTimer = setTimeout(() => connectCall(), answerDelay);
+}
+
+function connectCall(){
+  if(!callState.active) return;
+  callState.connected = true;
+  clearInterval(callState.ringTimer);
+  sfx.connect(); vib(30);
+  $('#callStatus').textContent = '00:00';
+  callState.seconds = 0;
+  clearInterval(callState.tickTimer);
+  callState.tickTimer = setInterval(() => {
+    callState.seconds++;
+    $('#callStatus').textContent = fmtDur(callState.seconds);
+  }, 1000);
+}
+
+function endCall(byUser){
+  if(!callState.active) return;
+  const wasConnected = callState.connected;
+  const dur = callState.seconds;
+  const chatId = callState.chatId;
+  const type = callState.type;
+
+  callState.active = false;
+  callState.connected = false;
+  clearInterval(callState.ringTimer);
+  clearInterval(callState.tickTimer);
+  clearTimeout(callState.answerTimer);
+  sfx.hangup(); vib(20);
+
+  $('#callStatus').textContent = wasConnected ? '通话已结束' : '已取消';
+
+  // 写入聊天记录
+  const c = chats[chatId];
+  if(c){
+    const label = type === 'video' ? '视频通话' : '语音通话';
+    const text = wasConnected
+      ? `${label}　通话时长 ${fmtDur(dur)}`
+      : `${label}　已取消`;
+    c.msgs.push({ t: 'time', text: text });
+    c.time = '刚刚';
+    if(currentChatId === chatId){
+      renderMessages();
+      setTimeout(scrollChatBottom, 60);
+    }
+    renderChatList();
+  }
+
+  setTimeout(() => {
+    $('#callOverlay').classList.remove('show', 'video');
+    $('#statusbar').classList.remove('light');
+    syncStatusbar();
+  }, 900);
+}
+
+$('#callHangup').addEventListener('click', () => { if(canTap(300)) endCall(true); });
+$('#callMute').addEventListener('click', function(){
+  this.classList.toggle('active');
+  sfx.tap(); vib(8);
+  toast(this.classList.contains('active') ? '已静音' : '已取消静音', 900);
+});
+$('#callSpeaker').addEventListener('click', function(){
+  this.classList.toggle('active');
+  sfx.tap(); vib(8);
+  toast(this.classList.contains('active') ? '已开启免提' : '已关闭免提', 900);
+});
+$('#chatCallVoice').addEventListener('click', () => {
+  if(!currentChatId) return;
+  sfx.tap(); vib(10);
+  startCall(currentChatId, 'voice');
+});
+$('#chatCallVideo').addEventListener('click', () => {
+  if(!currentChatId) return;
+  sfx.tap(); vib(10);
+  startCall(currentChatId, 'video');
+});
+
+/* =========================================================
+   10. 通讯录
+   ========================================================= */
+function renderContacts(){
+  const groups = {};
+  contacts.forEach(c => { (groups[c.letter] = groups[c.letter] || []).push(c); });
+  const letters = Object.keys(groups).sort();
+
+  let html = `
+    <div class="cell no-line" data-func="新的朋友">
+      <div class="avatar" style="background:#FA9D3B;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="10" cy="8" r="3.4"/><path d="M4 19c0-3.2 2.7-5.4 6-5.4s6 2.2 6 5.4"/><path d="M18 6v6M15 9h6"/></svg>
+      </div>
+      <div class="cell-body"><div class="cell-top"><span class="cell-name">新的朋友</span></div></div>
+    </div>
+    <div class="cell no-line" data-func="群聊">
+      <div class="avatar" style="background:#07C160;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round"><circle cx="9" cy="8.5" r="3"/><circle cx="16" cy="9.5" r="2.4"/><path d="M3.5 18.5c0-2.8 2.5-4.6 5.5-4.6s5.5 1.8 5.5 4.6"/><path d="M15.5 14.2c2.4.2 4.2 1.8 4.2 4.3"/></svg>
+      </div>
+      <div class="cell-body"><div class="cell-top"><span class="cell-name">群聊</span></div></div>
+    </div>
+    <div class="cell no-line" data-func="标签">
+      <div class="avatar" style="background:#4B8BF5;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"><path d="M11 3H4v7l9.5 9.5a2 2 0 0 0 2.8 0l4.2-4.2a2 2 0 0 0 0-2.8z"/><circle cx="7.5" cy="6.5" r="1.3" fill="#fff"/></svg>
+      </div>
+      <div class="cell-body"><div class="cell-top"><span class="cell-name">标签</span></div></div>
+    </div>
+    <div class="cell no-line" data-func="公众号">
+      <div class="avatar" style="background:#576B95;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round"><path d="M4 5h16v11H8l-4 3.5z" stroke-linejoin="round"/><path d="M8.5 9h7M8.5 12h4.5"/></svg>
+      </div>
+      <div class="cell-body"><div class="cell-top"><span class="cell-name">公众号</span></div></div>
+    </div>`;
+
+  letters.forEach(L => {
+    html += `<div class="group-title" id="letter-${L}">${L}</div>`;
+    groups[L].forEach(c => {
+      html += `<div class="cell" data-contact="${c.name}">
+        ${friendAvatarHTML(c.name, 'avatar')}
+        <div class="cell-body"><div class="cell-top"><span class="cell-name">${escapeHtml(c.name)}</span></div></div>
+      </div>`;
+    });
+  });
+  html += `<div class="indexbar">${letters.map(L => `<span data-jump="${L}">${L}</span>`).join('')}</div>`;
+  $('#contactList').innerHTML = html;
+}
+$('#contactList').addEventListener('click', e => {
+  const jump = e.target.closest('[data-jump]');
+  if(jump){
+    const el = document.getElementById('letter-' + jump.dataset.jump);
+    if(el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    sfx.tap();
+    return;
+  }
+  const fn = e.target.closest('[data-func]');
+  if(fn){ toast('「' + fn.dataset.func + '」为界面演示'); sfx.tap(); return; }
+  const ct = e.target.closest('[data-contact]');
+  if(ct){
+    const name = ct.dataset.contact;
+    let id = Object.keys(chats).find(k => chats[k].name === name);
+    if(!id){
+      id = 'ct_' + name;
+      addChat(id, name, [{ t: 'time', text: '刚刚' }, { f: 'them', k: 'text', text: '你好呀，我是' + name }]);
+      chats[id].time = '刚刚';
+    }
+    sfx.tap(); vib(8);
+    openChat(id);
+  }
+});
+
+/* =========================================================
+   11. 发现页
+   ========================================================= */
+function renderDiscover(){
+  const items = [
+    { key: 'moments',  title: '朋友圈', ico: '圈', bg: '#4B8BF5' },
+    { key: 'channels', title: '视频号', ico: '▶', bg: '#F2705C' },
+    { key: 'scan',     title: '扫一扫', ico: '扫', bg: '#38B2AC' },
+    { key: 'shake',    title: '摇一摇', ico: '摇', bg: '#8E6BF2' },
+    { key: 'look',     title: '看一看', ico: '看', bg: '#F5A623' },
+    { key: 'search',   title: '搜一搜', ico: '搜', bg: '#5B8DEF' },
+    { key: 'nearby',   title: '附近',   ico: '近', bg: '#07C160' },
+    { key: 'shopping', title: '购物',   ico: '购', bg: '#E85D75' },
+    { key: 'game',     title: '游戏',   ico: '游', bg: '#33B1A5' }
+  ];
+  let html = '<div class="group" style="margin-top:10px;">';
+  items.forEach(it => {
+    const badge = (it.key === 'moments' && store.momentUnread > 0)
+      ? `<span class="badge" style="margin-left:8px;">${store.momentUnread}</span>` : '';
+    html += `<div class="row" data-discover="${it.key}">
+      <div class="row-ico" style="background:${it.bg}">${it.ico}</div>
+      <div class="row-title">${it.title}</div>
+      ${badge}
+      <div class="row-arrow"></div>
+    </div>`;
+  });
+  html += '</div>';
+  $('#discoverList').innerHTML = html;
+}
+function updateDiscoverDot(){
+  const has = store.momentUnread > 0;
+  $('#discoverDot').classList.toggle('show', has);
+  renderDiscover();
+}
+$('#discoverList').addEventListener('click', e => {
+  const row = e.target.closest('[data-discover]');
+  if(!row) return;
+  sfx.tap(); vib(8);
+  const key = row.dataset.discover;
+  if(key === 'moments'){ openSub('page-moments'); }
+  else if(key === 'scan'){ openScan(); }
+  else if(key === 'shake'){
+    toast('摇一摇：什么也没摇到 🎲');
+    if(navigator.vibrate) navigator.vibrate([30, 60, 30]);
+  }
+  else{ toast('「' + row.querySelector('.row-title').textContent + '」为界面演示'); }
+});
+
+/* =========================================================
+   12. 我（个人主页）
+   ========================================================= */
+function renderMe(){
+  const p = store.profile;
+  $('#meList').innerHTML = `
+    <div class="me-card" data-me="profile">
+      ${avatarHTML(p, 'me-avatar')}
+      <div class="me-info">
+        <div class="me-name">${escapeHtml(p.name)}</div>
+        <div class="me-id">微信号：${escapeHtml(p.wxid)}
+          <svg class="qr-mini" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3z"/></svg>
+        </div>
+      </div>
+      <div class="row-arrow" style="opacity:.6;"></div>
+    </div>
+    <div class="group">
+      <div class="row" data-me="service">
+        <div class="row-ico" style="background:#07C160">¥</div>
+        <div class="row-title">服务</div>
+        <div class="row-val" id="meBalance">¥0.00</div>
+        <div class="row-arrow"></div>
+      </div>
+    </div>
+    <div class="group">
+      <div class="row" data-me="fav"><div class="row-ico" style="background:#F5A623">★</div><div class="row-title">收藏</div><div class="row-arrow"></div></div>
+      <div class="row" data-me="moments"><div class="row-ico" style="background:#4B8BF5">◎</div><div class="row-title">朋友圈</div><div class="row-arrow"></div></div>
+      <div class="row" data-me="card"><div class="row-ico" style="background:#E85D75">卡</div><div class="row-title">卡包</div><div class="row-arrow"></div></div>
+      <div class="row" data-me="emoji"><div class="row-ico" style="background:#8E6BF2">☺</div><div class="row-title">表情</div><div class="row-arrow"></div></div>
+    </div>
+    <div class="group">
+      <div class="row" data-me="settings"><div class="row-ico" style="background:#7F7F7F">⚙</div><div class="row-title">设置</div><div class="row-arrow"></div></div>
+    </div>
+    <div style="height:80px;"></div>`;
+  $('#meBalance').textContent = '¥' + money(store.balance);
+}
+$('#meList').addEventListener('click', e => {
+  const card = e.target.closest('[data-me]');
+  if(!card) return;
+  sfx.tap(); vib(8);
+  const k = card.dataset.me;
+  if(k === 'service') openSub('page-service');
+  else if(k === 'moments') openSub('page-moments');
+  else if(k === 'settings') openSub('page-settings');
+  else if(k === 'profile') openProfilePage();
+  else{
+    const t = card.querySelector('.row-title');
+    toast('「' + (t ? t.textContent : '功能') + '」为界面演示');
+  }
+});
+
+/* =========================================================
+   13. 个人信息修改
+   ========================================================= */
+let avatarDraft = null;   // 头像弹层中的临时数据
+
+function openProfilePage(){
+  renderProfilePage();
+  openSub('page-profile');
+}
+function renderProfilePage(){
+  const p = store.profile;
+  $('#profileScroll').innerHTML = `
+    <div class="group" style="margin-top:10px;">
+      <div class="row" data-profile="avatar">
+        <div class="row-title">头像</div>
+        <div class="row-val">${avatarHTML(p, 'avatar-sm')}</div>
+        <div class="row-arrow"></div>
+      </div>
+      <div class="row" data-profile="name">
+        <div class="row-title">名字</div>
+        <div class="row-val">${escapeHtml(p.name)}</div><div class="row-arrow"></div>
+      </div>
+      <div class="row" data-profile="wxid">
+        <div class="row-title">微信号</div>
+        <div class="row-val">${escapeHtml(p.wxid)}</div><div class="row-arrow"></div>
+      </div>
+      <div class="row" data-profile="qrcode">
+        <div class="row-title">我的二维码</div>
+        <div class="row-val">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A9A9A" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM20 14v3M17 20h4"/></svg>
+        </div>
+        <div class="row-arrow"></div>
+      </div>
+    </div>
+    <div class="group">
+      <div class="row" data-profile="gender">
+        <div class="row-title">性别</div>
+        <div class="row-val">${escapeHtml(p.gender)}</div><div class="row-arrow"></div>
+      </div>
+      <div class="row" data-profile="region">
+        <div class="row-title">地区</div>
+        <div class="row-val">${escapeHtml(p.region)}</div><div class="row-arrow"></div>
+      </div>
+      <div class="row" data-profile="sign">
+        <div class="row-title">个性签名</div>
+        <div class="row-val">${escapeHtml(p.sign)}</div><div class="row-arrow"></div>
+      </div>
+    </div>
+    <div style="height:40px;"></div>`;
+}
+$('#profileScroll').addEventListener('click', e => {
+  const row = e.target.closest('[data-profile]');
+  if(!row) return;
+  sfx.tap(); vib(8);
+  const k = row.dataset.profile;
+  if(k === 'avatar'){ openAvatarSheet(); return; }
+  if(k === 'qrcode'){ toast('个人二维码（演示）'); return; }
+  openEditSheet(k);
+});
+
+// ---- 文本编辑弹层 ----
+let editKey = null;
+const EDIT_CONFIG = {
+  name:   { title: '修改名字',   hint: '好名字可以让朋友更容易记住你', max: 16 },
+  wxid:   { title: '修改微信号', hint: '微信号是账号的唯一凭证，只能设置一次', max: 20 },
+  gender: { title: '修改性别',   hint: '请输入「男」或「女」', max: 2 },
+  region: { title: '修改地区',   hint: '例如：北京 · 朝阳', max: 20 },
+  sign:   { title: '修改个性签名', hint: '介绍一下自己吧（最多 30 字）', max: 30 }
+};
+function openEditSheet(key){
+  editKey = key;
+  const cfg = EDIT_CONFIG[key];
+  $('#editTitle').textContent = cfg.title;
+  $('#editHint').textContent = cfg.hint;
+  $('#editInput').value = store.profile[key] || '';
+  $('#editInput').maxLength = cfg.max;
+  $('#mask').classList.add('show');
+  $('#editSheet').classList.add('show');
+  setTimeout(() => $('#editInput').focus(), 260);
+}
+function closeEditSheet(){
+  $('#mask').classList.remove('show');
+  $('#editSheet').classList.remove('show');
+  $('#editInput').blur();
+}
+$('#editCancel').addEventListener('click', () => { sfx.tap(); closeEditSheet(); });
+$('#editSave').addEventListener('click', () => {
+  if(!editKey) return;
+  let val = $('#editInput').value.trim();
+  if(!val){ toast('内容不能为空'); sfx.err(); return; }
+  if(editKey === 'gender'){
+    if(val !== '男' && val !== '女'){ toast('请输入「男」或「女」'); sfx.err(); return; }
+  }
+  store.profile[editKey] = val;
+  saveProfile();
+  closeEditSheet();
+  sfx.ok(); vib(15);
+  toast('保存成功');
+  refreshProfileEverywhere();
+  renderProfilePage();
+});
+
+// ---- 头像选择弹层 ----
+const AVATAR_EMOJIS = ['😎','😀','😊','🥳','😇','🤠','🐱','🐶','🐼','🦊','🐨','🦄','🍀','⭐','🌈','🔥'];
+const AVATAR_BGS = ['#4B8BF5','#07C160','#F5A623','#E85D75','#8E6BF2','#38B2AC','#F2705C','#5B8DEF','#33B1A5','#C86DD7','#2C3E50','#FF8A65'];
+
+function openAvatarSheet(){
+  avatarDraft = { avatar: store.profile.avatar, emoji: store.profile.emoji, bg: store.profile.bg };
+  renderAvatarSheet();
+  $('#mask').classList.add('show');
+  $('#avatarSheet').classList.add('show');
+}
+function closeAvatarSheet(){
+  $('#mask').classList.remove('show');
+  $('#avatarSheet').classList.remove('show');
+}
+function renderAvatarSheet(){
+  const d = avatarDraft;
+  const inner = d.avatar
+    ? `<img class="av-img" src="${d.avatar}" alt="">`
+    : (d.emoji || '😎');
+  $('#avatarPreview').style.background = d.bg;
+  $('#avatarPreview').innerHTML = inner;
+
+  $('#avatarEmojiPick').innerHTML = AVATAR_EMOJIS.map(e =>
+    `<div data-emoji="${e}" class="${(!d.avatar && d.emoji === e) ? 'sel' : ''}">${e}</div>`).join('');
+
+  $('#avatarColorPick').innerHTML = AVATAR_BGS.map(c =>
+    `<div data-bg="${c}" style="background:${c};" class="${d.bg === c ? 'sel' : ''}"></div>`).join('');
+}
+$('#avatarEmojiPick').addEventListener('click', e => {
+  const el = e.target.closest('[data-emoji]');
+  if(!el || !avatarDraft) return;
+  avatarDraft.emoji = el.dataset.emoji;
+  avatarDraft.avatar = '';       // 选择表情则清除上传图片
+  sfx.tap(); vib(8);
+  renderAvatarSheet();
+});
+$('#avatarColorPick').addEventListener('click', e => {
+  const el = e.target.closest('[data-bg]');
+  if(!el || !avatarDraft) return;
+  avatarDraft.bg = el.dataset.bg;
+  sfx.tap(); vib(8);
+  renderAvatarSheet();
+});
+$('#btnUploadAvatar').addEventListener('click', () => { sfx.tap(); $('#avatarFile').click(); });
+$('#btnClearAvatar').addEventListener('click', () => {
+  if(!avatarDraft) return;
+  avatarDraft.avatar = '';
+  avatarDraft.emoji = avatarDraft.emoji || '😎';
+  sfx.tap();
+  renderAvatarSheet();
+});
+$('#avatarFile').addEventListener('change', e => {
+  const f = e.target.files && e.target.files[0];
+  if(!f) return;
+  readImageFile(f, 260, dataUrl => {
+    if(!avatarDraft) return;
+    avatarDraft.avatar = dataUrl;
+    sfx.ok();
+    renderAvatarSheet();
+  });
+  e.target.value = '';
+});
+$('#avatarCancel').addEventListener('click', () => { sfx.tap(); closeAvatarSheet(); });
+$('#avatarSave').addEventListener('click', () => {
+  if(!avatarDraft) return;
+  store.profile.avatar = avatarDraft.avatar;
+  store.profile.emoji = avatarDraft.emoji;
+  store.profile.bg = avatarDraft.bg;
+  saveProfile();
+  closeAvatarSheet();
+  sfx.ok(); vib(15);
+  toast('头像已更新');
+  refreshProfileEverywhere();
+  renderProfilePage();
+});
+
+// 读取图片并压缩成 dataURL
+function readImageFile(file, maxSize, cb){
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+      const w = Math.max(1, Math.round(img.width * scale));
+      const h = Math.max(1, Math.round(img.height * scale));
+      const cv = document.createElement('canvas');
+      cv.width = w; cv.height = h;
+      const ctx = cv.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      try{
+        cb(cv.toDataURL('image/jpeg', 0.82));
+      }catch(err){
+        toast('图片处理失败');
+      }
+    };
+    img.onerror = () => toast('图片读取失败');
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// 个人资料变更后刷新所有相关界面
+function refreshProfileEverywhere(){
+  renderMe();
+  renderChatList();
+  if(currentChatId) renderMessages();
+  renderMoments();
+  if(store.profile.name){
+    // 我的点赞名称随之变化无需额外处理（渲染时实时读取）
+  }
+}
+
+/* =========================================================
+   14. 服务页 / 钱包 / 账单
+   ========================================================= */
+const SERVICE_ITEMS = [
+  { key: 'paycode',  name: '收付款', ico: '收', bg: 'linear-gradient(135deg,#3BAAFF,#2E86DE)' },
+  { key: 'wallet',   name: '钱包',   ico: '¥', bg: 'linear-gradient(135deg,#FFB53F,#FF8A00)' },
+  { key: 'transfer', name: '转账',   ico: '转', bg: 'linear-gradient(135deg,#4CD97B,#07C160)' },
+  { key: 'recharge', name: '零钱充值', ico: '充', bg: 'linear-gradient(135deg,#FF7A7A,#E8453C)' },
+  { key: 'life',     name: '生活缴费', ico: '缴', bg: 'linear-gradient(135deg,#61C8FF,#2E9BE8)' },
+  { key: 'credit',   name: '信用卡',  ico: '还', bg: 'linear-gradient(135deg,#FFC66D,#F5A623)' },
+  { key: 'licai',    name: '理财通',  ico: '理', bg: 'linear-gradient(135deg,#FF9C6E,#F26B38)' },
+  { key: 'insure',   name: '保险',   ico: '保', bg: 'linear-gradient(135deg,#7DD3A0,#3FA76A)' },
+  { key: 'loan',     name: '微粒贷',  ico: '贷', bg: 'linear-gradient(135deg,#8AB4FF,#4C7DF0)' },
+  { key: 'city',     name: '城市服务', ico: '城', bg: 'linear-gradient(135deg,#9BB3C9,#6B8AA5)' },
+  { key: 'travel',   name: '出行',   ico: '行', bg: 'linear-gradient(135deg,#A7D8FF,#5AA9F0)' },
+  { key: 'charity',  name: '公益',   ico: '益', bg: 'linear-gradient(135deg,#FFB0C8,#F05A8A)' }
+];
+function renderService(){
+  let html = '<div class="group" style="margin-top:10px;"><div class="grid4">';
+  SERVICE_ITEMS.forEach(it => {
+    html += `<div class="grid-item" data-service="${it.key}">
+      <div class="grid-ico" style="background:${it.bg}">${it.ico}</div>
+      <div class="grid-label">${it.name}</div>
+    </div>`;
+  });
+  html += '</div></div>';
+  html += `<div class="group">
+      <div class="row" data-service="bills"><div class="row-ico" style="background:#576B95">单</div><div class="row-title">账单明细</div><div class="row-arrow"></div></div>
+      <div class="row" data-service="safety"><div class="row-ico" style="background:#07C160">安</div><div class="row-title">支付安全</div><div class="row-arrow"></div></div>
+    </div>
+    <div style="height:60px;"></div>`;
+  $('#serviceScroll').innerHTML = html;
+}
+$('#serviceScroll').addEventListener('click', e => {
+  const el = e.target.closest('[data-service]');
+  if(!el) return;
+  sfx.tap(); vib(8);
+  const k = el.dataset.service;
+  if(k === 'paycode') openPayCode();
+  else if(k === 'wallet') openWallet();
+  else if(k === 'bills') openSub('page-bills');
+  else if(k === 'transfer') startTransfer(null);
+  else if(k === 'recharge') startAmount('recharge', null);
+  else{
+    const t = el.querySelector('.row-title') || el.querySelector('.grid-label');
+    toast('「' + (t ? t.textContent : '功能') + '」为界面演示');
+  }
+});
+
+function renderWallet(){
+  $('#walletScroll').innerHTML = `
+    <div style="margin-top:10px;background:#fff;">
+      <div class="wallet-head">
+        <div class="wallet-label">零钱（元）</div>
+        <div class="wallet-bal">¥${money(store.balance)}</div>
+        <div class="wallet-btns">
+          <div class="wallet-btn" data-wallet="recharge">充值</div>
+          <div class="wallet-btn" data-wallet="withdraw">提现</div>
+        </div>
+      </div>
+      <div class="row" data-wallet="bills"><div class="row-ico" style="background:#576B95">单</div><div class="row-title">账单</div><div class="row-arrow"></div></div>
+      <div class="row"><div class="row-ico" style="background:#4B8BF5">卡</div><div class="row-title">银行卡</div><div class="row-val">2 张</div><div class="row-arrow"></div></div>
+      <div class="row"><div class="row-ico" style="background:#07C160">安</div><div class="row-title">支付安全</div><div class="row-val">已开启</div><div class="row-arrow"></div></div>
+      <div class="row"><div class="row-ico" style="background:#F5A623">助</div><div class="row-title">帮助中心</div><div class="row-arrow"></div></div>
+    </div>
+    <div style="height:60px;"></div>`;
+}
+$('#walletScroll').addEventListener('click', e => {
+  const el = e.target.closest('[data-wallet]');
+  if(!el) return;
+  sfx.tap(); vib(8);
+  const k = el.dataset.wallet;
+  if(k === 'recharge') startAmount('recharge', null);
+  else if(k === 'withdraw') startAmount('withdraw', null);
+  else if(k === 'bills') openSub('page-bills');
+});
+function openWallet(){ renderWallet(); openSub('page-wallet'); }
+
+function renderBills(){
+  const box = $('#billScroll');
+  if(!box) return;
+  if(!store.bills.length){ box.innerHTML = '<div class="empty">暂无账单记录</div>'; return; }
+  box.innerHTML = '<div class="group" style="margin-top:10px;">' + store.bills.map(b => `
+    <div class="bill">
+      <div class="bill-l">
+        <div class="bill-name">${escapeHtml(b.name)}</div>
+        <div class="bill-time">${b.time}</div>
+      </div>
+      <div class="bill-amt" style="color:${b.amount < 0 ? '#191919' : '#07C160'}">
+        ${b.amount < 0 ? '-' : '+'}¥${money(Math.abs(b.amount))}
+      </div>
+    </div>`).join('') + '</div><div style="height:40px;"></div>';
+}
+
+/* =========================================================
+   15. 收付款码
+   ========================================================= */
+function drawFakeQR(canvas){
+  const ctx = canvas.getContext('2d');
+  const size = canvas.width, n = 25, cell = size / n;
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, size, size);
+  ctx.fillStyle = '#000';
+  for(let y = 0; y < n; y++){
+    for(let x = 0; x < n; x++){
+      const inFinder = (x < 8 && y < 8) || (x > n - 9 && y < 8) || (x < 8 && y > n - 9);
+      if(inFinder) continue;
+      if(Math.random() > 0.52) ctx.fillRect(x * cell, y * cell, cell, cell);
+    }
+  }
+  const finder = (ox, oy) => {
+    ctx.fillStyle = '#000'; ctx.fillRect(ox * cell, oy * cell, 7 * cell, 7 * cell);
+    ctx.fillStyle = '#fff'; ctx.fillRect((ox + 1) * cell, (oy + 1) * cell, 5 * cell, 5 * cell);
+    ctx.fillStyle = '#000'; ctx.fillRect((ox + 2) * cell, (oy + 2) * cell, 3 * cell, 3 * cell);
+  };
+  finder(0, 0); finder(n - 7, 0); finder(0, n - 7);
+}
+function drawFakeBarcode(canvas){
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#000';
+  let x = 8;
+  while(x < canvas.width - 8){
+    const w = 1 + Math.floor(Math.random() * 3);
+    ctx.fillRect(x, 6, w, canvas.height - 12);
+    x += w + 1 + Math.floor(Math.random() * 3);
+  }
+}
+function openPayCode(){
+  drawFakeQR($('#qrCanvas'));
+  drawFakeBarcode($('#barCanvas'));
+  $('#paycodeBal').textContent = '¥' + money(store.balance);
+  openSub('page-paycode');
+}
+$('#btnSimPay').addEventListener('click', () => {
+  if(!canTap()) return;
+  sfx.tap(); vib(10);
+  const merchants = [
+    { name: '星巴克咖啡（国贸店）', min: 18, max: 68 },
+    { name: '全家便利店（朝阳门店）', min: 5, max: 45 },
+    { name: '瑞幸咖啡（SOHO店）', min: 12, max: 39 },
+    { name: '海底捞火锅（三里屯店）', min: 88, max: 260 }
+  ];
+  const m = merchants[Math.floor(Math.random() * merchants.length)];
+  const amount = Math.round((m.min + Math.random() * (m.max - m.min)) * 100) / 100;
+  openPayPage(m.name, amount, '消费付款');
+});
+
+/* =========================================================
+   16. 扫一扫
+   ========================================================= */
+let scanTimer = null;
+function openScan(){
+  openSub('page-scan');
+  clearTimeout(scanTimer);
+  scanTimer = setTimeout(() => {
+    sfx.recv(); vib(20);
+    const merchants = [
+      { name: '肯德基（建国路店）', min: 20, max: 88 },
+      { name: '屈臣氏（朝阳大悦城）', min: 30, max: 180 },
+      { name: '美团外卖', min: 15, max: 60 },
+      { name: '喜茶（国贸商城店）', min: 15, max: 45 }
+    ];
+    const m = merchants[Math.floor(Math.random() * merchants.length)];
+    const amount = Math.round((m.min + Math.random() * (m.max - m.min)) * 100) / 100;
+    backSub();
+    setTimeout(() => openPayPage(m.name, amount, '扫码支付'), 260);
+  }, 2100);
+}
+
+/* =========================================================
+   17. 支付流程
+   ========================================================= */
+let payCtx = { merchant: '', amount: 0, desc: '消费付款' };
+
+function openPayPage(merchant, amount, desc){
+  payCtx = { merchant, amount, desc: desc || '消费付款' };
+  $('#payMerchant').textContent = merchant;
+  $('#payAmount').innerHTML = '<small>¥</small>' + money(amount);
+  $('#payBalance').textContent = '¥' + money(store.balance);
+  $('#payDesc').textContent = payCtx.desc;
+  openSub('page-pay');
+}
+$('#btnConfirmPay').addEventListener('click', () => {
+  if(!canTap(400)) return;
+  sfx.tap(); vib(15);
+  if(payCtx.amount > store.balance){ sfx.err(); toast('零钱余额不足'); return; }
+  askPassword(payCtx.amount, () => {
+    store.balance = Math.round((store.balance - payCtx.amount) * 100) / 100;
+    saveStore();
+    addBill(payCtx.merchant, -payCtx.amount);
+    renderMe();
+    $('#payBalance').textContent = '¥' + money(store.balance);
+    showSuccess('支付成功', '¥' + money(payCtx.amount), payCtx.merchant);
+  });
+});
+
+/* ---- 支付密码 ---- */
+let pwdInput = '';
+let pwdCallback = null;
+
+function buildKeypad(container, onKey){
+  const keys = ['1','2','3','4','5','6','7','8','9','','0','del'];
+  container.innerHTML = keys.map(k => {
+    if(k === '') return '<button disabled style="background:#fff;"></button>';
+    if(k === 'del'){
+      return `<button data-key="del"><svg viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="1.8" stroke-linecap="round"><path d="M9 5h11v14H9L3 12z" stroke-linejoin="round"/><path d="M12 9.5l4 5M16 9.5l-4 5"/></svg></button>`;
+    }
+    return `<button data-key="${k}">${k}</button>`;
+  }).join('');
+  container.addEventListener('click', e => {
+    const btn = e.target.closest('button[data-key]');
+    if(!btn) return;
+    onKey(btn.dataset.key);
+  });
+}
+buildKeypad($('#pwdKeypad'), key => { sfx.key(); vib(6); handlePwdKey(key); });
+buildKeypad($('#amountKeypad'), key => { sfx.key(); vib(6); handleAmountKey(key); });
+
+function renderPwdDots(){
+  const box = $('#pwdDots');
+  if(!box.children.length) box.innerHTML = '<i></i><i></i><i></i><i></i><i></i><i></i>';
+  Array.from(box.children).forEach((d, i) => d.classList.toggle('on', i < pwdInput.length));
+}
+function handlePwdKey(key){
+  if(key === 'del'){ pwdInput = pwdInput.slice(0, -1); renderPwdDots(); return; }
+  if(pwdInput.length >= 6) return;
+  pwdInput += key;
+  renderPwdDots();
+  if(pwdInput.length === 6){
+    setTimeout(() => {
+      if(pwdInput === store.password){
+        const cb = pwdCallback;
+        closePwdSheet();
+        if(cb) cb();
+      }else{
+        sfx.err(); vib([40, 60, 40]);
+        $('#pwdDots').classList.add('shake');
+        toast('支付密码错误，请重新输入');
+        setTimeout(() => {
+          $('#pwdDots').classList.remove('shake');
+          pwdInput = '';
+          renderPwdDots();
+        }, 380);
+      }
+    }, 140);
+  }
+}
+function askPassword(amount, cb){
+  pwdCallback = cb;
+  pwdInput = '';
+  $('#pwdAmt').textContent = '¥' + money(amount);
+  renderPwdDots();
+  $('#mask').classList.add('show');
+  $('#pwdSheet').classList.add('show');
+}
+function closePwdSheet(){
+  $('#mask').classList.remove('show');
+  $('#pwdSheet').classList.remove('show');
+  pwdInput = '';
+  renderPwdDots();
+}
+$('#pwdClose').addEventListener('click', () => { sfx.tap(); closePwdSheet(); });
+$('#mask').addEventListener('click', () => {
+  sfx.tap();
+  closePwdSheet();
+  closeEditSheet();
+  closeAvatarSheet();
+});
+
+/* =========================================================
+   18. 支付成功页（Three.js 3D 金币）
+   ========================================================= */
+let three = null;
+
+function makeSymbolTexture(sym){
+  const c = document.createElement('canvas');
+  c.width = c.height = 256;
+  const x = c.getContext('2d');
+  x.clearRect(0, 0, 256, 256);
+  x.font = 'bold 190px "PingFang SC", Helvetica, Arial';
+  x.textAlign = 'center';
+  x.textBaseline = 'middle';
+  const g = x.createLinearGradient(0, 40, 0, 226);
+  g.addColorStop(0, '#FFF8DC');
+  g.addColorStop(.45, '#FFD75E');
+  g.addColorStop(1, '#C88A12');
+  x.fillStyle = g;
+  x.fillText(sym, 128, 138);
+  const t = new THREE.CanvasTexture(c);
+  t.anisotropy = 4;
+  return t;
+}
+
+function startCoin3D(){
+  if(typeof THREE === 'undefined') return;
+  const canvas = $('#coin3d');
+  if(three){ three.running = true; three.resize(); return; }
+
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+  camera.position.set(0, 0, 7);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.75));
+  const d1 = new THREE.DirectionalLight(0xfff3cf, 1.35); d1.position.set(3, 5, 6); scene.add(d1);
+  const d2 = new THREE.DirectionalLight(0xffc76b, 0.7);  d2.position.set(-4, -3, 3); scene.add(d2);
+
+  const coinGroup = new THREE.Group();
+  coinGroup.position.set(0, -1.05, 0);
+
+  const coinMat = new THREE.MeshStandardMaterial({
+    color: 0xffcb4d, metalness: 0.95, roughness: 0.24,
+    emissive: 0x6b4200, emissiveIntensity: 0.22
+  });
+  const coin = new THREE.Mesh(new THREE.CylinderGeometry(1.62, 1.62, 0.22, 64), coinMat);
+  coin.rotation.x = Math.PI / 2;
+  coinGroup.add(coin);
+
+  const ringMat = new THREE.MeshStandardMaterial({ color: 0xffe9a8, metalness: 1, roughness: 0.3 });
+  const ring1 = new THREE.Mesh(new THREE.TorusGeometry(1.6, 0.045, 10, 64), ringMat);
+  const ring2 = new THREE.Mesh(new THREE.TorusGeometry(1.3, 0.03, 10, 64), ringMat);
+  ring1.position.z = 0.115; ring2.position.z = 0.118;
+  coinGroup.add(ring1, ring2);
+
+  const tex = makeSymbolTexture('¥');
+  const faceMat = new THREE.MeshBasicMaterial({ map: tex, transparent: true });
+  const front = new THREE.Mesh(new THREE.PlaneGeometry(2.1, 2.1), faceMat);
+  front.position.z = 0.121;
+  const back = front.clone();
+  back.position.z = -0.121;
+  back.rotation.y = Math.PI;
+  coinGroup.add(front, back);
+
+  scene.add(coinGroup);
+
+  const pGeo = new THREE.BufferGeometry();
+  const count = 260;
+  const pos = new Float32Array(count * 3);
+  for(let i = 0; i < count; i++){
+    const r = 3 + Math.random() * 4.5;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    pos[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
+    pos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta) * 0.6;
+    pos[i * 3 + 2] = r * Math.cos(phi) * 0.5;
+  }
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const stars = new THREE.Points(pGeo, new THREE.PointsMaterial({
+    color: 0xffd76b, size: 0.075, transparent: true, opacity: 0.85,
+    sizeAttenuation: true, depthWrite: false
+  }));
+  scene.add(stars);
+
+  function resize(){
+    const w = canvas.clientWidth || canvas.offsetWidth || 320;
+    const h = canvas.clientHeight || canvas.offsetHeight || 600;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  three = { renderer, scene, camera, coinGroup, stars, running: true, resize };
+
+  let t = 0;
+  (function loop(){
+    requestAnimationFrame(loop);
+    if(!three || !three.running) return;
+    t += 0.016;
+    coinGroup.rotation.y += 0.022;
+    coinGroup.position.y = -1.05 + Math.sin(t * 1.6) * 0.11;
+    coinGroup.rotation.z = Math.sin(t * 0.9) * 0.07;
+    stars.rotation.y -= 0.0016;
+    stars.rotation.x = Math.sin(t * 0.4) * 0.16;
+    renderer.render(scene, camera);
+  })();
+}
+function stopCoin3D(){ if(three) three.running = false; }
+
+function showSuccess(title, amountText, sub){
+  $('#succTitle').textContent = title;
+  $('#succAmount').textContent = amountText;
+  $('#succSub').textContent = sub;
+  $('#successOverlay').classList.add('show');
+  sfx.coin();
+  vib([25, 50, 25, 50, 40]);
+  requestAnimationFrame(() => { startCoin3D(); if(three) three.resize(); });
+}
+$('#succDone').addEventListener('click', () => {
+  sfx.tap();
+  $('#successOverlay').classList.remove('show');
+  stopCoin3D();
+  closeAllSub();
+  switchTab('chats');
+  renderMe();
+});
+
+/* =========================================================
+   19. 金额输入页
+   ========================================================= */
+let amountMode = 'recharge';
+let amountCents = 0;
+let amountChatId = null;
+
+function startAmount(mode, chatId){
+  amountMode = mode;
+  amountChatId = chatId || null;
+  amountCents = 0;
+  const titleMap = { recharge: '充值', withdraw: '提现', transfer: '转账' };
+  const labelMap = {
+    recharge: '充值金额',
+    withdraw: '提现金额',
+    transfer: chatId ? '转账给 ' + chats[chatId].name : '转账金额'
+  };
+  const btnMap = { recharge: '确认充值', withdraw: '确认提现', transfer: '确认转账' };
+  $('#amountTitle').textContent = titleMap[mode];
+  $('#amountLabel').textContent = labelMap[mode];
+  $('#amountConfirm').textContent = btnMap[mode];
+  updateAmountDisplay();
+  openSub('page-amount');
+}
+function updateAmountDisplay(){
+  $('#amountNum').textContent = money(amountCents / 100);
+  $('#amountBalance').textContent = '零钱余额 ¥' + money(store.balance);
+}
+function handleAmountKey(key){
+  if(key === 'del'){
+    amountCents = Math.floor(amountCents / 10);
+  }else{
+    if(amountCents === 0 && key === '0') return;
+    const next = amountCents * 10 + parseInt(key, 10);
+    if(next > 99999999) return;
+    amountCents = next;
+  }
+  updateAmountDisplay();
+}
+$('#amountConfirm').addEventListener('click', () => {
+  if(!canTap(350)) return;
+  sfx.tap(); vib(12);
+  const amount = amountCents / 100;
+  if(amount <= 0){ toast('请输入金额'); return; }
+
+  if(amountMode === 'recharge'){
+    store.balance = Math.round((store.balance + amount) * 100) / 100;
+    saveStore();
+    addBill('零钱充值', amount);
+    renderMe(); renderWallet();
+    showSuccess('充值成功', '¥' + money(amount), '零钱余额 ¥' + money(store.balance));
+  }
+  else if(amountMode === 'withdraw'){
+    if(amount > store.balance){ sfx.err(); toast('零钱余额不足'); return; }
+    store.balance = Math.round((store.balance - amount) * 100) / 100;
+    saveStore();
+    addBill('零钱提现', -amount);
+    renderMe(); renderWallet();
+    showSuccess('提现申请已提交', '¥' + money(amount), '预计 2 小时内到账');
+  }
+  else if(amountMode === 'transfer'){
+    if(amount > store.balance){ sfx.err(); toast('零钱余额不足'); return; }
+    askPassword(amount, () => {
+      store.balance = Math.round((store.balance - amount) * 100) / 100;
+      saveStore();
+      const target = amountChatId ? chats[amountChatId] : null;
+      if(target){
+        target.msgs.push({ f: 'me', k: 'transfer', amount: amount });
+        target.time = '刚刚';
+        addBill('转账给 ' + target.name, -amount);
+      }else{
+        addBill('微信转账', -amount);
+      }
+      renderMe();
+      closeAllSub();
+      if(target){
+        currentChatId = target.id;
+        $('#chatTitle').textContent = target.name;
+        renderMessages();
+        renderChatList();
+        openSub('page-chat');
+        setTimeout(scrollChatBottom, 120);
+      }
+      showSuccess('转账成功', '¥' + money(amount), target ? '已转账给 ' + target.name : '微信转账');
+    });
+  }
+});
+function startTransfer(chatId){ startAmount('transfer', chatId); }
+
+/* =========================================================
+   20. 聊天加号面板 & 表情面板
+   ========================================================= */
+function renderPlusGrid(){
+  const items = [
+    { k: 'album', n: '相册', g: '🖼' },
+    { k: 'camera', n: '拍摄', g: '📷' },
+    { k: 'videocall', n: '视频通话', g: '📹' },
+    { k: 'voicecall', n: '语音通话', g: '📞' },
+    { k: 'location', n: '位置', g: '📍' },
+    { k: 'hongbao', n: '红包', g: '🧧' },
+    { k: 'transfer', n: '转账', g: '💰' },
+    { k: 'fav', n: '收藏', g: '⭐' }
+  ];
+  $('#plusGrid').innerHTML = items.map(it => `
+    <div class="plus-item" data-plus="${it.k}">
+      <div class="plus-ico">${it.g}</div>
+      <span>${it.n}</span>
+    </div>`).join('');
+}
+$('#plusGrid').addEventListener('click', e => {
+  const it = e.target.closest('[data-plus]');
+  if(!it) return;
+  sfx.tap(); vib(8);
+  const k = it.dataset.plus;
+  closePanels();
+  if(!currentChatId) return;
+  if(k === 'transfer') startTransfer(currentChatId);
+  else if(k === 'hongbao') startAmount('transfer', currentChatId);
+  else if(k === 'videocall') startCall(currentChatId, 'video');
+  else if(k === 'voicecall') startCall(currentChatId, 'voice');
+  else toast('「' + it.querySelector('span').textContent + '」为界面演示');
+});
+
+function renderEmoji(){
+  const list = ['😀','😁','😂','🤣','😊','😍','🤔','😎','😭','😡','😴','🤗','👍','👏','🙏','🎉','❤️','🔥','🍺','☕','🌹','🐶','🍀','💪','🤝','✨','🥰','😜','🙌','💯','🎁','🍰'];
+  $('#emojiGrid').innerHTML = list.map(e => `<span>${e}</span>`).join('');
+}
+$('#emojiGrid').addEventListener('click', e => {
+  if(e.target.tagName !== 'SPAN') return;
+  $('#msgInput').value += e.target.textContent;
+  sfx.tap(); vib(6);
+});
+
+/* =========================================================
+   21. 朋友圈（发布 + 好友互动）
+   ========================================================= */
+function momentImgsHTML(imgs){
+  if(!imgs || !imgs.length) return '';
+  const cls = imgs.length === 1 ? ' post-imgs one' : (imgs.length === 2 ? ' post-imgs two' : ' post-imgs');
+  return `<div class="${cls.trim()}">` + imgs.map((it, i) => {
+    if(it.k === 'img') return `<div><img class="fill" src="${it.v}" alt=""></div>`;
+    const hue = ((i * 57) + (it.v.charCodeAt(0) * 7)) % 360;
+    return `<div style="background:linear-gradient(135deg,hsl(${hue},72%,88%),hsl(${(hue + 32) % 360},68%,76%))">
+      <span class="fill">${it.v}</span></div>`;
+  }).join('') + '</div>';
+}
+
+function renderMoments(){
+  const box = $('#momentsScroll');
+  if(!box) return;
+  const p = store.profile;
+  const myName = p.name;
+
+  let html = `
+    <div class="moments-cover">
+      <div class="cover-name">
+        <span>${escapeHtml(p.name)}</span>
+        ${avatarHTML(p, 'cover-avatar')}
+      </div>
+    </div>
+    <div style="height:30px;"></div>`;
+
+  html += store.moments.map(m => {
+    const liked = m.likes.indexOf(myName) >= 0;
+    const authorAvatar = m.isMe ? avatarHTML(p, 'post-av') : friendAvatarHTML(m.author, 'post-av');
+    const likesLine = m.likes.length ? `❤️ ${m.likes.map(escapeHtml).join('，')}` : '';
+    const cmtLine = m.comments.map(c => `<div class="cmt"><b>${escapeHtml(c.name)}</b>：${escapeHtml(c.text)}</div>`).join('');
+    return `
+      <div class="post" data-post="${m.id}">
+        ${authorAvatar}
+        <div class="post-body">
+          <div class="post-name">${escapeHtml(m.author)}${m.isMe ? '（我）' : ''}</div>
+          <div class="post-text">${escapeHtml(m.text)}</div>
+          ${momentImgsHTML(m.imgs)}
+          <div class="post-meta">
+            <span>${relTime(m.ts)}</span>
+            <div class="post-actions">
+              <span data-like="${m.id}" class="${liked ? 'liked' : ''}">${liked ? '❤️ 已赞' : '♡ 赞'}</span>
+              <span data-cmt="${m.id}">💬 评论</span>
+            </div>
+          </div>
+          ${(likesLine || cmtLine) ? `<div class="post-likes">${likesLine}${cmtLine}</div>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+  html += '<div style="height:40px;"></div>';
+  box.innerHTML = html;
+}
+
+$('#momentsScroll').addEventListener('click', e => {
+  const likeEl = e.target.closest('[data-like]');
+  if(likeEl){
+    const id = likeEl.dataset.like;
+    const m = store.moments.find(x => x.id === id);
+    if(!m) return;
+    const myName = store.profile.name;
+    const idx = m.likes.indexOf(myName);
+    if(idx >= 0){
+      m.likes.splice(idx, 1);
+    }else{
+      m.likes.push(myName);
+      sfx.tap(); vib(10);
+    }
+    saveMoments();
+    renderMoments();
+    return;
+  }
+  const cmtEl = e.target.closest('[data-cmt]');
+  if(cmtEl){
+    const id = cmtEl.dataset.cmt;
+    const m = store.moments.find(x => x.id === id);
+    if(!m) return;
+    openCommentEdit(id);
+  }
+});
+
+// 打开评论输入
+let commentTargetId = null;
+function openCommentEdit(id){
+  commentTargetId = id;
+  editKey = null;                    // 避免与资料编辑冲突
+  $('#editTitle').textContent = '评论';
+  $('#editHint').textContent = '说点什么吧（最多 40 字）';
+  $('#editInput').value = '';
+  $('#editInput').maxLength = 40;
+  editKey = '__comment__';
+  $('#mask').classList.add('show');
+  $('#editSheet').classList.add('show');
+  setTimeout(() => $('#editInput').focus(), 260);
+}
+
+/* ---- 发表朋友圈 ---- */
+let postImgs = [];   // [{k:'img'|'emoji', v:...}]
+const POST_EMOJIS = ['🌅','🌊','🏔','🌸','🍜','☕','🐱','🐶','🎉','🎵','📷','⚽','🚗','✈️','📚','💻'];
+
+function openPostPage(){
+  postImgs = [];
+  $('#postText').value = '';
+  renderPostPicked();
+  renderPostEmojiPick();
+  openSub('page-post');
+  setTimeout(() => $('#postText').focus(), 320);
+}
+function renderPostPicked(){
+  const list = postImgs.map((it, i) => `
+    <div class="picked-item">
+      ${it.k === 'img'
+        ? `<img class="fill" src="${it.v}" alt="">`
+        : `<span class="fill">${it.v}</span>`}
+      <div class="del" data-delimg="${i}">✕</div>
+    </div>`).join('');
+  const addTile = postImgs.length < 9
+    ? `<div class="picked-item" data-addimg="1"><div class="add-tile">＋</div></div>` : '';
+  $('#postPicked').innerHTML = list + addTile;
+}
+function renderPostEmojiPick(){
+  $('#postEmojiPick').innerHTML = POST_EMOJIS.map(e => `<div data-postemoji="${e}">${e}</div>`).join('');
+}
+$('#postPicked').addEventListener('click', e => {
+  const del = e.target.closest('[data-delimg]');
+  if(del){
+    postImgs.splice(parseInt(del.dataset.delimg, 10), 1);
+    sfx.tap();
+    renderPostPicked();
+    return;
+  }
+  if(e.target.closest('[data-addimg]')){
+    sfx.tap();
+    $('#postFile').click();
+  }
+});
+$('#postEmojiPick').addEventListener('click', e => {
+  const el = e.target.closest('[data-postemoji]');
+  if(!el) return;
+  if(postImgs.length >= 9){ toast('最多 9 张'); return; }
+  postImgs.push({ k: 'emoji', v: el.dataset.postemoji });
+  sfx.tap(); vib(8);
+  renderPostPicked();
+});
+$('#btnUploadPost').addEventListener('click', () => { sfx.tap(); $('#postFile').click(); });
+$('#postFile').addEventListener('change', e => {
+  const files = Array.from(e.target.files || []);
+  if(!files.length) return;
+  let remaining = 9 - postImgs.length;
+  if(remaining <= 0){ toast('最多 9 张'); return; }
+  files.slice(0, remaining).forEach(f => {
+    readImageFile(f, 400, dataUrl => {
+      if(postImgs.length >= 9) return;
+      postImgs.push({ k: 'img', v: dataUrl });
+      renderPostPicked();
+    });
+  });
+  e.target.value = '';
+});
+
+$('#btnPublish').addEventListener('click', () => {
+  if(!canTap(400)) return;
+  const text = ($('#postText').value || '').trim();
+  if(!text && !postImgs.length){ toast('说点什么或选张图吧'); sfx.err(); return; }
+  const id = 'my_' + Date.now();
+  const post = {
+    id, author: store.profile.name, isMe: true, ts: Date.now(),
+    text: text || '分享图片',
+    imgs: JSON.parse(JSON.stringify(postImgs)),
+    likes: [], comments: []
+  };
+  store.moments.unshift(post);
+  saveMoments();
+  postImgs = [];
+  sfx.ok(); vib(20);
+  toast('发表成功');
+  backSub();
+  renderMoments();
+  const ms = $('#momentsScroll');
+  if(ms) ms.scrollTop = 300;
+  // 触发好友互动
+  scheduleFriendReaction(id);
+});
+
+/* ---- 好友互动模拟 ---- */
+const FRIEND_POOL = ['张伟','李雷','林晓','孙悦','王芳','周杰','陈晨','刘洋','杨幂','唐嫣'];
+const COMMENT_POOL = [
+  '哇，好棒！', '太羡慕了 😍', '这个地方我也想去', '拍得真好看',
+  '哈哈哈哈', '什么时候一起去？', '不错不错 👍', '我酸了',
+  '这图我可以偷走吗', '厉害呀', '下次约起', '朋友圈摄影大师'
+];
+let reactionTimers = [];
+
+function pickOne(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+
+function scheduleFriendReaction(postId){
+  // 清理上一轮未执行的定时器，避免堆积
+  reactionTimers.forEach(t => clearTimeout(t));
+  reactionTimers = [];
+
+  const likeDelay = 1600 + Math.random() * 2200;
+  const cmtDelay  = likeDelay + 2400 + Math.random() * 3000;
+  const likeDelay2 = cmtDelay + 2000 + Math.random() * 2500;
+
+  // 第一位好友点赞
+  reactionTimers.push(setTimeout(() => {
+    const p = store.moments.find(m => m.id === postId);
+    if(!p) return;
+    const f = pickOne(FRIEND_POOL);
+    if(p.likes.indexOf(f) < 0) p.likes.push(f);
+    saveMoments();
+    refreshMomentsIfVisible();
+    noticeFriend(f + ' 赞了你的朋友圈');
+  }, likeDelay));
+
+  // 好友评论
+  reactionTimers.push(setTimeout(() => {
+    const p = store.moments.find(m => m.id === postId);
+    if(!p) return;
+    // 评论者优先选择已点赞的好友
+    let f = p.likes.find(n => n !== store.profile.name);
+    if(!f) f = pickOne(FRIEND_POOL);
+    const text = pickOne(COMMENT_POOL);
+    if(p.comments.some(c => c.name === f && c.text === text)) return;
+    p.comments.push({ name: f, text: text });
+    saveMoments();
+    refreshMomentsIfVisible();
+    noticeFriend(f + '：' + text);
+  }, cmtDelay));
+
+  // 第二位好友点赞
+  reactionTimers.push(setTimeout(() => {
+    const p = store.moments.find(m => m.id === postId);
+    if(!p) return;
+    const f = pickOne(FRIEND_POOL.filter(n => p.likes.indexOf(n) < 0));
+    if(f){
+      p.likes.push(f);
+      saveMoments();
+      refreshMomentsIfVisible();
+      noticeFriend(f + ' 赞了你的朋友圈');
+    }
+  }, likeDelay2));
+}
+
+// 如果朋友圈页面正在显示，实时刷新
+function refreshMomentsIfVisible(){
+  const el = document.getElementById('page-moments');
+  if(el && el.classList.contains('active')) renderMoments();
+}
+// 好友互动提醒（Toast + 未读小红点）
+function noticeFriend(msg){
+  sfx.recv();
+  if(navigator.vibrate) navigator.vibrate([15, 40, 15]);
+  toast(msg, 2200);
+  store.momentUnread = (store.momentUnread || 0) + 1;
+  safeSet('wx_moment_unread', String(store.momentUnread));
+  updateDiscoverDot();
+}
+
+$('#momentCamera').addEventListener('click', () => { sfx.tap(); vib(10); openPostPage(); });
+
+/* =========================================================
+   22. 设置页
+   ========================================================= */
+function renderSettings(){
+  $('#settingsScroll').innerHTML = `
+    <div class="group" style="margin-top:10px;">
+      <div class="row" data-setting="profile"><div class="row-ico" style="background:#4B8BF5">我</div><div class="row-title">编辑个人信息</div><div class="row-arrow"></div></div>
+      <div class="row"><div class="row-title">账号与安全</div><div class="row-arrow"></div></div>
+      <div class="row"><div class="row-title">新消息通知</div><div class="row-val">已开启</div><div class="row-arrow"></div></div>
+      <div class="row"><div class="row-title">隐私</div><div class="row-arrow"></div></div>
+    </div>
+    <div class="group">
+      <div class="row"><div class="row-title">支付密码</div><div class="row-val">123456（演示）</div><div class="row-arrow"></div></div>
+      <div class="row" data-setting="reset"><div class="row-title" style="color:#E64340;">清空演示数据并重置</div></div>
+    </div>
+    <div class="group">
+      <div class="row"><div class="row-title">关于微信</div><div class="row-val">Demo v1.2</div><div class="row-arrow"></div></div>
+    </div>
+    <div style="height:60px;"></div>`;
+}
+$('#settingsScroll').addEventListener('click', e => {
+  const r = e.target.closest('[data-setting]');
+  if(!r) return;
+  sfx.tap(); vib(8);
+  if(r.dataset.setting === 'profile'){ openProfilePage(); return; }
+  if(r.dataset.setting === 'reset'){
+    localStorage.removeItem('wx_balance');
+    localStorage.removeItem('wx_bills');
+    localStorage.removeItem('wx_moments');
+    localStorage.removeItem('wx_moment_unread');
+    store.balance = 8888.88;
+    store.bills = [{ time: nowStr(), name: '数据已重置', amount: 0 }];
+    store.moments = defaultMoments();
+    store.momentUnread = 0;
+    saveStore();
+    saveMoments();
+    renderMe(); renderBills(); renderWallet(); renderMoments(); updateDiscoverDot();
+    toast('演示数据已重置');
+  }
+});
+
+/* =========================================================
+   23. 编辑弹层复用的保存处理（评论 / 资料）
+   ========================================================= */
+// 覆盖 editSave 的行为，使其同时支持评论场景
+$('#editSave').addEventListener('click', () => {
+  // 评论场景
+  if(editKey === '__comment__'){
+    const val = ($('#editInput').value || '').trim();
+    if(!val){ toast('请输入评论内容'); sfx.err(); return; }
+    const m = store.moments.find(x => x.id === commentTargetId);
+    if(m){
+      m.comments.push({ name: store.profile.name, text: val });
+      saveMoments();
+      renderMoments();
+    }
+    editKey = null;
+    commentTargetId = null;
+    closeEditSheet();
+    sfx.ok(); vib(12);
+    toast('评论成功');
+  }
+});
+
+/* =========================================================
+   24. Toast
+   ========================================================= */
+let toastTimer = null;
+function toast(msg, dur){
+  const el = $('#toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), dur || 1600);
+}
+
+/* =========================================================
+   25. 顶栏按钮
+   ========================================================= */
+$('#btnSearchTop').addEventListener('click', () => { toast('搜索（演示）'); sfx.tap(); });
+$('#btnPlusTop').addEventListener('click', () => { toast('发起群聊 / 添加朋友（演示）'); sfx.tap(); });
+$('#btnAddFriend').addEventListener('click', () => { toast('添加朋友（演示）'); sfx.tap(); });
+
+/* =========================================================
+   26. 时钟 & 初始化
+   ========================================================= */
+function updateClock(){
+  const d = new Date();
+  $('#clock').textContent = d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+setInterval(updateClock, 10000);
+updateClock();
+
+// 首次交互解锁音频（移动端浏览器策略）
+function unlockAudio(){
+  ac();
+  document.removeEventListener('touchstart', unlockAudio);
+  document.removeEventListener('click', unlockAudio);
+}
+document.addEventListener('touchstart', unlockAudio, { passive: true });
+document.addEventListener('click', unlockAudio);
+
+// 页面初始化
+renderChatList();
+renderContacts();
+renderDiscover();
+renderMe();
+renderService();
+renderBills();
+renderWallet();
+renderPlusGrid();
+renderEmoji();
+renderMoments();
+renderSettings();
+renderProfilePage();
+updateAmountDisplay();
+renderPwdDots();
+renderPostEmojiPick();
+updateDiscoverDot();
+
+setTimeout(() => toast('欢迎体验微信高仿界面 · 支付密码 123456', 2600), 700);
+</script>
+</body>
+</html>

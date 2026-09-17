@@ -13,24 +13,94 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,Blink
 #gameWrap{position:fixed;inset:0;overflow:hidden;background:radial-gradient(ellipse at 50% 40%, #0a4d7c 0%, #022c4a 40%, #001a33 70%, #000a15 100%);}
 #gameCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;}
 
+/* ========== 竖屏旋转提示 ========== */
+.rotate-overlay{
+  position:fixed;inset:0;z-index:9999;
+  display:none;
+  flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(180deg, #001a33 0%, #022c4a 100%);
+  color:#fff;
+  padding:20px;
+  text-align:center;
+}
+.rotate-overlay.show{display:flex;}
+.rotate-phone{
+  width:80px;height:130px;
+  border:4px solid #7ed6ff;
+  border-radius:14px;
+  position:relative;
+  margin-bottom:30px;
+  animation:rotateAnim 2s ease-in-out infinite;
+  box-shadow:0 0 30px rgba(0,180,255,.5);
+}
+.rotate-phone::before{
+  content:'';
+  position:absolute;
+  top:8px;left:50%;
+  transform:translateX(-50%);
+  width:24px;height:4px;
+  border-radius:2px;
+  background:#7ed6ff;
+}
+.rotate-phone::after{
+  content:'';
+  position:absolute;
+  bottom:8px;left:50%;
+  transform:translateX(-50%);
+  width:30px;height:30px;
+  border-radius:50%;
+  border:3px solid #7ed6ff;
+}
+@keyframes rotateAnim{
+  0%, 100%{ transform:rotate(0deg); }
+  50%{ transform:rotate(90deg); }
+}
+.rotate-title{
+  font-size:22px;font-weight:900;
+  color:#7ed6ff;letter-spacing:3px;
+  margin-bottom:12px;
+  text-shadow:0 0 20px rgba(0,180,255,.6);
+}
+.rotate-sub{
+  font-size:14px;color:#bfe8ff;
+  line-height:1.7;letter-spacing:1px;
+  margin-bottom:24px;
+  max-width:280px;
+}
+.rotate-arrow{
+  font-size:32px;color:#00e5ff;
+  animation:arrowPulse 1.5s ease-in-out infinite;
+  margin-bottom:8px;
+}
+@keyframes arrowPulse{
+  0%, 100%{ opacity:.5; transform:translateY(0); }
+  50%{ opacity:1; transform:translateY(-6px); }
+}
+.rotate-force-btn{
+  padding:10px 26px;border:2px solid #7ed6ff;border-radius:22px;
+  background:transparent;color:#7ed6ff;
+  font-size:13px;font-weight:700;letter-spacing:2px;
+  cursor:pointer;margin-top:16px;
+  font-family:inherit;
+}
+.rotate-force-btn:active{ background:rgba(126,214,255,.15); }
+
 /* HUD */
-.hud{position:absolute;top:0;left:0;right:0;z-index:10;padding:calc(env(safe-area-inset-top,0px) + 8px) 10px 8px;display:flex;align-items:center;justify-content:space-between;pointer-events:none;gap:6px;}
-.hud-box{background:rgba(0,30,60,.55);border:1px solid rgba(120,220,255,.25);border-radius:12px;padding:6px 10px;display:flex;align-items:center;gap:6px;pointer-events:auto;}
-.hud-icon{font-size:16px;line-height:1;}
+.hud{position:absolute;top:0;left:0;right:0;z-index:10;padding:calc(env(safe-area-inset-top,0px) + 6px) 10px 6px;display:flex;align-items:center;justify-content:space-between;pointer-events:none;gap:6px;}
+.hud-box{background:rgba(0,30,60,.55);border:1px solid rgba(120,220,255,.25);border-radius:10px;padding:5px 9px;display:flex;align-items:center;gap:6px;pointer-events:auto;}
+.hud-icon{font-size:15px;line-height:1;}
 .hud-label{font-size:9px;color:#7ed6ff;font-weight:600;}
-.hud-value{font-size:15px;color:#fff;font-weight:800;}
-.hud-bar{width:60px;height:5px;border-radius:3px;background:rgba(0,0,0,.4);overflow:hidden;margin-left:4px;}
+.hud-value{font-size:14px;color:#fff;font-weight:800;}
+.hud-bar{width:56px;height:5px;border-radius:3px;background:rgba(0,0,0,.4);overflow:hidden;margin-left:4px;}
 .hud-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#00e5ff,#00b3ff);width:0%;transition:width .3s;}
 .hp-hearts{font-size:11px;letter-spacing:1px;margin-left:4px;}
-.btn-icon{width:38px;height:38px;border-radius:12px;background:rgba(0,30,60,.55);border:1px solid rgba(120,220,255,.25);display:flex;align-items:center;justify-content:center;font-size:18px;color:#7ed6ff;pointer-events:auto;cursor:pointer;}
+.btn-icon{width:36px;height:36px;border-radius:10px;background:rgba(0,30,60,.55);border:1px solid rgba(120,220,255,.25);display:flex;align-items:center;justify-content:center;font-size:17px;color:#7ed6ff;pointer-events:auto;cursor:pointer;}
 .btn-icon:active{transform:scale(.9);}
 
-.bottom-tip{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);left:0;right:0;z-index:10;text-align:center;pointer-events:none;}
-.bottom-tip span{display:inline-block;background:rgba(0,30,60,.55);border:1px solid rgba(120,220,255,.2);border-radius:20px;padding:5px 14px;font-size:11px;color:#7ed6ff;font-weight:500;}
+.bottom-tip{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 8px);left:0;right:0;z-index:10;text-align:center;pointer-events:none;}
+.bottom-tip span{display:inline-block;background:rgba(0,30,60,.55);border:1px solid rgba(120,220,255,.2);border-radius:20px;padding:4px 12px;font-size:10px;color:#7ed6ff;font-weight:500;}
 
-/* ============================================================
-   虚拟摇杆（转圈摇杆）
-   ============================================================ */
+/* 虚拟摇杆 */
 .joystick{
   position:absolute;
   left:20px;
@@ -44,77 +114,45 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,Blink
   box-shadow:0 0 24px rgba(0,180,255,.3), inset 0 0 20px rgba(0,180,255,.15);
   pointer-events:auto;
   touch-action:none;
-  transition:opacity .3s;
 }
 .joystick::before{
-  content:'';
-  position:absolute;
-  inset:8px;
-  border-radius:50%;
-  border:1px dashed rgba(120,220,255,.25);
-  pointer-events:none;
+  content:'';position:absolute;inset:8px;border-radius:50%;
+  border:1px dashed rgba(120,220,255,.25);pointer-events:none;
 }
-/* 方向指示点 */
 .joystick .dir-dot{
-  position:absolute;
-  width:6px;
-  height:6px;
-  border-radius:50%;
-  background:rgba(120,220,255,.4);
-  top:50%; left:50%;
-  transform:translate(-50%,-50%);
-  pointer-events:none;
+  position:absolute;width:6px;height:6px;border-radius:50%;
+  background:rgba(120,220,255,.4);top:50%;left:50%;
+  transform:translate(-50%,-50%);pointer-events:none;
 }
 .joystick .dir-dot.n{ top:14px; }
 .joystick .dir-dot.s{ top:calc(100% - 14px); }
 .joystick .dir-dot.w{ left:14px; }
 .joystick .dir-dot.e{ left:calc(100% - 14px); }
-
-/* 摇杆中心旋钮 */
 .joystick-knob{
-  position:absolute;
-  top:50%; left:50%;
-  width:56px;
-  height:56px;
-  margin:-28px 0 0 -28px;
+  position:absolute;top:50%;left:50%;
+  width:56px;height:56px;margin:-28px 0 0 -28px;
   border-radius:50%;
   background:radial-gradient(circle at 35% 30%, rgba(0,229,255,.9), rgba(0,120,200,.95) 60%, rgba(0,60,120,.95) 100%);
   border:2px solid rgba(180,240,255,.9);
-  box-shadow:
-    0 0 20px rgba(0,229,255,.7),
-    0 4px 12px rgba(0,0,0,.5),
-    inset 0 2px 6px rgba(255,255,255,.4);
+  box-shadow:0 0 20px rgba(0,229,255,.7), 0 4px 12px rgba(0,0,0,.5), inset 0 2px 6px rgba(255,255,255,.4);
   pointer-events:none;
-  transition:box-shadow .2s ease;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  display:flex;align-items:center;justify-content:center;
 }
 .joystick-knob::before{
-  content:'';
-  width:20px;
-  height:20px;
-  border-radius:50%;
+  content:'';width:20px;height:20px;border-radius:50%;
   background:radial-gradient(circle at 40% 30%, #fff, rgba(180,240,255,.8));
   box-shadow:inset 0 1px 3px rgba(0,0,0,.3);
 }
 .joystick.active .joystick-knob{
-  box-shadow:
-    0 0 32px rgba(0,229,255,1),
-    0 6px 16px rgba(0,0,0,.6),
-    inset 0 2px 6px rgba(255,255,255,.5);
+  box-shadow:0 0 32px rgba(0,229,255,1), 0 6px 16px rgba(0,0,0,.6), inset 0 2px 6px rgba(255,255,255,.5);
 }
 .joystick.active{
   border-color:rgba(180,240,255,.9);
   box-shadow:0 0 36px rgba(0,229,255,.6), inset 0 0 24px rgba(0,229,255,.25);
 }
-/* 摇杆底部光圈（增强视觉） */
 .joystick-ring{
-  position:absolute;
-  inset:-4px;
-  border-radius:50%;
-  border:1px solid rgba(0,229,255,.2);
-  pointer-events:none;
+  position:absolute;inset:-4px;border-radius:50%;
+  border:1px solid rgba(0,229,255,.2);pointer-events:none;
   animation:joystickPulse 2s ease-in-out infinite;
 }
 @keyframes joystickPulse{
@@ -122,129 +160,199 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,Blink
   50%{ transform:scale(1.08); opacity:.8; }
 }
 
-/* 手机隐藏拖动提示 */
-@media (max-width:900px){
-  .bottom-tip span{ font-size:10.5px; }
-}
-
-/* 桌面端弱化摇杆（不显示） */
-@media (min-width:1024px){
-  .joystick{ opacity:.55; }
-}
-
 /* 技能栏 */
-.skill-bar{position:absolute;right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 55px);z-index:20;display:flex;flex-direction:column;gap:8px;}
-.skill-btn{width:52px;height:52px;border-radius:50%;background:radial-gradient(circle at 30% 30%, rgba(0,229,255,.4), rgba(0,80,140,.85));border:2px solid rgba(120,220,255,.6);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;cursor:pointer;position:relative;overflow:hidden;}
+.skill-bar{position:absolute;right:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 40px);z-index:20;display:flex;flex-direction:column;gap:6px;}
+.skill-btn{width:48px;height:48px;border-radius:50%;background:radial-gradient(circle at 30% 30%, rgba(0,229,255,.4), rgba(0,80,140,.85));border:2px solid rgba(120,220,255,.6);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;cursor:pointer;position:relative;overflow:hidden;}
 .skill-btn:active{transform:scale(.9);}
-.skill-btn .si-icon{font-size:20px;line-height:1;}
+.skill-btn .si-icon{font-size:18px;line-height:1;}
 .skill-btn .si-label{font-size:8px;font-weight:700;margin-top:1px;}
-.skill-btn .cd-mask{position:absolute;inset:0;background:rgba(0,0,0,.65);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#7ed6ff;opacity:0;transition:opacity .2s;}
+.skill-btn .cd-mask{position:absolute;inset:0;background:rgba(0,0,0,.65);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#7ed6ff;opacity:0;transition:opacity .2s;}
 .skill-btn.cooling .cd-mask{opacity:1;}
-.skill-btn.fire{background:radial-gradient(circle at 30% 30%, rgba(255,150,80,.5), rgba(180,40,20,.9));border-color:rgba(255,180,120,.8);width:58px;height:58px;}
-.skill-btn.fire .si-icon{font-size:24px;}
+.skill-btn.fire{background:radial-gradient(circle at 30% 30%, rgba(255,150,80,.5), rgba(180,40,20,.9));border-color:rgba(255,180,120,.8);width:54px;height:54px;}
+.skill-btn.fire .si-icon{font-size:22px;}
 .skill-btn.bubble{background:radial-gradient(circle at 30% 30%, rgba(180,240,255,.55), rgba(0,120,180,.9));border-color:rgba(180,240,255,.85);}
 .skill-btn.dash{background:radial-gradient(circle at 30% 30%, rgba(255,220,100,.5), rgba(200,100,0,.9));border-color:rgba(255,220,100,.8);}
 .skill-btn.shield{background:radial-gradient(circle at 30% 30%, rgba(100,200,255,.5), rgba(0,60,140,.9));border-color:rgba(100,200,255,.85);}
 .skill-btn.suck{background:radial-gradient(circle at 30% 30%, rgba(200,150,255,.5), rgba(90,20,180,.9));border-color:rgba(200,150,255,.85);}
-.ammo-badge{position:absolute;top:-5px;right:-5px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:linear-gradient(135deg,#ff8a65,#d84315);color:#fff;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;border:2px solid #001a33;}
+.ammo-badge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:linear-gradient(135deg,#ff8a65,#d84315);color:#fff;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;border:2px solid #001a33;}
 
 .skill-status{position:absolute;top:35%;left:50%;transform:translate(-50%,-50%) scale(.5);z-index:50;pointer-events:none;opacity:0;font-size:20px;font-weight:900;padding:8px 20px;border-radius:26px;color:#fff;transition:opacity .3s;}
 .skill-status.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
 
 /* 覆盖层 */
-.overlay{position:absolute;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%, rgba(10,77,124,.95) 0%, rgba(2,44,74,.97) 40%, rgba(0,26,51,.99) 100%);padding:14px;overflow-y:auto;}
+.overlay{position:absolute;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%, rgba(10,77,124,.95) 0%, rgba(2,44,74,.97) 40%, rgba(0,26,51,.99) 100%);padding:10px;overflow-y:auto;}
 .overlay.hide{opacity:0;pointer-events:none;display:none;}
-.game-logo{font-size:44px;font-weight:900;background:linear-gradient(180deg,#7ed6ff,#00b3ff,#005f9e);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:4px;margin-bottom:4px;}
-.game-sub{font-size:11px;color:#7ed6ff;letter-spacing:6px;margin-bottom:14px;}
-.btn-start{padding:13px 50px;border:none;border-radius:50px;background:linear-gradient(180deg,#00e5ff,#0088cc);color:#fff;font-size:17px;font-weight:800;letter-spacing:3px;margin-bottom:10px;cursor:pointer;}
+.game-logo{font-size:40px;font-weight:900;background:linear-gradient(180deg,#7ed6ff,#00b3ff,#005f9e);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:4px;margin-bottom:2px;}
+.game-sub{font-size:10px;color:#7ed6ff;letter-spacing:6px;margin-bottom:10px;}
+.btn-start{padding:11px 44px;border:none;border-radius:50px;background:linear-gradient(180deg,#00e5ff,#0088cc);color:#fff;font-size:16px;font-weight:800;letter-spacing:3px;margin-bottom:8px;cursor:pointer;}
 .btn-start:active{transform:scale(.95);}
 
-.rules{background:rgba(0,30,60,.6);border:1px solid rgba(120,220,255,.2);border-radius:14px;padding:10px 16px;max-width:340px;margin-bottom:8px;color:#bfe8ff;font-size:11.5px;line-height:1.7;}
-.rules h3{font-size:12px;color:#7ed6ff;font-weight:700;margin-bottom:6px;text-align:center;letter-spacing:2px;}
+.rules{background:rgba(0,30,60,.6);border:1px solid rgba(120,220,255,.2);border-radius:12px;padding:8px 14px;max-width:340px;margin-bottom:6px;color:#bfe8ff;font-size:11px;line-height:1.6;}
+.rules h3{font-size:11px;color:#7ed6ff;font-weight:700;margin-bottom:4px;text-align:center;letter-spacing:2px;}
 
-.diff-picker{background:rgba(0,30,60,.6);border:1px solid rgba(120,220,255,.2);border-radius:14px;padding:10px 14px;max-width:340px;margin-bottom:8px;width:100%;}
-.diff-picker h3{font-size:12px;color:#7ed6ff;font-weight:700;margin-bottom:8px;text-align:center;letter-spacing:2px;}
-.diff-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-.diff-item{padding:8px 4px;border-radius:10px;background:rgba(0,20,40,.6);border:2px solid transparent;text-align:center;cursor:pointer;color:#bfe8ff;font-size:12px;font-weight:700;}
+.diff-picker{background:rgba(0,30,60,.6);border:1px solid rgba(120,220,255,.2);border-radius:12px;padding:8px 12px;max-width:340px;margin-bottom:6px;width:100%;}
+.diff-picker h3{font-size:11px;color:#7ed6ff;font-weight:700;margin-bottom:6px;text-align:center;letter-spacing:2px;}
+.diff-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.diff-item{padding:6px 4px;border-radius:8px;background:rgba(0,20,40,.6);border:2px solid transparent;text-align:center;cursor:pointer;color:#bfe8ff;font-size:11px;font-weight:700;}
 .diff-item.selected{border-color:#00e5ff;background:rgba(0,100,160,.6);color:#fff;}
-.diff-item .di-sub{font-size:9px;color:#7ed6ff;margin-top:2px;font-weight:500;}
+.diff-item .di-sub{font-size:8px;color:#7ed6ff;margin-top:1px;font-weight:500;}
 
-.skin-picker{background:rgba(0,30,60,.6);border:1px solid rgba(120,220,255,.2);border-radius:14px;padding:10px 14px;max-width:340px;margin-bottom:8px;width:100%;}
-.skin-picker h3{font-size:12px;color:#7ed6ff;font-weight:700;margin-bottom:8px;text-align:center;letter-spacing:2px;}
-.skin-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
-.skin-item{aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,20,40,.6);border:2px solid transparent;cursor:pointer;position:relative;font-size:20px;}
+.skin-picker{background:rgba(0,30,60,.6);border:1px solid rgba(120,220,255,.2);border-radius:12px;padding:8px 12px;max-width:340px;margin-bottom:6px;width:100%;}
+.skin-picker h3{font-size:11px;color:#7ed6ff;font-weight:700;margin-bottom:6px;text-align:center;letter-spacing:2px;}
+.skin-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;}
+.skin-item{aspect-ratio:1;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,20,40,.6);border:2px solid transparent;cursor:pointer;position:relative;font-size:18px;}
 .skin-item.locked{opacity:.45;cursor:not-allowed;}
-.skin-item.locked::after{content:'🔒';position:absolute;top:1px;right:1px;font-size:9px;}
+.skin-item.locked::after{content:'🔒';position:absolute;top:1px;right:1px;font-size:8px;}
 .skin-item.selected{border-color:#00e5ff;background:rgba(0,100,160,.6);}
-.skin-item .si-name{font-size:8px;color:#7ed6ff;margin-top:2px;font-weight:600;}
+.skin-item .si-name{font-size:7px;color:#7ed6ff;margin-top:2px;font-weight:600;}
 
-.over-icon{font-size:60px;margin-bottom:8px;}
-.over-title{font-size:28px;font-weight:900;background:linear-gradient(180deg,#ff8a8a,#ff3b3b);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:4px;margin-bottom:14px;}
-.over-stats{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;justify-content:center;}
-.over-stat{background:rgba(0,30,60,.6);border:1px solid rgba(120,220,255,.2);border-radius:12px;padding:8px 12px;text-align:center;min-width:74px;}
-.over-stat .os-val{font-size:18px;font-weight:900;color:#7ed6ff;margin-bottom:2px;}
+.over-icon{font-size:56px;margin-bottom:6px;}
+.over-title{font-size:26px;font-weight:900;background:linear-gradient(180deg,#ff8a8a,#ff3b3b);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:4px;margin-bottom:12px;}
+.over-stats{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;justify-content:center;}
+.over-stat{background:rgba(0,30,60,.6);border:1px solid rgba(120,220,255,.2);border-radius:10px;padding:6px 10px;text-align:center;min-width:70px;}
+.over-stat .os-val{font-size:17px;font-weight:900;color:#7ed6ff;margin-bottom:2px;}
 .over-stat .os-label{font-size:9px;color:#7fa8c8;letter-spacing:1px;}
 .over-stat.best .os-val{color:#ffd700;}
 
-.unlock-show{background:rgba(0,30,60,.6);border:1px solid rgba(255,215,0,.4);border-radius:12px;padding:10px 14px;margin-bottom:10px;text-align:center;}
-.unlock-show h4{font-size:11px;color:#ffd700;font-weight:800;letter-spacing:2px;margin-bottom:6px;}
-.unlock-list{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
-.unlock-skin{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;border:2px solid #ffd700;}
+.unlock-show{background:rgba(0,30,60,.6);border:1px solid rgba(255,215,0,.4);border-radius:10px;padding:8px 12px;margin-bottom:8px;text-align:center;}
+.unlock-show h4{font-size:10px;color:#ffd700;font-weight:800;letter-spacing:2px;margin-bottom:4px;}
+.unlock-list{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;}
+.unlock-skin{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;border:2px solid #ffd700;}
 
-.pause-card{background:linear-gradient(180deg,#1a3a5c,#0a1f33);border:2px solid #00e5ff;border-radius:20px;padding:22px 20px;max-width:340px;width:100%;}
-.pause-title{font-size:22px;color:#fff;font-weight:900;text-align:center;margin-bottom:16px;letter-spacing:4px;}
-.settings-block{background:rgba(0,20,40,.5);border:1px solid rgba(120,220,255,.2);border-radius:12px;padding:12px 14px;margin-bottom:12px;}
-.settings-block h4{font-size:11px;color:#7ed6ff;font-weight:700;margin-bottom:10px;text-align:center;letter-spacing:2px;}
-.volume-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.pause-card{background:linear-gradient(180deg,#1a3a5c,#0a1f33);border:2px solid #00e5ff;border-radius:18px;padding:18px 18px;max-width:340px;width:100%;}
+.pause-title{font-size:20px;color:#fff;font-weight:900;text-align:center;margin-bottom:14px;letter-spacing:4px;}
+.settings-block{background:rgba(0,20,40,.5);border:1px solid rgba(120,220,255,.2);border-radius:10px;padding:10px 12px;margin-bottom:10px;}
+.settings-block h4{font-size:10px;color:#7ed6ff;font-weight:700;margin-bottom:8px;text-align:center;letter-spacing:2px;}
+.volume-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
 .volume-row:last-child{margin-bottom:0;}
-.volume-row .vlabel{font-size:11px;color:#bfe8ff;font-weight:700;min-width:60px;}
-.volume-row .vvalue{font-size:11px;color:#7ed6ff;font-weight:900;min-width:32px;text-align:right;}
+.volume-row .vlabel{font-size:11px;color:#bfe8ff;font-weight:700;min-width:56px;}
+.volume-row .vvalue{font-size:11px;color:#7ed6ff;font-weight:900;min-width:30px;text-align:right;}
 .volume-slider{flex:1;height:5px;-webkit-appearance:none;appearance:none;background:rgba(0,0,0,.4);border-radius:3px;outline:none;}
 .volume-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:#00e5ff;cursor:pointer;}
 .volume-slider::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#00e5ff;cursor:pointer;border:none;}
 
 .revive-modal{position:absolute;inset:0;z-index:110;display:none;align-items:center;justify-content:center;background:rgba(0,10,25,.85);padding:20px;}
 .revive-modal.show{display:flex;}
-.revive-card{background:linear-gradient(180deg,#1a3a5c,#0a1f33);border:2px solid #00e5ff;border-radius:20px;padding:22px 20px;max-width:340px;width:100%;text-align:center;}
-.revive-icon{font-size:48px;margin-bottom:6px;}
-.revive-card h2{font-size:20px;color:#fff;font-weight:900;margin-bottom:5px;letter-spacing:2px;}
-.revive-card p{font-size:12px;color:#a8d4f0;line-height:1.6;margin-bottom:14px;}
-.revive-btn{width:100%;height:44px;border-radius:22px;border:none;font-size:15px;font-weight:800;letter-spacing:2px;color:#fff;cursor:pointer;margin-bottom:7px;}
+.revive-card{background:linear-gradient(180deg,#1a3a5c,#0a1f33);border:2px solid #00e5ff;border-radius:18px;padding:20px 18px;max-width:340px;width:100%;text-align:center;}
+.revive-icon{font-size:44px;margin-bottom:4px;}
+.revive-card h2{font-size:18px;color:#fff;font-weight:900;margin-bottom:4px;letter-spacing:2px;}
+.revive-card p{font-size:11.5px;color:#a8d4f0;line-height:1.6;margin-bottom:12px;}
+.revive-btn{width:100%;height:42px;border-radius:21px;border:none;font-size:14px;font-weight:800;letter-spacing:2px;color:#fff;cursor:pointer;margin-bottom:6px;}
 .revive-btn.ad{background:linear-gradient(180deg,#ffb74d,#f57c00);}
 .revive-btn.score{background:linear-gradient(180deg,#00e5ff,#0088cc);}
-.revive-btn.giveup{background:linear-gradient(180deg,#666,#333);font-size:12px;height:36px;}
+.revive-btn.giveup{background:linear-gradient(180deg,#666,#333);font-size:12px;height:34px;}
 
-.quest-panel{position:absolute;top:calc(env(safe-area-inset-top,0px) + 56px);right:10px;z-index:15;background:rgba(0,30,60,.75);border:1px solid rgba(120,220,255,.3);border-radius:12px;padding:8px 10px;min-width:140px;max-width:170px;pointer-events:auto;}
+.quest-panel{position:absolute;top:calc(env(safe-area-inset-top,0px) + 48px);right:10px;z-index:15;background:rgba(0,30,60,.75);border:1px solid rgba(120,220,255,.3);border-radius:10px;padding:6px 8px;min-width:120px;max-width:150px;pointer-events:auto;}
 .quest-panel.collapsed .quest-list{display:none;}
-.quest-header{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#ffd700;font-weight:800;letter-spacing:1px;cursor:pointer;}
-.quest-header .qh-toggle{font-size:12px;color:#7ed6ff;}
-.quest-list{margin-top:6px;display:flex;flex-direction:column;gap:5px;}
-.quest-item{display:flex;flex-direction:column;gap:2px;font-size:10px;color:#bfe8ff;}
+.quest-header{display:flex;align-items:center;justify-content:space-between;font-size:10px;color:#ffd700;font-weight:800;letter-spacing:1px;cursor:pointer;}
+.quest-header .qh-toggle{font-size:11px;color:#7ed6ff;}
+.quest-list{margin-top:4px;display:flex;flex-direction:column;gap:4px;}
+.quest-item{display:flex;flex-direction:column;gap:2px;font-size:9px;color:#bfe8ff;}
 .quest-item .qi-name{display:flex;justify-content:space-between;font-weight:600;}
 .quest-item .qi-progress{height:3px;background:rgba(0,0,0,.4);border-radius:2px;overflow:hidden;}
 .quest-item .qi-progress-fill{height:100%;background:linear-gradient(90deg,#ffd700,#ff8a00);border-radius:2px;transition:width .3s;}
 .quest-item.done{color:#7effb0;}
 .quest-item.done .qi-progress-fill{background:linear-gradient(90deg,#4ade80,#22c55e);}
 
-.achievement-toast{position:absolute;top:20%;left:50%;transform:translate(-50%,-50%) scale(.5);z-index:60;pointer-events:none;opacity:0;background:linear-gradient(135deg,rgba(255,215,0,.95),rgba(255,138,0,.95));border-radius:14px;padding:10px 20px;color:#5a3200;font-size:13px;font-weight:900;transition:all .3s;}
+.achievement-toast{position:absolute;top:20%;left:50%;transform:translate(-50%,-50%) scale(.5);z-index:60;pointer-events:none;opacity:0;background:linear-gradient(135deg,rgba(255,215,0,.95),rgba(255,138,0,.95));border-radius:12px;padding:8px 18px;color:#5a3200;font-size:12px;font-weight:900;transition:all .3s;}
 .achievement-toast.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
 
-.replay-panel{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:120;background:rgba(0,10,25,.9);border:2px solid #ff5252;border-radius:14px;padding:12px 18px;color:#fff;font-size:12px;font-weight:700;text-align:center;display:none;}
+.replay-panel{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:120;background:rgba(0,10,25,.9);border:2px solid #ff5252;border-radius:12px;padding:10px 16px;color:#fff;font-size:12px;font-weight:700;text-align:center;display:none;}
 .replay-panel.show{display:block;}
-.replay-panel .rp-title{color:#ff5252;font-size:11px;font-weight:900;letter-spacing:3px;margin-bottom:4px;}
+.replay-panel .rp-title{color:#ff5252;font-size:10px;font-weight:900;letter-spacing:3px;margin-bottom:4px;}
+
+/* ========== 横屏优化 ========== */
+@media (orientation: landscape) and (max-height: 500px){
+  /* 横屏低矮（手机横屏）：紧凑布局 */
+  .game-logo{ font-size:32px; letter-spacing:3px; }
+  .game-sub{ font-size:9px; margin-bottom:6px; letter-spacing:4px; }
+  .btn-start{ padding:9px 36px; font-size:14px; margin-bottom:6px; }
+  .rules{ font-size:10px; line-height:1.5; padding:6px 12px; max-width:520px; }
+  .rules h3{ font-size:10px; margin-bottom:3px; }
+  .rules > div{ display:inline-block; margin-right:10px; }
+  .diff-picker{ padding:6px 10px; margin-bottom:4px; max-width:520px; }
+  .diff-picker h3{ font-size:10px; margin-bottom:4px; }
+  .diff-item{ padding:5px 3px; font-size:10px; }
+  .diff-item .di-sub{ font-size:7px; }
+  .skin-picker{ padding:6px 10px; margin-bottom:4px; max-width:520px; }
+  .skin-picker h3{ font-size:10px; margin-bottom:4px; }
+  .skin-grid{ grid-template-columns:repeat(5,1fr); gap:5px; }
+  .skin-item{ font-size:16px; }
+  .skin-item .si-name{ font-size:6px; }
+
+  /* 开始界面改为横向两栏 */
+  #startOverlay{
+    flex-direction:row;
+    flex-wrap:wrap;
+    justify-content:center;
+    align-content:center;
+    gap:10px;
+    padding:10px 20px;
+  }
+  #startOverlay .game-logo,
+  #startOverlay .game-sub,
+  #startOverlay .btn-start{ width:100%; text-align:center; }
+  #startOverlay .diff-picker,
+  #startOverlay .skin-picker,
+  #startOverlay .rules{ max-width:260px; margin-bottom:0; }
+
+  /* 摇杆变小 */
+  .joystick{ width:100px; height:100px; left:14px; bottom:calc(env(safe-area-inset-bottom,0px) + 14px); }
+  .joystick-knob{ width:44px; height:44px; margin:-22px 0 0 -22px; }
+  .joystick-knob::before{ width:16px; height:16px; }
+
+  /* 技能更小 */
+  .skill-bar{ right:10px; bottom:calc(env(safe-area-inset-bottom,0px) + 20px); gap:5px; }
+  .skill-btn{ width:42px; height:42px; }
+  .skill-btn .si-icon{ font-size:16px; }
+  .skill-btn .si-label{ font-size:7px; }
+  .skill-btn.fire{ width:48px; height:48px; }
+  .skill-btn.fire .si-icon{ font-size:20px; }
+
+  /* HUD 紧凑 */
+  .hud{ padding:calc(env(safe-area-inset-top,0px) + 4px) 8px 4px; }
+  .hud-box{ padding:4px 8px; }
+  .hud-value{ font-size:13px; }
+  .hud-bar{ width:48px; }
+  .btn-icon{ width:34px; height:34px; font-size:16px; }
+
+  /* 任务面板更紧凑 */
+  .quest-panel{ top:calc(env(safe-area-inset-top,0px) + 40px); right:8px; min-width:110px; max-width:135px; padding:5px 7px; }
+  .quest-header{ font-size:9px; }
+  .quest-item{ font-size:8px; }
+
+  /* 结算界面横向排列 */
+  #overOverlay .over-stats{ gap:8px; }
+  .over-stat{ min-width:68px; padding:6px 10px; }
+  .over-stat .os-val{ font-size:16px; }
+}
+
+/* 竖屏时隐藏底部提示（旋转提示会覆盖） */
+@media (orientation: portrait) and (max-width: 500px){
+  .bottom-tip{ display:none; }
+}
+
+/* 桌面端小摇杆 */
+@media (min-width:1024px){
+  .joystick{ opacity:.55; }
+}
 
 @media(max-width:380px){
-  .game-logo{font-size:36px;}
-  .btn-start{padding:11px 40px;font-size:15px;}
-  .skill-btn{width:46px;height:46px;}
-  .skill-btn.fire{width:52px;height:52px;}
-  .quest-panel{min-width:120px;max-width:150px;}
   .joystick{ width:110px; height:110px; left:14px; bottom:calc(env(safe-area-inset-bottom,0px) + 14px); }
   .joystick-knob{ width:48px; height:48px; margin:-24px 0 0 -24px; }
 }
 </style>
 </head>
 <body>
+
+<!-- ========== 竖屏旋转提示 ========== -->
+<div class="rotate-overlay" id="rotateOverlay">
+  <div class="rotate-phone"></div>
+  <div class="rotate-title">请旋转手机</div>
+  <div class="rotate-sub">横屏体验更佳<br>转圈摇杆在左下角，技能在右下角</div>
+  <div class="rotate-arrow">↻</div>
+  <button class="rotate-force-btn" id="rotateForceBtn">仍要竖屏游玩</button>
+</div>
 
 <div id="gameWrap">
   <canvas id="gameCanvas"></canvas>
@@ -371,8 +479,8 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,Blink
           <span class="vvalue" id="sfxVolumeVal">70</span>
         </div>
       </div>
-      <button class="btn-start" id="btnResume" style="width:100%;padding:12px 0;font-size:16px;">继 续 游 戏</button>
-      <button class="btn-start" id="btnBackHome" style="width:100%;padding:12px 0;font-size:16px;background:linear-gradient(180deg,#666,#333);">返 回 主 页</button>
+      <button class="btn-start" id="btnResume" style="width:100%;padding:10px 0;font-size:15px;">继 续 游 戏</button>
+      <button class="btn-start" id="btnBackHome" style="width:100%;padding:10px 0;font-size:15px;background:linear-gradient(180deg,#666,#333);">返 回 主 页</button>
     </div>
   </div>
 
@@ -402,7 +510,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,Blink
       <div class="unlock-list" id="unlockList"></div>
     </div>
     <button class="btn-start" id="btnRestart">再 来 一 局</button>
-    <button class="btn-start" id="btnHome" style="padding:10px 40px;font-size:14px;background:linear-gradient(180deg,#666,#333);">返 回 主 页</button>
+    <button class="btn-start" id="btnHome" style="padding:8px 34px;font-size:13px;background:linear-gradient(180deg,#666,#333);">返 回 主 页</button>
   </div>
 
   <div class="revive-modal" id="reviveModal">
@@ -424,7 +532,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:-apple-system,Blink
 
 <script>
 /* ============================================================
-   深海进化 v4 - 增加虚拟摇杆
+   深海进化 v5 - 横屏优化
    ============================================================ */
 
 const canvas = document.getElementById('gameCanvas');
@@ -441,6 +549,33 @@ const MAX_MINES = 12;
 const MAX_POWERUPS = 4;
 const MAX_HEARTS = 3;
 const MAX_REMAINS = 8;
+
+/* ============================================================
+   横屏检测
+   ============================================================ */
+const rotateOverlay = document.getElementById('rotateOverlay');
+let userForcedPortrait = false;
+
+function checkOrientation(){
+  const isPortrait = window.innerHeight > window.innerWidth;
+  const isMobile = /Android|iPhone|iPad|iPod|Mobile|HarmonyOS/i.test(navigator.userAgent)
+    || (window.innerWidth <= 900 && 'ontouchstart' in window);
+  /* 竖屏 + 手机 + 未强制 → 显示提示 */
+  if(isMobile && isPortrait && !userForcedPortrait){
+    rotateOverlay.classList.add('show');
+    /* 暂停游戏 */
+    if(game.running && !game.paused){
+      game.paused = true;
+      document.getElementById('pauseOverlay').classList.add('hide');
+    }
+  } else {
+    rotateOverlay.classList.remove('show');
+  }
+}
+document.getElementById('rotateForceBtn').addEventListener('click', () => {
+  userForcedPortrait = true;
+  rotateOverlay.classList.remove('show');
+});
 
 /* ============================================================
    皮肤与成就
@@ -554,7 +689,6 @@ const player = {
   growGlow:0,
 };
 
-/* 鱼类配置 */
 const FISH_TYPES = [
   { size:9,  speed:1.4, score:5,   color:'#7ee8fa', colorDark:'#29b6f6', fin:'#b3e5fc', weight:22, ai:'flee' },
   { size:12, speed:1.2, score:8,   color:'#ffb74d', colorDark:'#ff7043', fin:'#ffcc80', weight:20, ai:'flee' },
@@ -580,7 +714,6 @@ const POWERUP_TYPES = [
   { id:'ammo',      icon:'💥', color:'#ff8a65', weight:8 },
 ];
 
-/* 工具 */
 function rand(a,b){ return a + Math.random() * (b-a); }
 function randInt(a,b){ return Math.floor(rand(a,b+1)); }
 function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
@@ -672,7 +805,7 @@ const sfx = {
   boss(){ beep(100, 0.5, 'sawtooth', 0.15); beep(80, 0.6, 'sawtooth', 0.12); },
 };
 
-/* 尺寸 */
+/* 尺寸 - 横屏优化 */
 function resize(){
   DPR = Math.min(window.devicePixelRatio || 1, 2);
   W = window.innerWidth;
@@ -682,29 +815,43 @@ function resize(){
   canvas.style.width = W + 'px';
   canvas.style.height = H + 'px';
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-  WORLD.w = Math.max(2800, W * 6);
-  WORLD.h = Math.max(2200, H * 5);
+
+  /* 世界尺寸：横屏比例更宽 → 世界更大更广阔 */
+  const aspect = W / H;
+  if(aspect > 1.6){
+    /* 横屏手机：超宽世界 */
+    WORLD.w = Math.max(3200, W * 6);
+    WORLD.h = Math.max(1800, H * 4);
+  } else {
+    /* 竖屏/方形：常规世界 */
+    WORLD.w = Math.max(2400, W * 5);
+    WORLD.h = Math.max(2600, H * 5);
+  }
+
+  checkOrientation();
 }
 window.addEventListener('resize', resize);
-window.addEventListener('orientationchange', () => setTimeout(resize, 200));
+window.addEventListener('orientationchange', () => {
+  /* 屏幕旋转后等布局稳定再重算 */
+  setTimeout(resize, 250);
+  setTimeout(() => { joystick.updateCenter(); }, 300);
+});
 resize();
 
 /* ============================================================
-   虚拟摇杆（转圈摇杆）
+   虚拟摇杆
    ============================================================ */
 const joystick = {
   el: document.getElementById('joystick'),
   knob: document.getElementById('joystickKnob'),
   active: false,
-  centerX: 0,
-  centerY: 0,
-  radius: 0,      // 摇杆半径
-  knobRadius: 28, // 旋钮半径
-  dx: 0, dy: 0,   // 归一化方向 (-1~1)
+  centerX: 0, centerY: 0, radius: 0,
+  dx: 0, dy: 0,
   pointerId: null,
   init(){
     this.updateCenter();
     window.addEventListener('resize', () => this.updateCenter());
+    window.addEventListener('orientationchange', () => setTimeout(() => this.updateCenter(), 300));
     this.el.addEventListener('touchstart', e => this.onStart(e), { passive: false });
     this.el.addEventListener('touchmove', e => this.onMove(e), { passive: false });
     this.el.addEventListener('touchend', e => this.onEnd(e), { passive: false });
@@ -724,9 +871,7 @@ const joystick = {
     if(!game.running || game.paused) return;
     this.active = true;
     this.el.classList.add('active');
-    if(e.touches && e.touches[0]){
-      this.pointerId = e.touches[0].identifier;
-    }
+    if(e.touches && e.touches[0]) this.pointerId = e.touches[0].identifier;
     this.updateCenter();
     this.update(e);
   },
@@ -740,8 +885,7 @@ const joystick = {
     this.active = false;
     this.el.classList.remove('active');
     this.pointerId = null;
-    this.dx = 0;
-    this.dy = 0;
+    this.dx = 0; this.dy = 0;
     this.knob.style.transform = 'translate(0px, 0px)';
   },
   update(e){
@@ -759,21 +903,16 @@ const joystick = {
     let dy = cy - this.centerY;
     const d = Math.sqrt(dx*dx + dy*dy);
     const maxR = this.radius;
-    if(d > maxR){
-      dx = dx / d * maxR;
-      dy = dy / d * maxR;
-    }
-    /* 归一化方向 (-1 ~ 1) */
+    if(d > maxR){ dx = dx / d * maxR; dy = dy / d * maxR; }
     this.dx = dx / maxR;
     this.dy = dy / maxR;
-    /* 更新旋钮位置 */
     this.knob.style.transform = `translate(${dx}px, ${dy}px)`;
   }
 };
 joystick.init();
 
 /* ============================================================
-   绘制：鱼
+   绘制函数
    ============================================================ */
 function drawFish(fish, isPlayer){
   const { x, y, size, angle, color, colorDark, fin, tailPhase } = fish;
@@ -784,42 +923,35 @@ function drawFish(fish, isPlayer){
   ctx.save();
   ctx.translate(x + shakeX, y + shakeY);
   ctx.rotate(angle);
-
   const levelFactor = isPlayer ? Math.min(2.2, 1 + (game.level - 1) * 0.12) : 1;
   const tailWag = Math.sin(tailPhase) * size * 0.35;
-
   ctx.beginPath();
   ctx.moveTo(-size*0.85, 0);
   ctx.quadraticCurveTo(-size*1.75*levelFactor, -size*0.7 + tailWag, -size*1.9*levelFactor, -size*0.05 + tailWag);
   ctx.quadraticCurveTo(-size*1.75*levelFactor, size*0.7 + tailWag, -size*0.85, 0);
   ctx.fillStyle = f; ctx.fill();
   ctx.strokeStyle = cd; ctx.lineWidth = Math.max(1, size*0.06); ctx.stroke();
-
   ctx.beginPath();
   ctx.moveTo(-size*0.2, -size*0.75);
   ctx.quadraticCurveTo(size*0.1, -size*1.35*levelFactor, size*0.5*levelFactor, -size*0.65);
   ctx.quadraticCurveTo(size*0.2, -size*0.55, -size*0.2, -size*0.75);
   ctx.fillStyle = f; ctx.fill();
   ctx.strokeStyle = cd; ctx.lineWidth = Math.max(1, size*0.05); ctx.stroke();
-
   ctx.beginPath();
   ctx.moveTo(-size*0.1, size*0.7);
   ctx.quadraticCurveTo(size*0.15, size*1.2*levelFactor, size*0.45, size*0.6);
   ctx.quadraticCurveTo(size*0.15, size*0.5, -size*0.1, size*0.7);
   ctx.fillStyle = f; ctx.fill();
   ctx.strokeStyle = cd; ctx.lineWidth = Math.max(1, size*0.05); ctx.stroke();
-
   const g = ctx.createRadialGradient(-size*0.2, -size*0.3, size*0.1, 0, 0, size*1.2);
   g.addColorStop(0, c); g.addColorStop(1, cd);
   ctx.beginPath();
   ctx.ellipse(0, 0, size*1.05, size*0.75, 0, 0, Math.PI*2);
   ctx.fillStyle = g; ctx.fill();
   ctx.strokeStyle = cd; ctx.lineWidth = Math.max(1, size*0.07); ctx.stroke();
-
   ctx.beginPath();
   ctx.ellipse(-size*0.15, -size*0.35, size*0.45, size*0.18, -0.3, 0, Math.PI*2);
   ctx.fillStyle = 'rgba(255,255,255,0.45)'; ctx.fill();
-
   if(isPlayer && game.level >= 5){
     ctx.globalAlpha = 0.35;
     for(let i=0;i<3;i++){
@@ -829,7 +961,6 @@ function drawFish(fish, isPlayer){
     }
     ctx.globalAlpha = 1;
   }
-
   const eyeX = size*0.5, eyeY = -size*0.15, eyeR = size*0.22;
   ctx.beginPath(); ctx.arc(eyeX, eyeY, eyeR, 0, Math.PI*2);
   ctx.fillStyle = '#fff'; ctx.fill();
@@ -840,7 +971,6 @@ function drawFish(fish, isPlayer){
   ctx.beginPath();
   ctx.arc(eyeX - eyeR*0.15, eyeY - eyeR*0.2, eyeR*0.2, 0, Math.PI*2);
   ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.fill();
-
   ctx.restore();
 }
 
@@ -1259,7 +1389,6 @@ function updateCamera(){
   game.cam.y += (ty - game.cam.y) * 0.12;
 }
 
-/* 体型压制 AI */
 function applySizeSuppression(f, p, pd, pdx, pdy){
   if(f.ai === 'chase' && f.size > p.size * 1.05 && p.invisibleActive <= 0){
     if(pd < 550){
@@ -1345,13 +1474,10 @@ document.getElementById('questHeader').addEventListener('click', () => {
   document.getElementById('questPanel').classList.toggle('collapsed');
 });
 
-/* ============================================================
-   更新（玩家使用摇杆输入）
-   ============================================================ */
+/* 主更新 */
 function update(dt){
   const p = game.player;
   if(!p || !p.alive) return;
-
   if(game.screenShake > 0) game.screenShake -= dt;
 
   ['speed','shield','magnet','dash','suck'].forEach(k => {
@@ -1366,7 +1492,6 @@ function update(dt){
   if(p.doubleScoreActive > 0) p.doubleScoreActive -= dt;
   if(p.growGlow > 0) p.growGlow -= dt;
 
-  /* ★ 玩家移动：优先使用摇杆输入 */
   const speedMul = p.speedActive > 0 ? 2.0 : (p.dashActive > 0 ? 3.5 : 1.0);
   const stickActive = joystick.active && (Math.abs(joystick.dx) > 0.08 || Math.abs(joystick.dy) > 0.08);
 
@@ -1378,7 +1503,6 @@ function update(dt){
     p.vy += (targetVy - p.vy) * 0.25;
     p.moving = true;
   } else if(p.moving && p.targetX !== 0){
-    /* 兼容拖动模式（桌面端仍可用） */
     const dx = p.targetX - p.x, dy = p.targetY - p.y;
     const d = Math.sqrt(dx*dx + dy*dy);
     if(d > 2){
@@ -1390,11 +1514,9 @@ function update(dt){
       p.vy += (ny - p.vy) * 0.15;
     } else { p.vx *= 0.9; p.vy *= 0.9; }
   } else {
-    p.vx *= 0.92;
-    p.vy *= 0.92;
+    p.vx *= 0.92; p.vy *= 0.92;
   }
 
-  /* 陷阱减速 */
   let inSand = false, inSeaweed = false;
   for(const h of game.hazards){
     const d = dist(h.x, h.y, p.x, p.y);
@@ -1424,7 +1546,6 @@ function update(dt){
   else if(p.size > growthTarget) p.size += (growthTarget - p.size) * 0.05;
   p.tailPhase += 0.25 + Math.min(0.3, Math.abs(p.vx)*0.08 + Math.abs(p.vy)*0.08);
 
-  /* 冲刺撞碎 */
   if(p.dashActive > 0){
     for(let i = game.fishes.length - 1; i >= 0; i--){
       const f = game.fishes[i];
@@ -1440,7 +1561,6 @@ function update(dt){
     }
   }
 
-  /* 吸力 */
   if(p.suckActive > 0){
     for(const f of game.fishes){
       const dx = p.x - f.x, dy = p.y - f.y;
@@ -1463,7 +1583,6 @@ function update(dt){
     }
   }
 
-  /* 磁铁 */
   if(p.magnetActive > 0){
     for(const f of game.fishes){
       if(f.size >= p.size * 0.95) continue;
@@ -1477,7 +1596,6 @@ function update(dt){
     }
   }
 
-  /* NPC 鱼 */
   const diff = DIFFICULTY[currentDiff];
   for(let i = game.fishes.length - 1; i >= 0; i--){
     const f = game.fishes[i];
@@ -1554,7 +1672,6 @@ function update(dt){
     }
   }
 
-  /* 潜水员 */
   for(let i = game.divers.length - 1; i >= 0; i--){
     const d = game.divers[i];
     const pdx = p.x - d.x, pdy = p.y - d.y;
@@ -1606,7 +1723,6 @@ function update(dt){
     }
   }
 
-  /* BOSS */
   for(let i = game.bosses.length - 1; i >= 0; i--){
     const b = game.bosses[i];
     const pdx = p.x - b.x, pdy = p.y - b.y;
@@ -1663,7 +1779,6 @@ function update(dt){
     }
   }
 
-  /* 炮弹 */
   for(let i = game.bullets.length - 1; i >= 0; i--){
     const b = game.bullets[i];
     b.x += b.vx * dt;
@@ -1740,7 +1855,6 @@ function update(dt){
     if(hit){ game.bullets.splice(i, 1); }
   }
 
-  /* 水雷 */
   for(let i = game.mines.length - 1; i >= 0; i--){
     const m = game.mines[i];
     m.x += m.vx * dt;
@@ -1763,7 +1877,6 @@ function update(dt){
     }
   }
 
-  /* 道具 */
   for(let i = game.powerups.length - 1; i >= 0; i--){
     const pu = game.powerups[i];
     pu.x += pu.vx * dt;
@@ -1779,7 +1892,6 @@ function update(dt){
     }
   }
 
-  /* 红心 */
   for(let i = game.hearts.length - 1; i >= 0; i--){
     const h = game.hearts[i];
     h.x += h.vx * dt;
@@ -1797,7 +1909,6 @@ function update(dt){
     }
   }
 
-  /* 残骸 */
   for(let i = game.remains.length - 1; i >= 0; i--){
     const r = game.remains[i];
     r.x += r.vx * dt;
@@ -1830,7 +1941,6 @@ function update(dt){
     }
   }
 
-  /* 危险区 */
   for(let i = game.hazards.length - 1; i >= 0; i--){
     const h = game.hazards[i];
     h.life -= dt;
@@ -1838,7 +1948,6 @@ function update(dt){
     if(h.life <= 0){ game.hazards.splice(i, 1); continue; }
   }
 
-  /* 泡泡陷阱 */
   for(let i = game.traps.length - 1; i >= 0; i--){
     const t = game.traps[i];
     t.life -= dt;
@@ -1851,7 +1960,6 @@ function update(dt){
     }
   }
 
-  /* 金鱼 */
   if(game.goldenFish){
     const g = game.goldenFish;
     g.x += g.vx * dt;
@@ -1880,7 +1988,6 @@ function update(dt){
 
   updateEcosystem();
 
-  /* 生成 */
   game.spawnTimer -= dt;
   if(game.spawnTimer <= 0){
     const base = Math.max(15, 40 - game.level * 2);
@@ -1943,7 +2050,6 @@ function update(dt){
     }
   }
 
-  /* 粒子 */
   for(let i = game.particles.length - 1; i >= 0; i--){
     const pt = game.particles[i];
     pt.x += pt.vx * dt;
@@ -1990,7 +2096,6 @@ function doRevive(){
   updateHUD();
 }
 
-/* 技能 */
 function useSkill(type){
   const p = game.player;
   if(!p || !p.alive || !game.running || game.paused) return;
@@ -2094,7 +2199,6 @@ function showAchievement(text){
   setTimeout(() => el.classList.remove('show'), 1800);
 }
 
-/* HUD */
 let lastScore = -1, lastLevel = -1, lastHp = -1;
 function updateHUD(){
   const p = game.player;
@@ -2160,7 +2264,6 @@ function levelUp(){
   updateHUD();
 }
 
-/* 渲染 */
 function render(){
   ctx.clearRect(0, 0, W, H);
   const camX = game.cam.x;
@@ -2267,7 +2370,6 @@ function render(){
   ctx.restore();
 }
 
-/* 开始/结束 */
 function startGame(){
   resize();
   game.running = true;
@@ -2327,6 +2429,8 @@ function startGame(){
   document.getElementById('reviveModal').classList.remove('show');
   document.getElementById('bottomTip').textContent = '左侧摇杆移动 · 右下角技能';
   startBGM();
+  /* 重新计算摇杆中心 */
+  setTimeout(() => joystick.updateCenter(), 100);
 }
 
 function gameOver(){
@@ -2381,7 +2485,7 @@ function gameOver(){
   }, 600);
 }
 
-/* 桌面拖动（保留兼容） */
+/* 画布拖动兼容（桌面端） */
 let pointerDown = false;
 function getPointerPos(e){
   const rect = canvas.getBoundingClientRect();
@@ -2393,7 +2497,6 @@ function getPointerPos(e){
 }
 function onCanvasStart(e){
   if(!game.running || game.paused) return;
-  /* 如果摇杆正在激活，不处理画布拖动 */
   if(joystick.active) return;
   e.preventDefault();
   pointerDown = true;
@@ -2440,6 +2543,7 @@ document.getElementById('btnResume').addEventListener('click', () => {
   sfx.click();
   game.paused = false;
   document.getElementById('pauseOverlay').classList.add('hide');
+  setTimeout(() => joystick.updateCenter(), 100);
 });
 document.getElementById('btnBackHome').addEventListener('click', () => {
   sfx.click();
@@ -2499,7 +2603,6 @@ document.addEventListener('keydown', e => {
   if(e.key.toLowerCase() === 'u') useSkill('bubble');
 });
 
-/* 主循环 */
 let lastTime = performance.now();
 function loop(now){
   try {

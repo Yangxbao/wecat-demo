@@ -408,6 +408,243 @@ button{cursor:pointer;}
 /* ========== 字母索引 ========== */
 .indexbar{position:absolute;right:2px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;z-index:5;}
 .indexbar span{font-size:11px;color:#7a7a7a;padding:1px 6px;font-weight:500;}
+
+/* ============================================================
+   ★★★ EXTENSION PACK — 增强样式 ★★★
+   ============================================================ */
+.ext-btn{height:44px;padding:0 22px;border-radius:22px;background:#07C160;color:#fff;font-size:16px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:transform .12s,background .15s;}
+.ext-btn:active{background:#06AD56;transform:scale(.96);}
+.ext-btn.ghost{background:#F2F2F2;color:#333;}
+.ext-btn.ghost:active{background:#e6e6e6;}
+.ext-btn.sm{height:30px;padding:0 14px;font-size:13px;border-radius:15px;}
+.ext-btn.block{display:flex;width:calc(100% - 32px);margin:0 16px;}
+.ext-btn[disabled]{opacity:.45;}
+.ext-pad{padding:12px;}
+.ext-card{background:#fff;border-radius:10px;overflow:hidden;margin:10px 12px;}
+.ext-title{font-size:13px;color:#888;padding:16px 16px 8px;display:flex;align-items:center;justify-content:space-between;}
+.ext-hint{font-size:12px;color:#aaa;padding:2px 16px 14px;line-height:1.7;}
+.ext-input{width:100%;height:44px;background:#F7F7F7;border-radius:8px;padding:0 12px;font-size:16px;border:1px solid #EEE;}
+.ext-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:12px;background:#F2F2F2;color:#666;font-size:12px;}
+.ext-chip.green{background:#E9FBF1;color:#07C160;}
+.ext-row{display:flex;align-items:center;gap:12px;padding:13px 16px;background:#fff;position:relative;}
+.ext-row:active{background:#f5f5f5;}
+.ext-row+.ext-row::before{content:'';position:absolute;left:16px;right:0;top:0;height:1px;background:#EFEFEF;transform:scaleY(.6);}
+.ext-row .t{flex:1;font-size:16px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ext-row .v{font-size:14px;color:#999;max-width:46%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ext-empty{text-align:center;color:#b5b5b5;font-size:14px;padding:64px 24px;line-height:1.8;}
+.ext-empty .big{font-size:52px;display:block;margin-bottom:12px;opacity:.5;}
+.ext-hero{background:linear-gradient(135deg,#0aa850,#07C160);color:#fff;padding:26px 20px;}
+.ext-hero .h1{font-size:24px;font-weight:600;}
+.ext-hero .h2{font-size:13px;opacity:.88;margin-top:8px;line-height:1.7;}
+.ext-av46{width:46px;height:46px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:17px;flex:0 0 46px;overflow:hidden;}
+.ext-av42{width:42px;height:42px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex:0 0 42px;overflow:hidden;}
+.ext-av36{width:36px;height:36px;border-radius:5px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;flex:0 0 36px;overflow:hidden;}
+.ext-seg{display:flex;background:#EDEDED;border-radius:8px;padding:3px;margin:12px;font-size:14px;}
+.ext-seg>div{flex:1;text-align:center;padding:7px 0;border-radius:6px;color:#666;transition:.2s;}
+.ext-seg>div.on{background:#fff;color:#07C160;font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.08);}
+.ext-fade{animation:extFade .32s ease;}
+@keyframes extFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ---------- 摇一摇 ---------- */
+.shake-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:radial-gradient(circle at 50% 38%,#1d5c3a,#0d0d0f 72%);color:#fff;padding:30px 20px;text-align:center;overflow-y:auto;}
+.shake-icon{font-size:78px;line-height:1;filter:drop-shadow(0 10px 24px rgba(7,193,96,.55));}
+.shake-icon.go{animation:shk .55s ease;}
+@keyframes shk{0%,100%{transform:rotate(0)}18%{transform:rotate(-20deg) translateX(-10px)}38%{transform:rotate(18deg) translateX(10px)}58%{transform:rotate(-13deg) translateX(-6px)}78%{transform:rotate(9deg) translateX(4px)}}
+.shake-tip{font-size:13px;color:#9de7bd;letter-spacing:1px;}
+.shake-list{width:100%;max-width:320px;display:flex;flex-direction:column;gap:10px;}
+.shake-person{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:11px 13px;animation:extFade .35s ease;}
+.shake-person .nm{flex:1;text-align:left;font-size:15px;}
+.shake-person .ds{font-size:11px;color:#8fd9b1;margin-top:3px;}
+.shake-person .hi{height:30px;padding:0 14px;border-radius:15px;background:#07C160;color:#fff;font-size:13px;display:flex;align-items:center;}
+
+/* ---------- 视频号 ---------- */
+.ch-wrap{background:#0e0e10;min-height:100%;padding-bottom:20px;}
+.ch-card{margin:0 0 10px;background:#17171a;color:#fff;padding:14px;}
+.ch-head{display:flex;align-items:center;gap:10px;}
+.ch-head .nm{font-size:14px;font-weight:500;}
+.ch-body{margin-top:12px;height:210px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:66px;position:relative;overflow:hidden;}
+.ch-body::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.16),transparent 65%);}
+.ch-cap{font-size:14px;margin-top:10px;line-height:1.6;color:#eaeaea;}
+.ch-bar{display:flex;gap:22px;margin-top:12px;font-size:13px;color:#bdbdbd;align-items:center;}
+.ch-bar span:active{opacity:.6;}
+.ch-bar .liked{color:#fa5151;}
+
+/* ---------- 看一看 ---------- */
+.art{display:flex;gap:12px;padding:14px 16px;background:#fff;position:relative;}
+.art+.art::before{content:'';position:absolute;left:16px;right:0;top:0;height:1px;background:#F0F0F0;transform:scaleY(.6);}
+.art:active{background:#f7f7f7;}
+.art .thumb{width:82px;height:62px;border-radius:6px;flex:0 0 82px;display:flex;align-items:center;justify-content:center;font-size:28px;}
+.art .info{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;}
+.art .tt{font-size:15px;line-height:1.4;color:#191919;}
+.art .meta{font-size:12px;color:#a5a5a5;margin-top:6px;display:flex;gap:10px;}
+.article-body{padding:20px 18px 40px;background:#fff;}
+.article-body h1{font-size:21px;line-height:1.45;margin-bottom:10px;}
+.article-body .ameta{font-size:12px;color:#a5a5a5;margin-bottom:18px;}
+.article-body p{font-size:16px;line-height:1.85;color:#2b2b2b;margin-bottom:16px;}
+.article-bar{display:flex;gap:10px;padding:10px 14px;background:#F7F7F7;border-top:1px solid #E2E2E2;}
+.article-bar .ext-btn{flex:1;height:40px;font-size:15px;}
+
+/* ---------- 搜索 ---------- */
+.sr-box{display:flex;gap:8px;padding:0 12px 10px;background:#EDEDED;align-items:center;}
+.sr-input{flex:1;height:36px;background:#fff;border-radius:6px;padding:0 12px;font-size:15px;}
+.sr-cat{font-size:13px;color:#888;padding:14px 16px 6px;}
+.sr-hit{padding:12px 16px;background:#fff;position:relative;}
+.sr-hit+.sr-hit::before{content:'';position:absolute;left:16px;right:0;top:0;height:1px;background:#F0F0F0;}
+.sr-hit .k{font-size:15px;}
+.sr-hit .k b{color:#07C160;}
+.sr-hit .s{font-size:12px;color:#9c9c9c;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+/* ---------- 购物 ---------- */
+.shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px;}
+.shop-item{background:#fff;border-radius:10px;overflow:hidden;transition:transform .12s;}
+.shop-item:active{transform:scale(.97);}
+.shop-item .pic{height:118px;display:flex;align-items:center;justify-content:center;font-size:44px;}
+.shop-item .bd{padding:9px 10px 11px;}
+.shop-item .nm{font-size:13px;line-height:1.4;height:36px;overflow:hidden;color:#222;}
+.shop-item .pr{color:#E64340;font-size:15px;font-weight:600;margin-top:6px;}
+.shop-item .pr small{font-size:11px;}
+.shop-bar{position:absolute;left:0;right:0;bottom:0;height:calc(52px + var(--sb));padding-bottom:var(--sb);background:#F7F7F7;border-top:1px solid #DCDCDC;display:flex;align-items:center;gap:10px;padding-left:14px;padding-right:14px;}
+.shop-bar .tt{flex:1;font-size:13px;color:#666;}
+
+/* ---------- 红包 ---------- */
+.rp-card{display:flex;align-items:center;gap:10px;min-width:200px;padding:12px 14px;border-radius:5px;background:linear-gradient(135deg,#F5563C,#E23B24);color:#fff;position:relative;}
+.rp-card .ic{width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:19px;flex:0 0 34px;}
+.rp-card .tt{font-size:15px;font-weight:500;}
+.rp-card .ss{font-size:11px;opacity:.88;margin-top:3px;}
+.rp-card::after{content:'';position:absolute;top:11px;width:0;height:0;border:6px solid transparent;}
+.msg.them .rp-card::after{left:-11px;border-right-color:#EE4A2E;}
+.msg.me .rp-card::after{right:-11px;border-left-color:#EE4A2E;}
+.rp-card.opened{background:linear-gradient(135deg,#d9a271,#c98a55);}
+.rp-card.opened::after{border-right-color:#cf955f;border-left-color:#cf955f;}
+.rp-mask{position:absolute;inset:0;z-index:520;background:rgba(0,0,0,.62);display:none;align-items:center;justify-content:center;flex-direction:column;}
+.rp-mask.show{display:flex;}
+.rp-pop{width:280px;border-radius:14px;background:linear-gradient(180deg,#F5563C,#D2371F);color:#fff;padding:26px 20px;text-align:center;position:relative;animation:rpIn .4s cubic-bezier(.2,1.4,.5,1);}
+@keyframes rpIn{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.rp-pop .who{font-size:13px;opacity:.85;}
+.rp-pop .big{font-size:40px;margin:14px 0 6px;}
+.rp-pop .amt{font-size:34px;font-weight:700;letter-spacing:-1px;}
+.rp-pop .amt small{font-size:18px;font-weight:500;}
+.rp-pop .note{font-size:12px;opacity:.85;margin-top:10px;}
+.rp-open-btn{width:74px;height:74px;border-radius:50%;background:#FFD24A;color:#A8351E;font-size:30px;display:flex;align-items:center;justify-content:center;margin:0 auto 4px;box-shadow:0 8px 22px rgba(0,0,0,.3);animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+.rp-close{position:absolute;top:12px;right:12px;width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(255,255,255,.7);color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center;}
+
+/* ---------- 红包雨小游戏 ---------- */
+.gp-stage{position:relative;flex:1;background:radial-gradient(circle at 50% 0%,#8B1D10,#3a0d06 65%);overflow:hidden;color:#fff;}
+.gp-hud{position:absolute;top:12px;left:0;right:0;display:flex;justify-content:space-between;padding:0 16px;font-size:14px;z-index:5;}
+.gp-hud b{font-size:19px;color:#FFD24A;}
+.gp-item{position:absolute;font-size:34px;user-select:none;filter:drop-shadow(0 4px 8px rgba(0,0,0,.4));}
+.gp-item.pop{animation:gpPop .3s ease forwards;}
+@keyframes gpPop{to{transform:scale(1.9);opacity:0}}
+.gp-float{position:absolute;font-size:15px;font-weight:700;color:#FFD24A;animation:gpUp .8s ease forwards;pointer-events:none;}
+@keyframes gpUp{to{transform:translateY(-52px);opacity:0}}
+.gp-over{position:absolute;inset:0;background:rgba(0,0,0,.72);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:9;}
+.gp-over .s{font-size:44px;font-weight:700;color:#FFD24A;}
+
+/* ---------- 语音消息 ---------- */
+.voice-b{display:flex;align-items:center;gap:8px;min-width:70px;}
+.voice-b .wv{display:flex;align-items:flex-end;gap:2px;height:18px;}
+.voice-b .wv i{width:3px;background:#3f3f3f;border-radius:2px;}
+.msg.me .voice-b .wv i{background:#2f6b1f;}
+.voice-b.play .wv i{animation:wvA .8s infinite ease-in-out;}
+.voice-b .wv i:nth-child(1){height:7px}
+.voice-b .wv i:nth-child(2){height:14px;animation-delay:.12s}
+.voice-b .wv i:nth-child(3){height:9px;animation-delay:.24s}
+.voice-b .wv i:nth-child(4){height:17px;animation-delay:.36s}
+.voice-b .wv i:nth-child(5){height:11px;animation-delay:.48s}
+@keyframes wvA{0%,100%{transform:scaleY(.45)}50%{transform:scaleY(1.15)}}
+.hold-talk{flex:1;height:36px;border-radius:4px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;color:#333;font-weight:500;}
+.hold-talk.rec{background:#d5d5d5;color:#666;}
+.rec-overlay{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);width:160px;padding:20px 0;border-radius:14px;background:rgba(0,0,0,.72);color:#fff;display:none;flex-direction:column;align-items:center;gap:10px;z-index:560;}
+.rec-overlay.show{display:flex;}
+.rec-wave{display:flex;gap:4px;align-items:flex-end;height:34px;}
+.rec-wave i{width:4px;background:#07C160;border-radius:2px;animation:wvA .7s infinite;}
+.rec-overlay .tip{font-size:12px;color:#ddd;}
+
+/* ---------- 长按菜单 ---------- */
+.ctx{position:absolute;z-index:580;background:#2c2c2e;border-radius:10px;padding:6px 0;min-width:130px;box-shadow:0 10px 30px rgba(0,0,0,.4);display:none;}
+.ctx.show{display:block;animation:extFade .16s ease;}
+.ctx div{padding:10px 18px;font-size:15px;color:#fff;}
+.ctx div:active{background:#3a3a3c;}
+.ctx div.danger{color:#ff6b6b;}
+
+/* ---------- 开关 ---------- */
+.sw{width:46px;height:27px;border-radius:14px;background:#D8D8D8;position:relative;transition:background .22s;flex:0 0 46px;}
+.sw.on{background:#07C160;}
+.sw i{position:absolute;top:2px;left:2px;width:23px;height:23px;border-radius:50%;background:#fff;transition:left .22s;box-shadow:0 1px 3px rgba(0,0,0,.25);}
+.sw.on i{left:21px;}
+
+/* ---------- 收藏 / 卡包 / 表情 ---------- */
+.fav-item{padding:13px 16px;background:#fff;position:relative;}
+.fav-item+.fav-item::before{content:'';position:absolute;left:16px;right:0;top:0;height:1px;background:#F0F0F0;}
+.fav-item .t{font-size:15px;line-height:1.5;color:#222;word-break:break-all;}
+.fav-item .m{font-size:12px;color:#a5a5a5;margin-top:6px;display:flex;justify-content:space-between;}
+.cp{display:flex;align-items:center;gap:12px;padding:14px;background:#fff;position:relative;}
+.cp+.cp::before{content:'';position:absolute;left:16px;right:0;top:0;height:1px;background:#F0F0F0;}
+.cp .amt{font-size:22px;font-weight:600;color:#E64340;min-width:74px;}
+.cp .amt small{font-size:12px;}
+.cp .info{flex:1;min-width:0;}
+.cp .nm{font-size:15px;}
+.cp .dt{font-size:12px;color:#a5a5a5;margin-top:5px;}
+.stk-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:12px;}
+.stk{background:#fff;border-radius:12px;padding:12px 0;display:flex;flex-direction:column;align-items:center;gap:6px;}
+.stk .e{font-size:30px;}
+.stk .n{font-size:11px;color:#777;}
+.stk .add{height:22px;padding:0 10px;border-radius:11px;background:#07C160;color:#fff;font-size:11px;display:flex;align-items:center;}
+.stk .add.has{background:#EDEDED;color:#999;}
+.added-stk{display:grid;grid-template-columns:repeat(8,1fr);gap:9px;padding:6px 0;font-size:23px;text-align:center;}
+
+/* ---------- 好友资料 ---------- */
+.fr-head{background:linear-gradient(135deg,#3f4a56,#26303a);padding:26px 20px;display:flex;align-items:center;gap:16px;color:#fff;}
+.fr-head .av{width:64px;height:64px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:26px;flex:0 0 64px;}
+.fr-head .nm{font-size:20px;font-weight:600;}
+.fr-head .id{font-size:12px;opacity:.75;margin-top:7px;}
+
+/* ---------- 深色模式 ---------- */
+html[data-dark="1"]{--bg:#111113;--line:#2a2a2d;--text:#ededed;}
+html[data-dark="1"] body{background:#000;}
+html[data-dark="1"] .phone{background:#111113;}
+html[data-dark="1"] .statusbar{color:#fff;}
+html[data-dark="1"] .nav{background:#1c1c1e;color:#fff;}
+html[data-dark="1"] .nav.white{background:#1c1c1e;}
+html[data-dark="1"] .nav-title{color:#fff;}
+html[data-dark="1"] .searchbar{background:#111113;}
+html[data-dark="1"] .sb-input{background:#2a2a2d;color:#8a8a8a;}
+html[data-dark="1"] .tab-page{background:#111113;}
+html[data-dark="1"] .tabbar{background:#1c1c1e;border-top-color:#2a2a2d;}
+html[data-dark="1"] .cell,html[data-dark="1"] .row,html[data-dark="1"] .group,html[data-dark="1"] .grid4,html[data-dark="1"] .me-card{background:#1c1c1e;color:#ededed;}
+html[data-dark="1"] .cell-name,html[data-dark="1"] .row-title,html[data-dark="1"] .grid-label{color:#ededed;}
+html[data-dark="1"] .group-title{background:#111113;color:#7d7d80;}
+html[data-dark="1"] .chat-scroll{background:#111113;}
+html[data-dark="1"] .bubble{background:#2a2a2d;color:#ededed;}
+html[data-dark="1"] .msg.them .bubble::after{border-right-color:#2a2a2d;}
+html[data-dark="1"] .chat-inputbar{background:#1c1c1e;border-top-color:#2a2a2d;}
+html[data-dark="1"] .chat-inputbar input{background:#2a2a2d;color:#ededed;}
+html[data-dark="1"] .panel{background:#1c1c1e;}
+html[data-dark="1"] .ib-btn{color:#c9c9c9;}
+html[data-dark="1"] .plus-ico{background:#2a2a2d;border-color:#333;}
+html[data-dark="1"] .ext-card,html[data-dark="1"] .ext-row,html[data-dark="1"] .art,html[data-dark="1"] .shop-item,html[data-dark="1"] .fav-item,html[data-dark="1"] .cp,html[data-dark="1"] .stk,html[data-dark="1"] .sr-hit,html[data-dark="1"] .article-body{background:#1c1c1e;color:#ededed;}
+html[data-dark="1"] .ext-title,html[data-dark="1"] .ext-hint{color:#8a8a8a;}
+html[data-dark="1"] .sheet{background:#1c1c1e;}
+html[data-dark="1"] .pwd-dots{background:#2a2a2d;border-color:#3a3a3d;}
+html[data-dark="1"] .keypad{background:#3a3a3d;border-top-color:#3a3a3d;}
+html[data-dark="1"] .keypad button{background:#2a2a2d;color:#ededed;}
+html[data-dark="1"] .pwd-head{border-bottom-color:#2a2a2d;}
+html[data-dark="1"] .ext-input,html[data-dark="1"] .edit-input{background:#2a2a2d;border-color:#3a3a3d;color:#ededed;}
+html[data-dark="1"] .sr-input{background:#2a2a2d;color:#ededed;}
+html[data-dark="1"] .sr-box{background:#111113;}
+html[data-dark="1"] .post,html[data-dark="1"] .post-body{border-bottom-color:#2a2a2d;}
+html[data-dark="1"] .post-text{color:#e8e8e8;}
+html[data-dark="1"] .article-body p{color:#c9c9c9;}
+html[data-dark="1"] .article-bar{background:#1c1c1e;border-top-color:#2a2a2d;}
+html[data-dark="1"] .ext-seg{background:#2a2a2d;}
+html[data-dark="1"] .ext-seg>div.on{background:#3a3a3d;}
+.shake-wrap{min-height:100%;justify-content:flex-start;padding-top:9vh;}
+.ch-wrap{min-height:100%;}
+.flexcol{display:flex;flex-direction:column;}
+
+
+
 </style>
 </head>
 <body>
@@ -2822,6 +3059,1447 @@ renderPostEmojiPick();
 updateDiscoverDot();
 
 setTimeout(() => toast('欢迎体验微信高仿界面 · 支付密码 123456', 2600), 700);
+</script>
+<script>
+/* EXTENSION PACK */
+(function(){
+'use strict';
+
+/* ============================================================
+   ██ EXTENSION PACK —— 功能扩展内核
+   ============================================================ */
+const SVG_BACK = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></svg>';
+const SVG_X = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+
+/* ---------- 状态（独立持久化，不影响原数据） ---------- */
+const EXTS = loadJSON('wx_ext', {
+  dark: false, favs: [], coupons: [], stickers: [], best: 0,
+  greeted: {}, cart: {}, voiceOn: false, grabTotal: 0
+});
+function saveEx(){ safeSet('wx_ext', JSON.stringify(EXTS)); }
+
+/* ---------- 工具 ---------- */
+function gid(i){ return document.getElementById(i); }
+function rnd(a){ return a[Math.floor(Math.random() * a.length)]; }
+function ri(a, b){ return Math.floor(Math.random() * (b - a + 1)) + a; }
+function p2(n){ return String(n).padStart(2, '0'); }
+function hhmm(){ const d = new Date(); return p2(d.getHours()) + ':' + p2(d.getMinutes()); }
+function ts2str(ts){
+  const d = new Date(ts);
+  const ap = d.getHours() < 12 ? '上午' : '下午';
+  let h = d.getHours() % 12; if(h === 0) h = 12;
+  return (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + ap + h + ':' + p2(d.getMinutes());
+}
+function av(name, cls){
+  return '<div class="' + (cls || 'ext-av42') + '" style="background:' + colorOf(name) + '">' + escapeHtml(name.slice(0, 1)) + '</div>';
+}
+
+/* ---------- 子页面工厂 ---------- */
+function mkPage(id, opt){
+  let d = gid(id);
+  if(d) return d;
+  opt = opt || {};
+  d = document.createElement('div');
+  d.className = 'subpage';
+  if(opt.dark) d.dataset.dark = '1';
+  d.id = id;
+  d.innerHTML =
+    '<div class="nav ' + (opt.dark ? 'dark' : 'white') + '"' + (opt.dark ? '' : ' style="background:#fff;"') + '>' +
+      '<div class="nav-left"><button class="nav-back" data-back>' + SVG_BACK + '</button></div>' +
+      '<div class="nav-title">' + (opt.title || '') + '</div>' +
+      '<div class="nav-right" id="' + id + '_r" style="font-size:15px;color:#576B95;"></div>' +
+    '</div>' +
+    '<div class="scroll" id="' + id + '_s"' + (opt.dark ? ' style="background:#141416;"' : '') + '></div>';
+  gid('phone').appendChild(d);
+  return d;
+}
+function pbody(id){ return gid(id + '_s'); }
+function pnav(id){ return gid(id + '_r'); }
+function openP(id, opt){
+  const d = mkPage(id, opt);
+  if(opt && opt.build) opt.build();
+  if(stack[stack.length - 1] === d) return;
+  openSub(id);
+}
+
+/* ---------- 主题 ---------- */
+function applyTheme(){
+  document.documentElement.setAttribute('data-dark', EXTS.dark ? '1' : '0');
+  const m = document.querySelector('meta[name="theme-color"]');
+  if(m) m.setAttribute('content', EXTS.dark ? '#1c1c1e' : '#EDEDED');
+}
+function toggleDark(v){
+  EXTS.dark = (typeof v === 'boolean') ? v : !EXTS.dark;
+  saveEx(); applyTheme(); sfx.tap(); vib(10);
+  toast(EXTS.dark ? '深色模式已开启 🌙' : '深色模式已关闭 ☀️');
+}
+
+/* ---------- 全局动作派发（捕获阶段，优先于原逻辑） ---------- */
+const EXT_ACTIONS = {};
+function regExt(sel, fn){ EXT_ACTIONS[sel] = fn; }
+document.addEventListener('click', function(e){
+  for(const sel in EXT_ACTIONS){
+    const n = e.target.closest(sel);
+    if(n){ e.stopPropagation(); e.preventDefault(); EXT_ACTIONS[sel](n, e); return; }
+  }
+}, true);
+
+/* ---------- 通用组件 ---------- */
+function extRow(o){
+  return '<div class="ext-row" ' + (o.ext ? 'data-ext="' + o.ext + '"' : '') + '>' +
+    (o.ico ? '<div class="row-ico" style="background:' + o.ico.bg + '">' + o.ico.t + '</div>' : '') +
+    (o.av ? av(o.av, o.avCls) : '') +
+    '<div class="t">' + o.title + (o.sub ? '<div style="font-size:12px;color:#a0a0a0;margin-top:4px;">' + o.sub + '</div>' : '') + '</div>' +
+    (o.val ? '<div class="v">' + o.val + '</div>' : '') +
+    (o.arrow ? '<div class="row-arrow"></div>' : '') +
+    (o.extra || '') + '</div>';
+}
+
+
+/* ============================================================
+   ① 共享内容数据
+   ============================================================ */
+const NEARBY_POOL = [
+  ['林小满', '0.4km', '喜欢摄影和骑行 📷'],
+  ['陈屿', '0.8km', '程序员 / 咖啡续命 ☕'],
+  ['苏晚晚', '1.2km', '爱看展的文艺青年 🎨'],
+  ['周野', '1.5km', '健身教练，撸铁使我快乐 💪'],
+  ['许星河', '2.1km', '深夜电台主播 🎙'],
+  ['温柔', '2.6km', '烘焙 / 猫奴 🐱'],
+  ['江屿白', '3.0km', '周末爬山党 ⛰'],
+  ['芒果冰', '3.4km', '二次元浓度超标 🍭'],
+  ['Leo', '4.2km', '在学吉他的产品经理 🎸'],
+  ['小行星', '5.1km', '天文爱好者 🔭'],
+  ['一颗糖', '5.8km', '甜品店老板娘 🍰'],
+  ['风过耳', '6.3km', '骑行 100km 挑战者 🚴']
+];
+const GREET = ['你好呀～很高兴认识你 😊', '嗨！我们是不是在哪里见过？', '哈喽，交个朋友吧！', '哇，缘分让我们相遇 🎲', '你好，一起聊聊？'];
+
+const ARTICLES = [
+  { id: 'a1', t: '凌晨四点的城市，藏着你不知道的温柔', s: '人物', tm: '2小时前', e: '🌃', bg: 'linear-gradient(135deg,#2b3a67,#5b7cc9)',
+    p: ['环卫工人的扫帚在空旷的街道上画出规律的弧线，早餐摊的蒸汽刚刚升起，出租车司机在路口等一个很长的红灯。',
+        '这座城市在凌晨四点依然醒着，只是它换了一副面孔—— quieter，更慢，也更接近它本来的样子。',
+        '有人在这时候结束一天的疲惫，也有人刚刚开始。他们很少相遇，却共同撑起了天亮之后的喧嚣。',
+        '如果你也曾失眠到天亮，不妨下楼走走。你会发现，原来孤单的不是你一个。'] },
+  { id: 'a2', t: '为什么我们越来越难专注读完一本书', s: '心理', tm: '3小时前', e: '📚', bg: 'linear-gradient(135deg,#8a5a2b,#d1a05b)',
+    p: ['注意力是一种被反复出售的资源。每一次下拉刷新，都是一次对耐心的重新标价。',
+        '神经科学告诉我们，大脑并不讨厌困难，它讨厌的是不确定的回报。',
+        '把手机放到另一个房间，你会惊讶地发现，书其实并没有那么难读。',
+        '专注不是一种天赋，而是一种被反复练习的生活方式。'] },
+  { id: 'a3', t: '一张旧照片，让我想起了十年前的夏天', s: '生活', tm: '6小时前', e: '📷', bg: 'linear-gradient(135deg,#1f7a6b,#4fc3a1)',
+    p: ['照片是 2015 年在老家门口拍的，背景里那棵石榴树现在已经不在了。',
+        '那时候手机像素很低，笑容却很清晰。',
+        '我们总以为来日方长，其实很多人见完那一面就真的再也没见过了。',
+        '所以趁还能见面的时候，多拍一点照片吧。'] },
+  { id: 'a4', t: '极简主义不是扔掉东西，而是留下重要的', s: '设计', tm: '昨天', e: '🕯', bg: 'linear-gradient(135deg,#4a4458,#9c8fb5)',
+    p: ['“断舍离”被误解了很多年。它的重点从来不是扔，而是选。',
+        '当你决定留下什么，你其实是在决定成为怎样的人。',
+        '少一点，才看得清一点。'] },
+  { id: 'a5', t: '夜跑三公里后，我重新理解了坚持', s: '运动', tm: '昨天', e: '🏃', bg: 'linear-gradient(135deg,#7a2c4a,#e0709a)',
+    p: ['第一公里是身体在抗议，第二公里是大脑在谈判，第三公里是它们终于达成共识。',
+        '坚持不是靠意志力硬撑，而是把门槛降低到“今天只要出门”。',
+        '跑完的那一刻，风都是甜的。'] },
+  { id: 'a6', t: '关于咖啡，你可能一直都喝错了', s: '美食', tm: '2天前', e: '☕', bg: 'linear-gradient(135deg,#4b3226,#a3714a)',
+    p: ['水温 92℃、粉水比 1:15、研磨度中细——这三个变量决定了 80% 的风味。',
+        '更重要的是：趁热喝。所有的香气都是挥发性的，凉了就散了。'] }
+];
+
+const GOODS = [
+  { id: 'g1', n: '极简陶瓷马克杯 350ml', p: 39, e: '☕', bg: 'linear-gradient(135deg,#f0e6d8,#d8c3a5)' },
+  { id: 'g2', n: '无线蓝牙耳机 Pro', p: 299, e: '🎧', bg: 'linear-gradient(135deg,#dfe9f5,#b3c8e0)' },
+  { id: 'g3', n: '护眼台灯 · 无极调光', p: 129, e: '💡', bg: 'linear-gradient(135deg,#fff3d6,#f7dfa5)' },
+  { id: 'g4', n: '手冲咖啡套装 入门款', p: 168, e: '🫖', bg: 'linear-gradient(135deg,#f3e2d3,#dcc0a4)' },
+  { id: 'g5', n: '记忆棉颈椎枕', p: 89, e: '🛏', bg: 'linear-gradient(135deg,#e8eef5,#c6d3e2)' },
+  { id: 'g6', n: '户外便携折叠椅', p: 149, e: '🪑', bg: 'linear-gradient(135deg,#e2f2e2,#b8dcb8)' },
+  { id: 'g7', n: '香薰蜡烛 · 雪松木质调', p: 69, e: '🕯', bg: 'linear-gradient(135deg,#f5e6ee,#e0bfd3)' },
+  { id: 'g8', n: '帆布托特包 大容量', p: 59, e: '👜', bg: 'linear-gradient(135deg,#eef0e2,#d3d8bb)' }
+];
+
+const CHANNELS = [
+  { au: '山野观察', e: '🏔', bg: 'linear-gradient(160deg,#2c5364,#0f2027)', cap: '海拔 4800 米的日出，等了两小时，值了。', like: 1284, cmt: 63 },
+  { au: '厨房日记', e: '🍳', bg: 'linear-gradient(160deg,#f7971e,#ffd200)', cap: '三分钟学会流心蛋包饭，早餐不用愁。', like: 862, cmt: 41 },
+  { au: '一只猫的日常', e: '🐱', bg: 'linear-gradient(160deg,#eecda3,#ef629f)', cap: '它今天又把我的键盘当床了……', like: 3491, cmt: 226 },
+  { au: '城市漫步', e: '🌆', bg: 'linear-gradient(160deg,#3a1c71,#d76d77)', cap: '下班后的江边，晚风刚好。', like: 654, cmt: 18 },
+  { au: '代码与咖啡', e: '💻', bg: 'linear-gradient(160deg,#1e3c72,#2a5298)', cap: '重构三小时，删掉两千行，神清气爽。', like: 977, cmt: 88 }
+];
+
+const STICKERS = [
+  { e: '🐶', n: '柴犬日常' }, { e: '🐱', n: '猫猫虫' }, { e: '🐼', n: '熊猫头' },
+  { e: '🐰', n: '兔子君' }, { e: '🦊', n: '狐狸精' }, { e: '🐸', n: '青蛙王子' },
+  { e: '🍔', n: '吃货星球' }, { e: '🌈', n: '彩虹屁' }
+];
+
+/* ============================================================
+   ② 摇一摇
+   ============================================================ */
+let shakeLock = 0, motionBound = false;
+function shakeCard(p){
+  return '<div class="shake-person">' + av(p[0], 'ext-av42') +
+    '<div class="nm">' + escapeHtml(p[0]) + '<div class="ds">' + escapeHtml(p[1]) + ' · ' + escapeHtml(p[2]) + '</div></div>' +
+    '<div class="hi" data-ext="greet" data-n="' + escapeHtml(p[0]) + '">打招呼</div></div>';
+}
+function doShake(){
+  const ic = gid('shakeIcon'), box = gid('shakeResult');
+  if(!box) return;
+  if(ic){ ic.classList.remove('go'); void ic.offsetWidth; ic.classList.add('go'); }
+  vib([35, 60, 35]); sfx.swipe();
+  box.innerHTML = '<div class="shake-tip" style="padding:20px 0;">正在寻找同一时刻摇一摇的人…</div>';
+  setTimeout(function(){
+    const pool = NEARBY_POOL.slice(), picks = [];
+    for(let i = 0; i < 3 && pool.length; i++) picks.push(pool.splice(ri(0, pool.length - 1), 1)[0]);
+    box.innerHTML = picks.map(shakeCard).join('');
+    sfx.recv(); vib(20);
+  }, 720);
+}
+function handleMotion(){
+  const now = Date.now();
+  if(now - shakeLock < 1700) return;
+  shakeLock = now;
+  if(document.querySelector('#page-shake.active')) doShake();
+}
+function bindMotion(){
+  if(motionBound) return;
+  motionBound = true;
+  window.addEventListener('devicemotion', function(ev){
+    const a = ev.accelerationIncludingGravity || ev.acceleration;
+    if(!a) return;
+    const m = Math.abs(a.x || 0) + Math.abs(a.y || 0) + Math.abs(a.z || 0);
+    if(m > 34) handleMotion();
+  });
+}
+function openShake(){
+  openP('page-shake', { dark: true, title: '摇一摇', build: function(){
+    pbody('page-shake').innerHTML =
+      '<div class="shake-wrap">' +
+        '<div class="shake-icon" id="shakeIcon">📱</div>' +
+        '<div class="shake-tip">摇动手机，或点击下方按钮</div>' +
+        '<button class="ext-btn" id="shakeBtn">摇 一 摇</button>' +
+        '<div class="shake-list" id="shakeResult"><div class="shake-tip" style="padding:24px 0;">遇见此刻也在摇手机的人 🎲</div></div>' +
+      '</div>';
+    gid('shakeBtn').addEventListener('click', function(){
+      sfx.tap();
+      if(typeof DeviceMotionEvent !== 'undefined' && DeviceMotionEvent.requestPermission){
+        DeviceMotionEvent.requestPermission().then(function(r){ if(r === 'granted') bindMotion(); doShake(); }).catch(doShake);
+      }else{ bindMotion(); doShake(); }
+    });
+    bindMotion();
+  }});
+}
+
+/* ============================================================
+   ③ 附近的人
+   ============================================================ */
+function renderNearby(){
+  const pool = NEARBY_POOL.slice().sort(function(){ return Math.random() - .5; }).slice(0, 8);
+  pbody('page-nearby').innerHTML =
+    '<div class="ext-hero"><div class="h1">附近的人</div><div class="h2">共 ' + pool.length + ' 位用户正在附近活跃 · 点击「打招呼」即可开始聊天</div></div>' +
+    '<div class="ext-title">距离由近到远</div>' +
+    pool.map(function(p){
+      return '<div class="ext-row">' + av(p[0], 'ext-av46') +
+        '<div class="t">' + escapeHtml(p[0]) + '<div style="font-size:12px;color:#a0a0a0;margin-top:4px;">' + escapeHtml(p[2]) + '</div></div>' +
+        '<div class="v">' + p[1] + '</div>' +
+        '<div class="ext-btn sm" data-ext="greet" data-n="' + escapeHtml(p[0]) + '">打招呼</div></div>';
+    }).join('') + '<div style="height:40px;"></div>';
+}
+function openNearby(){
+  openP('page-nearby', { title: '附近的人', build: renderNearby });
+  pnav('page-nearby').innerHTML = '<span data-ext="refreshNearby" style="padding:0 6px;">刷新</span>';
+}
+
+/* ============================================================
+   ④ 视频号
+   ============================================================ */
+const chLiked = {};
+function renderChannels(){
+  pbody('page-channels').innerHTML = '<div class="ch-wrap">' + CHANNELS.map(function(c, i){
+    const liked = !!chLiked[i];
+    return '<div class="ch-card">' +
+      '<div class="ch-head">' + av(c.au, 'ext-av36') + '<div class="nm">' + escapeHtml(c.au) + '</div></div>' +
+      '<div class="ch-body" style="background:' + c.bg + '">' + c.e + '</div>' +
+      '<div class="ch-cap">' + escapeHtml(c.cap) + '</div>' +
+      '<div class="ch-bar">' +
+        '<span class="' + (liked ? 'liked' : '') + '" data-ext="chlike" data-i="' + i + '">❤️ ' + (c.like + (liked ? 1 : 0)) + '</span>' +
+        '<span data-ext="chcmt" data-i="' + i + '">💬 ' + c.cmt + '</span>' +
+        '<span data-ext="chshare">↗ 分享</span>' +
+      '</div></div>';
+  }).join('') + '</div>';
+}
+function openChannels(){
+  openP('page-channels', { dark: true, title: '视频号', build: renderChannels });
+  pnav('page-channels').innerHTML = '<span data-ext="chrefresh" style="padding:0 6px;">换一批</span>';
+}
+regExt('[data-ext="chlike"]', function(n){
+  const i = +n.dataset.i;
+  chLiked[i] = !chLiked[i];
+  sfx.tap(); vib(8);
+  renderChannels();
+  if(chLiked[i]) toast('❤️ 已点赞');
+});
+regExt('[data-ext="chcmt"]', function(){ toast('评论区：' + rnd(['太美了！', '已收藏～', '求教程 🙏', '第一！']) ); });
+regExt('[data-ext="chshare"]', function(){ toast('已分享到朋友圈（演示）'); sfx.tap(); });
+regExt('[data-ext="chrefresh"]', function(){ renderChannels(); toast('已为你换一批 🎬'); sfx.swipe(); });
+
+/* ============================================================
+   ⑤ 看一看
+   ============================================================ */
+function renderLook(){
+  pbody('page-look').innerHTML =
+    '<div class="ext-hero" style="background:linear-gradient(135deg,#c98a1f,#F5A623);"><div class="h1">看一看</div><div class="h2">朋友都在读 · 为你精选今日好文</div></div>' +
+    ARTICLES.map(function(a){
+      return '<div class="art" data-ext="openart" data-id="' + a.id + '">' +
+        '<div class="thumb" style="background:' + a.bg + '">' + a.e + '</div>' +
+        '<div class="info"><div class="tt">' + escapeHtml(a.t) + '</div>' +
+        '<div class="meta"><span>' + escapeHtml(a.s) + '</span><span>' + a.tm + '</span><span>' + ri(20, 999) + ' 阅读</span></div></div></div>';
+    }).join('') + '<div style="height:30px;"></div>';
+}
+function openLook(){ openP('page-look', { title: '看一看', build: renderLook }); }
+
+const articleLiked = {};
+function openArticle(id){
+  const a = ARTICLES.filter(function(x){ return x.id === id; })[0];
+  if(!a) return;
+  openP('page-article', { title: '文章', build: function(){
+    pbody('page-article').innerHTML =
+      '<div class="article-body"><h1>' + escapeHtml(a.t) + '</h1>' +
+      '<div class="ameta">' + escapeHtml(a.s) + ' · ' + a.tm + ' · ' + ri(2000, 90000) + ' 阅读</div>' +
+      a.p.map(function(x){ return '<p>' + escapeHtml(x) + '</p>'; }).join('') +
+      '<div style="text-align:center;font-size:28px;margin:26px 0;opacity:.5;">· · ·</div>' +
+      '<p style="color:#999;font-size:14px;">本文为演示内容，仅用于界面展示。</p></div>' +
+      '<div class="article-bar">' +
+        '<button class="ext-btn ghost" data-ext="artlike" data-id="' + a.id + '">♡ 点赞</button>' +
+        '<button class="ext-btn ghost" data-ext="artfav" data-id="' + a.id + '">☆ 收藏</button>' +
+        '<button class="ext-btn" data-ext="artshare">分享</button>' +
+      '</div>';
+  }});
+}
+regExt('[data-ext="artlike"]', function(n){
+  const id = n.dataset.id; articleLiked[id] = !articleLiked[id];
+  n.textContent = articleLiked[id] ? '❤️ 已赞' : '♡ 点赞';
+  sfx.tap(); vib(8);
+});
+regExt('[data-ext="artfav"]', function(n){
+  const a = ARTICLES.filter(function(x){ return x.id === n.dataset.id; })[0];
+  if(!a) return;
+  if(EXTS.favs.some(function(f){ return f.id === 'art_' + a.id; })){ toast('已在收藏中'); return; }
+  EXTS.favs.unshift({ id: 'art_' + a.id, t: a.t, s: '看一看 · ' + a.s, ts: Date.now(), k: 'article' });
+  saveEx(); sfx.ok(); vib(12); toast('⭐ 已加入收藏');
+  n.textContent = '★ 已收藏';
+});
+regExt('[data-ext="artshare"]', function(){ toast('已复制链接（演示）'); sfx.tap(); });
+
+/* ============================================================
+   ⑥ 搜一搜（全局搜索）
+   ============================================================ */
+function doSearch(q){
+  const box = gid('searchResult');
+  if(!q){ box.innerHTML = '<div class="ext-empty"><span class="big">🔍</span>输入关键词搜索聊天记录、好友、朋友圈<br>以及文章和商品</div>'; return; }
+  const low = q.toLowerCase();
+  const hit = function(s){ return String(s).toLowerCase().indexOf(low) >= 0; };
+  const mark = function(s){ return escapeHtml(s).replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), function(m){ return '<b>' + m + '</b>'; }); };
+  let html = '', cnt = 0;
+
+  const cs = contacts.filter(function(c){ return hit(c.name); });
+  if(cs.length){ cnt += cs.length;
+    html += '<div class="sr-cat">联系人 · ' + cs.length + '</div>' + cs.slice(0, 5).map(function(c){
+      return '<div class="sr-hit" data-ext="sropen" data-k="contact" data-v="' + escapeHtml(c.name) + '"><div class="k">' + mark(c.name) + '</div><div class="s">点击查看资料</div></div>';
+    }).join(''); }
+
+  const chts = Object.values(chats).filter(function(c){ return hit(c.name) || c.msgs.some(function(m){ return m.text && hit(m.text); }); });
+  if(chts.length){ cnt += chts.length;
+    html += '<div class="sr-cat">聊天记录 · ' + chts.length + '</div>' + chts.slice(0, 6).map(function(c){
+      const m = c.msgs.filter(function(x){ return x.text && hit(x.text); })[0];
+      return '<div class="sr-hit" data-ext="sropen" data-k="chat" data-v="' + c.id + '"><div class="k">' + escapeHtml(c.name) + '</div><div class="s">' + (m ? mark(m.text) : '会话记录') + '</div></div>';
+    }).join(''); }
+
+  const mms = (store.moments || []).filter(function(m){ return hit(m.text); });
+  if(mms.length){ cnt += mms.length;
+    html += '<div class="sr-cat">朋友圈 · ' + mms.length + '</div>' + mms.slice(0, 5).map(function(m){
+      return '<div class="sr-hit" data-ext="sropen" data-k="moment"><div class="k">' + escapeHtml(m.author) + '</div><div class="s">' + mark(m.text) + '</div></div>';
+    }).join(''); }
+
+  const as = ARTICLES.filter(function(a){ return hit(a.t); });
+  if(as.length){ cnt += as.length;
+    html += '<div class="sr-cat">文章 · ' + as.length + '</div>' + as.slice(0, 5).map(function(a){
+      return '<div class="sr-hit" data-ext="sropen" data-k="article" data-v="' + a.id + '"><div class="k">' + mark(a.t) + '</div><div class="s">' + escapeHtml(a.s) + '</div></div>';
+    }).join(''); }
+
+  const gd = GOODS.filter(function(g){ return hit(g.n); });
+  if(gd.length){ cnt += gd.length;
+    html += '<div class="sr-cat">商品 · ' + gd.length + '</div>' + gd.slice(0, 5).map(function(g){
+      return '<div class="sr-hit" data-ext="sropen" data-k="goods"><div class="k">' + mark(g.n) + '</div><div class="s">¥' + g.p + '</div></div>';
+    }).join(''); }
+
+  box.innerHTML = cnt ? html : '<div class="ext-empty"><span class="big">🫥</span>没有找到与「' + escapeHtml(q) + '」相关的内容</div>';
+}
+function openSearch(){
+  openP('page-search', { title: '搜一搜', build: function(){
+    pbody('page-search').innerHTML =
+      '<div class="sr-box"><input class="sr-input" id="srInput" placeholder="搜索聊天记录 / 好友 / 朋友圈"><button class="ext-btn sm" id="srGo">搜索</button></div>' +
+      '<div id="searchResult"></div>';
+    gid('srGo').addEventListener('click', function(){ doSearch(gid('srInput').value.trim()); sfx.tap(); });
+    gid('srInput').addEventListener('keydown', function(e){ if(e.key === 'Enter'){ this.blur(); doSearch(this.value.trim()); } });
+    doSearch('');
+  }});
+}
+regExt('[data-ext="sropen"]', function(n){
+  const k = n.dataset.k, v = n.dataset.v;
+  if(k === 'chat') openChat(v);
+  else if(k === 'article') openArticle(v);
+  else if(k === 'contact') openFriend(v);
+  else if(k === 'moment'){ openSub('page-moments'); }
+  else if(k === 'goods') openMall();
+});
+
+/* ============================================================
+   ⑦ 打招呼 → 建立会话
+   ============================================================ */
+function greetPerson(name){
+  let key = 'u_' + name;
+  let c = chats[key];
+  if(!c){
+    c = addChat(key, name, [{ t: 'time', text: '今天 ' + hhmm() }]);
+    c.msgs.push({ f: 'them', k: 'text', text: rnd(GREET) });
+    renderChatList();
+  }
+  c.time = '刚刚';
+  EXTS.greeted[name] = Date.now(); saveEx();
+  sfx.send(); vib(12);
+  openChat(key);
+}
+regExt('[data-ext="greet"]', function(n){ greetPerson(n.dataset.n); });
+regExt('[data-ext="refreshNearby"]', function(){ renderNearby(); toast('已刷新附近的人 📍'); sfx.swipe(); });
+
+/* 发现页五项接管 */
+regExt('[data-discover="shake"]', function(){ openShake(); });
+regExt('[data-discover="nearby"]', function(){ openNearby(); });
+regExt('[data-discover="channels"]', function(){ openChannels(); });
+regExt('[data-discover="look"]', function(){ openLook(); });
+regExt('[data-discover="search"]', function(){ openSearch(); });
+
+
+/* ============================================================
+   ⑧ 资金：统一的收支入口（消费 / 收入）
+   ============================================================ */
+function money2(n){ return Math.round(n * 100) / 100; }
+function refreshMoneyUI(){
+  saveStore();
+  if(typeof renderBills === 'function') renderBills();
+  if(typeof renderWallet === 'function') renderWallet();
+  try{ renderMe(); }catch(e){}
+}
+function spendMoney(amount, name){
+  amount = money2(amount);
+  if(store.balance < amount){ toast('零钱余额不足，请先充值 💰'); sfx.err(); vib(40); return false; }
+  store.balance = money2(store.balance - amount);
+  addBill(name, -amount);
+  refreshMoneyUI();
+  return true;
+}
+function earnMoney(amount, name){
+  amount = money2(amount);
+  store.balance = money2(store.balance + amount);
+  addBill(name, amount);
+  refreshMoneyUI();
+  return true;
+}
+
+/* ============================================================
+   ⑨ 购物（微信小店）
+   ============================================================ */
+function cartQty(){ let n = 0; for(const k in EXTS.cart) n += EXTS.cart[k]; return n; }
+function cartTotal(){ let t = 0; for(const k in EXTS.cart){ const g = GOODS.filter(function(x){ return x.id === k; })[0]; if(g) t += g.p * EXTS.cart[k]; } return t; }
+function addCart(id, d){
+  EXTS.cart[id] = (EXTS.cart[id] || 0) + d;
+  if(EXTS.cart[id] <= 0) delete EXTS.cart[id];
+  saveEx(); syncShopBar();
+}
+function syncShopBar(){
+  const n = gid('shopQty'), t = gid('shopTotal');
+  if(n) n.textContent = cartQty();
+  if(t) t.textContent = '¥' + cartTotal().toFixed(2);
+}
+function renderMall(){
+  pbody('page-mall').innerHTML =
+    '<div class="ext-hero"><div class="h1">微信小店</div><div class="h2">好物精选 · 支持零钱支付 · 全场包邮</div></div>' +
+    '<div class="shop-grid">' + GOODS.map(function(g){
+      return '<div class="shop-item" data-ext="gd" data-id="' + g.id + '">' +
+        '<div class="pic" style="background:' + g.bg + '">' + g.e + '</div>' +
+        '<div class="bd"><div class="nm">' + escapeHtml(g.n) + '</div>' +
+        '<div class="pr"><small>¥</small>' + g.p + '<span style="float:right;font-size:11px;font-weight:400;color:#07C160;padding-top:4px;">加入购物车</span></div></div></div>';
+    }).join('') + '</div><div style="height:78px;"></div>';
+}
+function openMall(){
+  openP('page-mall', { title: '购物', build: function(){
+    renderMall();
+    gid('page-mall').insertAdjacentHTML('beforeend',
+      '<div class="shop-bar"><div class="tt">购物车 <b id="shopQty">0</b> 件 · 合计 <b id="shopTotal" style="color:#E64340;">¥0.00</b></div>' +
+      '<button class="ext-btn sm" data-ext="clearcart" style="background:#f2f2f2;color:#666;">清空</button>' +
+      '<button class="ext-btn sm" data-ext="checkout">去结算</button></div>');
+    syncShopBar();
+  }});
+}
+regExt('[data-ext="gd"]', function(n){
+  const g = GOODS.filter(function(x){ return x.id === n.dataset.id; })[0];
+  if(!g) return;
+  addCart(g.id, 1); sfx.tap(); vib(8);
+  toast('已加入购物车 · ' + g.n);
+});
+regExt('[data-ext="clearcart"]', function(){ EXTS.cart = {}; saveEx(); syncShopBar(); toast('购物车已清空'); sfx.tap(); });
+regExt('[data-ext="checkout"]', function(){
+  const total = cartTotal();
+  if(!total){ toast('购物车还是空的哦 🛒'); sfx.err(); return; }
+  const list = Object.keys(EXTS.cart).map(function(k){ const g = GOODS.filter(function(x){ return x.id === k; })[0]; return g ? g.n + ' ×' + EXTS.cart[k] : ''; }).filter(Boolean).join('、');
+  if(!confirm('确认支付 ¥' + total.toFixed(2) + '\n\n' + list + '\n\n将从零钱扣款')) return;
+  if(!spendMoney(total, '微信小店-购物')) return;
+  EXTS.cart = {}; saveEx(); syncShopBar();
+  sfx.ok(); vib([20, 40, 20]);
+  showExtSuccess('支付成功', total, '微信小店');
+});
+
+/* ============================================================
+   ⑩ 红包雨 · 小游戏
+   ============================================================ */
+let gpRun = false, gpRAF = 0, gpItems = [], gpScore = 0, gpLeft = 30, gpSpawn = 0, gpLast = 0, gpTimer = 0;
+function gpSpawnOne(st){
+  const W = st.clientWidth || 320;
+  const el = document.createElement('div');
+  el.className = 'gp-item';
+  el.textContent = '🧧';
+  el.style.left = ri(6, Math.max(10, W - 44)) + 'px';
+  el.style.top = '-46px';
+  st.appendChild(el);
+  gpItems.push({ el: el, x: 0, y: -46, v: 1.6 + Math.random() * 2.6 });
+}
+function gpLoop(ts){
+  if(!gpRun) return;
+  const st = gid('gpStage');
+  if(!st || !document.querySelector('#page-game.active')){ gpStop(); return; }
+  const dt = Math.min(48, ts - (gpLast || ts)); gpLast = ts;
+  gpSpawn += dt;
+  if(gpSpawn > 330){ gpSpawn = 0; gpSpawnOne(st); }
+  const H = st.clientHeight;
+  for(let i = gpItems.length - 1; i >= 0; i--){
+    const it = gpItems[i];
+    it.y += it.v * (dt / 16.6);
+    if(it.y > H){ it.el.remove(); gpItems.splice(i, 1); continue; }
+    it.el.style.transform = 'translate3d(0,' + it.y + 'px,0)';
+  }
+  gpRAF = requestAnimationFrame(gpLoop);
+}
+function gpStop(){
+  gpRun = false;
+  cancelAnimationFrame(gpRAF); clearInterval(gpTimer);
+  gpItems.forEach(function(it){ it.el.remove(); });
+  gpItems = [];
+}
+function gpEnd(){
+  gpStop();
+  const earn = money2(gpScore * 0.02);
+  const isBest = gpScore > (EXTS.best || 0);
+  if(isBest){ EXTS.best = gpScore; saveEx(); }
+  if(earn > 0) earnMoney(earn, '红包雨-游戏奖励');
+  sfx.coin(); vib([30, 50, 30]);
+  const st = gid('gpStage');
+  if(!st) return;
+  st.insertAdjacentHTML('beforeend',
+    '<div class="gp-over"><div style="font-size:44px;">🧧</div><div style="font-size:15px;opacity:.85;">本轮战绩</div>' +
+    '<div class="s">' + gpScore + '</div>' +
+    '<div style="font-size:13px;opacity:.9;">获得 ¥' + earn.toFixed(2) + (isBest ? ' · 🏆 新纪录！' : '') + '</div>' +
+    '<div style="font-size:12px;opacity:.6;">历史最高 ' + EXTS.best + ' 分</div>' +
+    '<button class="ext-btn" data-ext="gpretry" style="margin-top:10px;">再来一局</button></div>');
+}
+function gpStart(){
+  const st = gid('gpStage');
+  if(!st) return;
+  gpStop();
+  gpScore = 0; gpLeft = 30; gpSpawn = 0; gpLast = 0; gpRun = true;
+  const hud = gid('gpHud');
+  if(hud) hud.innerHTML = '<div>倒计时 <b id="gpLeft">30</b>s</div><div>得分 <b id="gpScore">0</b></div>';
+  clearInterval(gpTimer);
+  gpTimer = setInterval(function(){
+    gpLeft--;
+    const l = gid('gpLeft'); if(l) l.textContent = Math.max(0, gpLeft);
+    if(gpLeft <= 0){ clearInterval(gpTimer); gpEnd(); }
+    else if(gpLeft <= 5){ beep(1200, .05, 'square', .05); }
+  }, 1000);
+  gpRAF = requestAnimationFrame(gpLoop);
+}
+function gpHit(el){
+  const it = gpItems.filter(function(x){ return x.el === el; })[0];
+  if(!it) return;
+  const add = ri(1, 3);
+  gpScore += add;
+  const s = gid('gpScore'); if(s) s.textContent = gpScore;
+  const r = el.getBoundingClientRect(), pr = gid('gpStage').getBoundingClientRect();
+  const f = document.createElement('div');
+  f.className = 'gp-float'; f.textContent = '+' + add;
+  f.style.left = (r.left - pr.left) + 'px'; f.style.top = (r.top - pr.top) + 'px';
+  gid('gpStage').appendChild(f);
+  setTimeout(function(){ f.remove(); }, 800);
+  el.classList.add('pop');
+  const i = gpItems.indexOf(it); gpItems.splice(i, 1);
+  setTimeout(function(){ el.remove(); }, 300);
+  beep(1500, .03, 'square', .04); vib(6);
+}
+function openGame(){
+  openP('page-game', { dark: true, title: '红包雨', build: function(){
+    const s = pbody('page-game');
+    s.style.cssText = 'padding:0;overflow:hidden;display:flex;flex-direction:column;background:#3a0d06;';
+    s.innerHTML =
+      '<div class="gp-stage" id="gpStage">' +
+        '<div class="gp-hud" id="gpHud"><div>倒计时 <b id="gpLeft">30</b>s</div><div>得分 <b id="gpScore">0</b></div></div>' +
+        '<div class="gp-over" id="gpReady" style="background:rgba(0,0,0,.55);">' +
+          '<div style="font-size:52px;">🧧</div>' +
+          '<div style="font-size:17px;font-weight:600;">红包雨</div>' +
+          '<div style="font-size:13px;opacity:.8;text-align:center;line-height:1.8;">30 秒内点击落下的红包<br>1 分 = 0.02 元，自动存入零钱</div>' +
+          '<button class="ext-btn" data-ext="gpstart" style="margin-top:8px;">开始游戏</button>' +
+          '<div style="font-size:12px;opacity:.55;">🏆 历史最高 ' + (EXTS.best || 0) + ' 分</div>' +
+        '</div>' +
+      '</div>';
+    gid('gpStage').addEventListener('pointerdown', function(e){
+      const it = e.target.closest('.gp-item');
+      if(it && gpRun) gpHit(it);
+    });
+  }});
+}
+regExt('[data-ext="gpstart"]', function(){ const r = gid('gpReady'); if(r) r.remove(); gpStart(); });
+regExt('[data-ext="gpretry"]', function(){ const o = gid('gpStage').querySelector('.gp-over'); if(o) o.remove(); gpStart(); });
+
+/* ============================================================
+   ⑪ 收藏
+   ============================================================ */
+function addFav(o){
+  if(EXTS.favs.some(function(f){ return f.id === o.id; })){ toast('已在收藏中 ⭐'); return; }
+  EXTS.favs.unshift(o); saveEx(); sfx.ok(); vib(10);
+  toast('⭐ 已加入收藏');
+}
+function renderFav(){
+  const box = pbody('page-fav');
+  if(!EXTS.favs.length){
+    box.innerHTML = '<div class="ext-empty"><span class="big">⭐</span>还没有收藏内容<br>长按聊天消息，或在「看一看」里收藏吧</div>';
+    return;
+  }
+  box.innerHTML = EXTS.favs.map(function(f, i){
+    return '<div class="fav-item" data-ext="favopen" data-i="' + i + '"><div class="t">' + escapeHtml(f.t) + '</div>' +
+      '<div class="m"><span>' + escapeHtml(f.s || '') + '</span><span>' + relTime(f.ts) + ' · 删除</span></div></div>';
+  }).join('') + '<div style="height:30px;"></div>';
+}
+function openFav(){ openP('page-fav', { title: '收藏', build: renderFav }); }
+regExt('[data-ext="favopen"]', function(n){
+  const f = EXTS.favs[+n.dataset.i];
+  if(!f) return;
+  if(f.k === 'article'){ openArticle(f.id.replace('art_', '')); return; }
+  if(f.k === 'red'){ return; }
+  EXTS.favs.splice(+n.dataset.i, 1); saveEx(); renderFav(); toast('已删除该收藏');
+});
+
+/* ============================================================
+   ⑫ 卡包
+   ============================================================ */
+function seedCoupons(){
+  if(EXTS.coupons && EXTS.coupons.length) return;
+  EXTS.coupons = [
+    { n: '全场通用券', a: 5, c: '满 50 可用', d: '2025-12-31 到期' },
+    { n: '餐饮立减券', a: 10, c: '满 80 可用', d: '2025-10-01 到期' },
+    { n: '咖啡买一赠一', a: 0, c: '指定门店', d: '2025-09-15 到期' }
+  ];
+  saveEx();
+}
+function renderCards(){
+  seedCoupons();
+  pbody('page-cards').innerHTML =
+    '<div class="ext-hero" style="background:linear-gradient(135deg,#7a4bd0,#a86bf0);"><div class="h1">卡包</div><div class="h2">共 ' + EXTS.coupons.length + ' 张券 · 点击使用</div></div>' +
+    EXTS.coupons.map(function(c, i){
+      return '<div class="cp" data-ext="cpuse" data-i="' + i + '"><div class="amt">' + (c.a ? '<small>¥</small>' + c.a : '券') + '</div>' +
+        '<div class="info"><div class="nm">' + escapeHtml(c.n) + '</div><div class="dt">' + escapeHtml(c.c) + ' · ' + escapeHtml(c.d) + '</div></div>' +
+        '<div class="ext-btn sm" style="background:#07C160;">使用</div></div>';
+    }).join('') + '<div style="height:30px;"></div>';
+}
+function openCards(){ openP('page-cards', { title: '卡包', build: renderCards }); }
+regExt('[data-ext="cpuse"]', function(n){
+  const c = EXTS.coupons[+n.dataset.i];
+  if(!c) return;
+  sfx.tap(); vib(8);
+  toast('已使用「' + c.n + '」' + (c.a ? '，抵 ¥' + c.a : ''));
+  EXTS.coupons.splice(+n.dataset.i, 1); saveEx(); renderCards();
+});
+
+/* ============================================================
+   ⑬ 表情商店
+   ============================================================ */
+function renderStickers(){
+  pbody('page-stickers').innerHTML =
+    '<div class="ext-hero" style="background:linear-gradient(135deg,#5b4bd0,#8b7bf0);"><div class="h1">表情商店</div><div class="h2">添加后会自动出现在聊天表情面板中 ✨</div></div>' +
+    '<div class="ext-title">表情专辑</div><div class="stk-grid">' + STICKERS.map(function(s){
+      const has = EXTS.stickers.some(function(x){ return x.e === s.e; });
+      return '<div class="stk"><div class="e">' + s.e + '</div><div class="n">' + escapeHtml(s.n) + '</div>' +
+        '<div class="add ' + (has ? 'has' : '') + '" data-ext="stkadd" data-e="' + s.e + '" data-n="' + escapeHtml(s.n) + '">' + (has ? '已添加' : '+ 添加') + '</div></div>';
+    }).join('') + '</div>' +
+    '<div class="ext-title">我的表情 <span style="font-size:12px;color:#bbb;">(' + EXTS.stickers.length + ')</span></div>' +
+    '<div class="ext-card" style="padding:12px 14px;"><div class="added-stk">' + (EXTS.stickers.length ? EXTS.stickers.map(function(s){ return '<span>' + s.e + '</span>'; }).join('') : '<span style="font-size:13px;color:#bbb;">暂无，快去添加吧</span>') + '</div></div>' +
+    '<div style="height:30px;"></div>';
+}
+function openStickers(){ openP('page-stickers', { title: '表情', build: renderStickers }); }
+regExt('[data-ext="stkadd"]', function(n){
+  const e = n.dataset.e;
+  if(EXTS.stickers.some(function(x){ return x.e === e; })){ toast('已经在表情面板里啦'); return; }
+  EXTS.stickers.push({ e: e, n: n.dataset.n }); saveEx();
+  if(typeof renderEmoji === 'function') renderEmoji();
+  sfx.ok(); vib(10); renderStickers();
+  toast('已添加到聊天表情面板 ✨');
+});
+
+/* ============================================================
+   ⑭ 好友资料 / 添加朋友
+   ============================================================ */
+function openFriend(name){
+  const key = 'u_' + name;
+  openP('page-friend', { title: '详细资料', build: function(){
+    const region = rnd(['北京 朝阳', '上海 浦东', '广东 深圳', '浙江 杭州', '四川 成都', '江苏 南京']);
+    pbody('page-friend').innerHTML =
+      '<div class="fr-head">' + av(name, 'av') + '<div><div class="nm">' + escapeHtml(name) + '</div>' +
+        '<div class="id">微信号：' + escapeHtml('wxid_' + Math.abs(name.split('').reduce(function(a, c){ return a * 31 + c.charCodeAt(0); }, 7)) % 9999999) + '</div>' +
+        '<div class="id">地区：' + region + '</div></div></div>' +
+      '<div class="ext-title">朋友权限</div>' +
+      '<div class="ext-card">' +
+        extRow({ title: '朋友圈和状态', val: '不让他看 · 不看他', arrow: true }) +
+        extRow({ title: '朋友权限', val: '聊天、朋友圈', arrow: true }) +
+      '</div>' +
+      '<div class="ext-title">更多信息</div>' +
+      '<div class="ext-card">' + extRow({ title: '备注和标签', arrow: true }) + extRow({ title: '共同群聊', val: ri(1, 6) + ' 个', arrow: true }) + '</div>' +
+      '<div style="padding:16px;">' +
+        '<button class="ext-btn block" data-ext="fchat" data-n="' + escapeHtml(name) + '">发消息</button>' +
+        '<div style="display:flex;gap:12px;margin-top:12px;">' +
+          '<button class="ext-btn ghost" style="flex:1;height:40px;font-size:15px;" data-ext="fvoice" data-n="' + escapeHtml(name) + '">语音通话</button>' +
+          '<button class="ext-btn ghost" style="flex:1;height:40px;font-size:15px;" data-ext="fvideo" data-n="' + escapeHtml(name) + '">视频通话</button>' +
+        '</div>' +
+        '<button class="ext-btn ghost" style="width:100%;margin-top:12px;height:40px;font-size:15px;color:#E64340;" data-ext="fdel" data-n="' + escapeHtml(name) + '">删除联系人</button>' +
+      '</div><div style="height:30px;"></div>';
+  }});
+}
+function ensureChat(name){
+  const key = 'u_' + name;
+  if(!chats[key]){ addChat(key, name, [{ t: 'time', text: '今天 ' + hhmm() }]); renderChatList(); }
+  return key;
+}
+regExt('[data-contact]', function(n){ openFriend(n.dataset.contact); });
+regExt('[data-ext="fchat"]', function(n){ const k = ensureChat(n.dataset.n); openChat(k); });
+regExt('[data-ext="fvoice"]', function(n){ const k = ensureChat(n.dataset.n); closeAllSub(); startCall(k, 'voice'); });
+regExt('[data-ext="fvideo"]', function(n){ const k = ensureChat(n.dataset.n); closeAllSub(); startCall(k, 'video'); });
+regExt('[data-ext="fdel"]', function(n){
+  if(!confirm('删除联系人 ' + n.dataset.n + '？')) return;
+  const key = 'u_' + n.dataset.n;
+  delete chats[key]; renderChatList(); backSub(); backSub();
+  toast('已删除联系人'); sfx.tap();
+});
+regExt('[data-func="新的朋友"]', function(){ openAddFriend(); });
+function openAddFriend(){
+  openP('page-addfriend', { title: '添加朋友', build: function(){
+    const p = store.profile;
+    pbody('page-addfriend').innerHTML =
+      '<div class="sr-box" style="background:#fff;padding:14px 12px;"><input class="sr-input ext-input" id="afInput" placeholder="微信号 / 手机号" style="flex:1;background:#F7F7F7;"><button class="ext-btn sm" id="afGo" style="height:36px;">搜索</button></div>' +
+      '<div id="afResult"></div>' +
+      '<div class="ext-title">我的微信号</div>' +
+      '<div class="ext-card">' + extRow({ title: escapeHtml(p.wxid), val: '点击复制', arrow: true, ext: 'copywx' }) + '</div>' +
+      '<div class="ext-title">添加方式</div>' +
+      '<div class="ext-card">' + extRow({ ico: { t: '扫', bg: '#38B2AC' }, title: '扫一扫', arrow: true, ext: 'afscan' }) +
+        extRow({ ico: { t: '雷', bg: '#8E6BF2' }, title: '雷达加朋友', arrow: true, ext: 'afradar' }) +
+        extRow({ ico: { t: '群', bg: '#07C160' }, title: '群聊里加', arrow: true, ext: 'afgroup' }) + '</div>' +
+      '<div style="height:30px;"></div>';
+    gid('afGo').addEventListener('click', function(){ afSearch(); });
+    gid('afInput').addEventListener('keydown', function(e){ if(e.key === 'Enter'){ this.blur(); afSearch(); } });
+  }});
+}
+function afSearch(){
+  const q = gid('afInput').value.trim();
+  const box = gid('afResult');
+  if(!q){ box.innerHTML = ''; return; }
+  sfx.tap();
+  box.innerHTML = '<div class="ext-title">搜索结果</div><div class="ext-card">' +
+    extRow({ av: q.slice(0, 1), title: escapeHtml(q), sub: '来自搜索 · 微信号匹配', extra: '<div class="ext-btn sm" data-ext="afadd" data-n="' + escapeHtml(q) + '">加为好友</div>' }) +
+    '</div>';
+}
+regExt('[data-ext="afadd"]', function(n){
+  const nm = n.dataset.n;
+  if(!contacts.some(function(c){ return c.name === nm; })){
+    const L = /[a-zA-Z]/.test(nm) ? nm[0].toUpperCase() : '#';
+    contacts.push({ name: nm, letter: L });
+    contacts.sort(function(a, b){ return a.name.localeCompare(b.name, 'zh'); });
+    renderContacts();
+  }
+  sfx.ok(); vib(12);
+  renderChatList();
+  const k = ensureChat(nm);
+  toast('已添加好友，快去打个招呼吧 👋');
+  openChat(k);
+});
+regExt('[data-ext="copywx"]', function(){
+  const t = store.profile.wxid;
+  try{ navigator.clipboard.writeText(t); }catch(e){}
+  toast('已复制微信号：' + t);
+});
+regExt('[data-ext="afscan"]', function(){ openScan(); });
+regExt('[data-ext="afradar"]', function(){ openNearby(); });
+regExt('[data-ext="afgroup"]', function(){ toast('群聊加人（演示）'); });
+
+/* ============================================================
+   ⑮ 长按消息菜单
+   ============================================================ */
+const ctxEl = document.createElement('div');
+ctxEl.className = 'ctx'; ctxEl.id = 'ctxMenu';
+if(gid('phone')) gid('phone').appendChild(ctxEl);
+let ctxMsg = null;
+function hideCtx(){ ctxEl.classList.remove('show'); ctxMsg = null; }
+function showCtx(node){
+  const idx = Array.prototype.indexOf.call(gid('chatScroll').children, node);
+  const c = chats[currentChatId];
+  if(!c || !c.msgs[idx]) return;
+  const m = c.msgs[idx];
+  if(m.t === 'time') return;
+  ctxMsg = { idx: idx, m: m };
+  const items = [];
+  if(m.k !== 'red') items.push(['复制', 'copy']);
+  if(m.k === 'text') items.push(['收藏', 'fav']);
+  if(m.k === 'red') items.push(['查看红包', 'viewred']);
+  if(m.f === 'me') items.push(['撤回', 'recall']);
+  items.push(['删除', 'del']);
+  ctxEl.innerHTML = items.map(function(it){
+    return '<div data-ext="ctx" data-a="' + it[1] + '"' + (it[1] === 'del' || it[1] === 'recall' ? ' class="danger"' : '') + '>' + it[0] + '</div>';
+  }).join('');
+  const r = node.getBoundingClientRect(), pr = gid('phone').getBoundingClientRect();
+  let left = r.left - pr.left + 36;
+  left = Math.max(10, Math.min(left, pr.width - 146));
+  let top = r.top - pr.top + r.height / 2 - 30;
+  top = Math.max(70, Math.min(top, pr.height - items.length * 44 - 40));
+  ctxEl.style.left = left + 'px'; ctxEl.style.top = top + 'px';
+  ctxEl.classList.add('show');
+  sfx.tap(); vib(14);
+}
+(function bindLongPress(){
+  const cs = gid('chatScroll');
+  if(!cs) return;
+  let timer = null, sx = 0, sy = 0;
+  function down(e){
+    const node = e.target.closest('.msg, .chat-time');
+    if(!node) return;
+    const t = e.touches ? e.touches[0] : e;
+    sx = t.clientX; sy = t.clientY;
+    clearTimeout(timer);
+    timer = setTimeout(function(){ showCtx(node); }, 450);
+  }
+  function up(){ clearTimeout(timer); }
+  cs.addEventListener('touchstart', down, { passive: true });
+  cs.addEventListener('touchmove', function(e){ if(Math.abs(e.touches[0].clientX - sx) > 12 || Math.abs(e.touches[0].clientY - sy) > 12) up(); }, { passive: true });
+  cs.addEventListener('touchend', up);
+  cs.addEventListener('mousedown', down);
+  cs.addEventListener('mouseup', up);
+  cs.addEventListener('mouseleave', up);
+  cs.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+})();
+document.addEventListener('click', function(e){ if(!e.target.closest('#ctxMenu')) hideCtx(); }, true);
+regExt('[data-ext="ctx"]', function(n){
+  const a = n.dataset.a;
+  if(!ctxMsg) return;
+  const c = chats[currentChatId]; if(!c) return;
+  const m = c.msgs[ctxMsg.idx];
+  if(a === 'copy'){
+    try{ navigator.clipboard.writeText(m.text || ''); }catch(e){}
+    toast('已复制到剪贴板');
+  }else if(a === 'fav'){
+    addFav({ id: 'msg_' + Date.now(), t: m.text || '[消息]', s: '聊天记录 · ' + c.name, ts: Date.now(), k: 'msg' });
+  }else if(a === 'recall'){
+    c.msgs.splice(ctxMsg.idx, 1, { t: 'time', text: '你撤回了一条消息' });
+    sfx.swipe(); toast('已撤回');
+  }else if(a === 'del'){
+    c.msgs.splice(ctxMsg.idx, 1);
+    sfx.tap(); toast('已删除');
+  }else if(a === 'viewred'){
+    openRed(m.rid);
+  }
+  hideCtx();
+  renderMessages(); scrollChatBottom(); renderChatList();
+});
+
+/* ============================================================
+   ⑯ 语音消息（按住说话）
+   ============================================================ */
+const recOverlay = document.createElement('div');
+recOverlay.className = 'rec-overlay'; recOverlay.id = 'recOverlay';
+recOverlay.innerHTML = '<div class="rec-wave">' + '<i style="height:14px"></i><i style="height:26px"></i><i style="height:18px"></i><i style="height:32px"></i><i style="height:20px"></i><i style="height:28px"></i><i style="height:16px"></i>' + '</div><div class="tip" id="recTip">0.0″ 松开发送</div>';
+if(gid('phone')) gid('phone').appendChild(recOverlay);
+
+const recState = { on: false, t0: 0, timer: 0, cancelled: false };
+function applyVoiceMode(){
+  const bar = document.querySelector('#page-chat .chat-inputbar');
+  if(!bar) return;
+  const input = gid('msgInput');
+  let hold = gid('holdTalk');
+  if(EXTS.voiceOn){
+    if(!hold){
+      hold = document.createElement('div');
+      hold.className = 'hold-talk'; hold.id = 'holdTalk'; hold.textContent = '按住 说话';
+      bar.insertBefore(hold, input);
+      bindHold(hold);
+      hold.addEventListener('click', function(e){ e.stopPropagation(); });
+    }
+    hold.style.display = 'flex';
+    if(input){ input.style.display = 'none'; input.blur(); }
+    closePanels();
+  }else{
+    if(hold) hold.style.display = 'none';
+    if(input){ input.style.display = ''; }
+    recOverlay.classList.remove('show');
+  }
+}
+function bindHold(hold){
+  function start(e){
+    if(e.cancelable) e.preventDefault();
+    if(recState.on) return;
+    recState.on = true; recState.cancelled = false; recState.t0 = Date.now();
+    hold.classList.add('rec'); hold.textContent = '松开 发送';
+    recOverlay.classList.add('show');
+    sfx.tap(); vib(10);
+    recState.timer = setInterval(function(){
+      const s = (Date.now() - recState.t0) / 1000;
+      const t = gid('recTip'); if(t) t.textContent = s.toFixed(1) + '″ ' + (s > 60 ? '最长 60 秒' : '松开发送');
+      if(s > 60) release();
+    }, 100);
+  }
+  function release(e){
+    if(!recState.on) return;
+    recState.on = false;
+    clearInterval(recState.timer);
+    recOverlay.classList.remove('show');
+    hold.classList.remove('rec'); hold.textContent = '按住 说话';
+    const dur = Math.round((Date.now() - recState.t0) / 1000);
+    if(dur < 1){ toast('说话时间太短'); sfx.err(); return; }
+    const c = chats[currentChatId]; if(!c) return;
+    c.msgs.push({ f: 'me', k: 'voice', dur: Math.min(dur, 60) });
+    c.time = '刚刚';
+    renderMessages(); scrollChatBottom(); renderChatList();
+    sfx.send(); vib([12, 30, 12]);
+    autoReply(c);
+  }
+  hold.addEventListener('touchstart', start, { passive: false });
+  hold.addEventListener('touchend', release);
+  hold.addEventListener('touchcancel', release);
+  hold.addEventListener('mousedown', start);
+  hold.addEventListener('mouseup', release);
+  hold.addEventListener('mouseleave', function(){ if(recState.on) release(); });
+}
+regExt('#ibVoice', function(){ EXTS.voiceOn = !EXTS.voiceOn; saveEx(); applyVoiceMode(); });
+document.addEventListener('click', function(e){
+  const vb = e.target.closest('.voice-b');
+  if(!vb) return;
+  vb.classList.add('play');
+  beep(700, .12, 'sine', .07);
+  setTimeout(function(){ vb.classList.remove('play'); }, (parseInt(vb.dataset.voice, 10) || 2) * 600);
+});
+
+
+/* ============================================================
+   ⑰ 通用消息推送 + 消息预览
+   ============================================================ */
+function pushMsg(c, m, silent){
+  c.msgs.push(m);
+  c.time = '刚刚';
+  const open = (currentChatId === c.id);
+  if(open){ renderMessages(); scrollChatBottom(); }
+  if(!open && !silent) c.unread = (c.unread || 0) + 1;
+  renderChatList();
+  if(!silent && !open){ sfx.recv(); vib([15, 40, 15]); }
+}
+lastText = function(c){
+  for(let i = c.msgs.length - 1; i >= 0; i--){
+    const m = c.msgs[i];
+    if(m.k === 'text') return m.text;
+    if(m.k === 'transfer') return '[转账]';
+    if(m.k === 'red') return '[微信红包]';
+    if(m.k === 'voice') return '[语音]';
+    if(m.k === 'img') return '[图片]';
+  }
+  return '';
+};
+
+/* ============================================================
+   ⑱ 消息渲染重写（兼容原有 + 红包 / 语音 / 图片 / 系统）
+   ============================================================ */
+renderMessages = function(){
+  const c = chats[currentChatId];
+  if(!c) return;
+  const box = gid('chatScroll');
+  if(!box) return;
+  const meP = meObj();
+  box.innerHTML = c.msgs.map(function(m){
+    if(m.t === 'time') return '<div class="chat-time">' + escapeHtml(m.text) + '</div>';
+    if(m.k === 'sys') return '<div class="chat-time" style="color:#b0b0b0;">' + escapeHtml(m.text) + '</div>';
+    const isMe = m.f === 'me';
+    const ava = isMe ? avatarHTML(meP, 'av') : friendAvatarHTML(c.name, 'av');
+    let body;
+    if(m.k === 'transfer'){
+      body = '<div class="tr-card"><div class="tr-ico">¥</div><div><div class="tr-t">转账</div><div class="tr-a">¥' + money(m.amount) + '</div></div></div>';
+    }else if(m.k === 'red'){
+      body = redBubbleHTML(m, c);
+    }else if(m.k === 'voice'){
+      body = '<div class="bubble"><div class="voice-b" data-voice="' + m.dur + '">' +
+        '<div class="wv"><i></i><i></i><i></i><i></i><i></i></div><span>' + m.dur + '″</span></div></div>';
+    }else if(m.k === 'img'){
+      body = '<div class="bubble" style="padding:5px;"><div style="width:130px;height:130px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:54px;background:' + (m.bg || 'linear-gradient(135deg,#dfe9f5,#b3c8e0)') + '">' + (m.e || '🖼') + '</div></div>';
+    }else{
+      body = '<div class="bubble">' + escapeHtml(m.text) + '</div>';
+    }
+    return '<div class="msg ' + (isMe ? 'me' : 'them') + '">' + ava + body + '</div>';
+  }).join('');
+};
+
+/* ============================================================
+   ⑲ 红包：气泡 / 发红包 / 拆红包
+   ============================================================ */
+function redBubbleHTML(m, c){
+  const mine = m.f === 'me';
+  const sub = mine ? (m.got ? '已被领取' : '等待对方领取') : (m.got ? '已领取' : '点击拆开红包');
+  return '<div class="rp-card' + (m.got ? ' opened' : '') + '" data-red="' + m.rid + '">' +
+    '<div class="ic">🧧</div><div><div class="tt">' + escapeHtml(m.note || '恭喜发财，大吉大利') + '</div>' +
+    '<div class="ss">' + sub + '</div></div></div>';
+}
+const RED_CHIPS = [6.66, 8.88, 18.88, 52.0, 66.6, 88.88];
+function openSendRed(){
+  if(!currentChatId){ toast('请先进入一个聊天再发红包'); return; }
+  const c = chats[currentChatId];
+  openP('page-sendred', { title: '发红包', build: function(){
+    pbody('page-sendred').innerHTML =
+      '<div style="padding:18px 16px 0;">' +
+        '<div class="ext-card" style="margin:0;padding:20px 16px;text-align:center;background:linear-gradient(160deg,#F5563C,#D2371F);color:#fff;">' +
+          '<div style="font-size:13px;opacity:.85;">发给 ' + escapeHtml(c.name) + '</div>' +
+          '<div style="font-size:15px;margin-top:14px;opacity:.85;">红包金额</div>' +
+          '<div style="display:flex;align-items:flex-end;justify-content:center;gap:4px;margin-top:6px;">' +
+            '<span style="font-size:24px;padding-bottom:6px;">¥</span><input id="redAmt" inputmode="decimal" placeholder="0.00" style="width:150px;background:transparent;border:0;border-bottom:1.5px solid rgba(255,255,255,.5);color:#fff;font-size:40px;font-weight:600;text-align:center;">' +
+          '</div>' +
+          '<div style="font-size:12px;opacity:.8;margin-top:12px;">零钱余额 ¥' + money(store.balance) + '</div>' +
+        '</div>' +
+        '<div style="display:flex;flex-wrap:wrap;gap:10px;padding:16px 2px;">' + RED_CHIPS.map(function(v){
+          return '<div class="ext-chip" style="padding:9px 16px;font-size:14px;background:#F5F5F5;" data-ext="redchip" data-v="' + v + '">¥' + v.toFixed(2) + '</div>';
+        }).join('') + '</div>' +
+        '<div class="ext-input" style="display:flex;align-items:center;margin-bottom:16px;"><input id="redNote" placeholder="恭喜发财，大吉大利" maxlength="20" style="flex:1;background:transparent;border:0;"></div>' +
+        '<button class="ext-btn" id="redSend" style="width:100%;background:#F5563C;">塞钱进红包</button>' +
+        '<div class="ext-hint" style="text-align:center;padding-top:14px;">红包金额将从零钱扣除 · 演示环境随机发放</div>' +
+      '</div><div style="height:30px;"></div>';
+    gid('redSend').addEventListener('click', function(){ sendRed(c); });
+    gid('redAmt').addEventListener('focus', function(){ this.select && this.select(); });
+  }});
+}
+regExt('[data-ext="redchip"]', function(n){
+  const i = gid('redAmt'); if(i) i.value = (+n.dataset.v).toFixed(2);
+  sfx.tap(); vib(6);
+});
+function sendRed(c){
+  const raw = parseFloat((gid('redAmt').value || '').replace(/[^\d.]/g, ''));
+  const note = (gid('redNote').value || '').trim() || '恭喜发财，大吉大利';
+  if(!raw || raw <= 0){ toast('请输入红包金额'); sfx.err(); return; }
+  if(raw > 200){ toast('单个红包不能超过 200 元'); sfx.err(); return; }
+  const amt = money2(raw);
+  if(!spendMoney(amt, '微信红包-' + c.name)) return;
+  const rid = 'r' + Date.now() + ri(100, 999);
+  pushMsg(c, { f: 'me', k: 'red', rid: rid, amount: amt, note: note, got: false, my: true });
+  sfx.coin(); vib([20, 50, 20]);
+  backSub();
+  setTimeout(function(){
+    if(!chats[c.id]) return;
+    chats[c.id].msgs.forEach(function(m){ if(m.rid === rid) m.got = true; });
+    if(currentChatId === c.id) renderMessages();
+    setTimeout(function(){
+      pushMsg(c, { k: 'sys', text: '「' + c.name + '」领取了你的红包' });
+      const m = c.msgs.filter(function(x){ return x.rid === rid; })[0];
+      if(currentChatId === c.id){ renderMessages(); scrollChatBottom(); }
+    }, 500);
+    sfx.recv();
+  }, 1900);
+}
+const rpMask = document.createElement('div');
+rpMask.className = 'rp-mask'; rpMask.id = 'rpMask';
+if(gid('phone')) gid('phone').appendChild(rpMask);
+rpMask.addEventListener('click', function(e){ if(e.target === rpMask) rpMask.classList.remove('show'); });
+function openRed(rid){
+  let msg = null, owner = null;
+  Object.keys(chats).forEach(function(k){
+    chats[k].msgs.forEach(function(m){ if(m.rid === rid){ msg = m; owner = chats[k]; } });
+  });
+  if(!msg) return;
+  if(msg.f === 'me'){
+    rpMask.innerHTML = '<div class="rp-pop"><div class="rp-close" data-ext="redclose">✕</div>' +
+      '<div class="who">你发出的红包</div><div class="big">🧧</div>' +
+      '<div class="amt"><small>¥</small>' + money(msg.amount) + '</div>' +
+      '<div class="note">' + escapeHtml(msg.note) + '</div>' +
+      '<div class="note" style="margin-top:16px;">' + (msg.got ? '已被「' + escapeHtml(owner.name) + '」领取' : '等待对方领取…') + '</div></div>';
+    rpMask.classList.add('show'); sfx.tap();
+    return;
+  }
+  if(msg.got){
+    rpMask.innerHTML = '<div class="rp-pop"><div class="rp-close" data-ext="redclose">✕</div>' +
+      '<div class="who">' + escapeHtml(owner.name) + ' 的红包</div><div class="big">🧧</div>' +
+      '<div class="amt"><small>¥</small>' + money(msg.amount) + '</div>' +
+      '<div class="note">已存入零钱 · ' + escapeHtml(msg.note) + '</div></div>';
+    rpMask.classList.add('show'); sfx.tap();
+    return;
+  }
+  rpMask.innerHTML = '<div class="rp-pop"><div class="rp-close" data-ext="redclose">✕</div>' +
+    '<div class="who">' + escapeHtml(owner.name) + ' 给你发了一个红包</div>' +
+    '<div class="rp-open-btn" data-ext="redopen" data-rid="' + rid + '">開</div>' +
+    '<div class="note">' + escapeHtml(msg.note) + '</div></div>';
+  rpMask.classList.add('show');
+  sfx.recv(); vib(20);
+}
+regExt('[data-ext="redclose"]', function(){ rpMask.classList.remove('show'); });
+regExt('[data-red]', function(n){ openRed(n.dataset.red); });
+regExt('[data-ext="redopen"]', function(n){
+  const rid = n.dataset.rid;
+  let msg = null, owner = null;
+  Object.keys(chats).forEach(function(k){ chats[k].msgs.forEach(function(m){ if(m.rid === rid){ msg = m; owner = chats[k]; } }); });
+  if(!msg) return;
+  const amt = money2(msg.amount || (ri(50, 888) / 100));
+  msg.got = true; msg.amount = amt;
+  earnMoney(amt, '红包-来自' + owner.name);
+  sfx.coin(); vib([25, 60, 25]);
+  rpMask.innerHTML = '<div class="rp-pop"><div class="rp-close" data-ext="redclose">✕</div>' +
+    '<div class="who">' + escapeHtml(owner.name) + ' 的红包</div><div class="big">🧧</div>' +
+    '<div class="amt"><small>¥</small>' + money(amt) + '</div>' +
+    '<div class="note">已存入你的零钱 · ' + escapeHtml(msg.note || '') + '</div></div>';
+  if(currentChatId === owner.id) renderMessages();
+});
+autoReply = (function(orig){
+  return function(c){
+    orig(c);
+    if(Math.random() < 0.3){
+      const delay = 1500 + ri(0, 1600);
+      setTimeout(function(){
+        if(!chats[c.id]) return;
+        if(c.msgs.some(function(m){ return m.k === 'red' && m.f === 'them' && !m.got; })) return;
+        pushMsg(c, { f: 'them', k: 'red', rid: 'r' + Date.now() + ri(100, 999), amount: money2(ri(100, 888) / 100),
+          note: rnd(['恭喜发财，大吉大利', '给你发个小红包 🧧', '接住！', '一点心意']) });
+      }, delay);
+    }else if(Math.random() < 0.3){
+      setTimeout(function(){
+        if(!chats[c.id]) return;
+        pushMsg(c, { f: 'them', k: 'img', e: rnd(['🖼', '🐱', '🍜', '🌇', '☕', '🎂']),
+          bg: 'linear-gradient(135deg,hsl(' + ri(0, 360) + ',70%,86%),hsl(' + ri(0, 360) + ',65%,74%))' });
+      }, 1400 + ri(0, 1200));
+    }else if(Math.random() < 0.25){
+      setTimeout(function(){
+        if(!chats[c.id]) return;
+        pushMsg(c, { f: 'them', k: 'voice', dur: ri(2, 12) });
+      }, 1300 + ri(0, 1000));
+    }
+  };
+})(autoReply);
+
+/* ============================================================
+   ⑳ 聊天信息页
+   ============================================================ */
+const chatPref = {};
+function openChatInfo(){
+  const c = chats[currentChatId];
+  if(!c) return;
+  openP('page-chatinfo', { title: '聊天信息', build: function(){
+    const p = chatPref[c.id] || (chatPref[c.id] = { mute: false, top: false });
+    pbody('page-chatinfo').innerHTML =
+      '<div class="group" style="margin-top:10px;"><div class="grid4" style="padding:18px 8px 6px;">' +
+        '<div class="grid-item" data-ext="ciadd"><div class="grid-ico" style="background:#4B8BF5;font-size:24px;">+</div><div class="grid-label">添加成员</div></div>' +
+        '<div class="grid-item" data-ext="ciprofile"><div class="grid-ico" style="background:' + colorOf(c.name) + ';font-size:19px;">' + escapeHtml(c.name.slice(0, 1)) + '</div><div class="grid-label">' + escapeHtml(c.name) + '</div></div>' +
+      '</div></div>' +
+      '<div class="group">' +
+        extRow({ title: '消息免打扰', extra: '<div class="sw ' + (p.mute ? 'on' : '') + '"><i></i></div>', ext: 'cimute' }) +
+        extRow({ title: '置顶聊天', extra: '<div class="sw ' + (p.top ? 'on' : '') + '"><i></i></div>', ext: 'citop' }) +
+        extRow({ title: '查找聊天记录', arrow: true, ext: 'cifind' }) +
+      '</div>' +
+      '<div class="group">' +
+        extRow({ ico: { t: '转', bg: '#07C160' }, title: '向对方转账', arrow: true, ext: 'citransfer' }) +
+        extRow({ ico: { t: '🧧', bg: '#F5563C' }, title: '发红包', arrow: true, ext: 'cired' }) +
+        extRow({ ico: { t: '⭐', bg: '#F5A623' }, title: '收藏的内容', arrow: true, ext: 'cifav' }) +
+      '</div>' +
+      '<div class="group">' + extRow({ title: '清空聊天记录', extra: '<span style="color:#E64340;font-size:15px;">清空</span>', ext: 'ciclear' }) + '</div>' +
+      '<div style="height:40px;"></div>';
+  }});
+  pnav('page-chatinfo').innerHTML = '';
+}
+regExt('#chatMore', function(){ openChatInfo(); });
+regExt('[data-ext="cimute"]', function(n){
+  const c = chats[currentChatId]; const p = chatPref[c.id];
+  p.mute = !p.mute; n.querySelector('.sw').classList.toggle('on', p.mute);
+  toast(p.mute ? '已开启消息免打扰' : '已关闭消息免打扰'); sfx.tap(); vib(8);
+});
+regExt('[data-ext="citop"]', function(n){
+  const c = chats[currentChatId]; const p = chatPref[c.id];
+  p.top = !p.top; n.querySelector('.sw').classList.toggle('on', p.top);
+  toast(p.top ? '已置顶该聊天' : '已取消置顶'); sfx.tap(); vib(8); renderChatList();
+});
+regExt('[data-ext="ciclear"]', function(){
+  const c = chats[currentChatId];
+  if(!c) return;
+  if(!confirm('确定清空与「' + c.name + '」的聊天记录？')) return;
+  c.msgs = []; renderMessages(); renderChatList();
+  sfx.swipe(); toast('聊天记录已清空'); backSub();
+});
+regExt('[data-ext="cifind"]', function(){ closeAllSub(); openSearch(); });
+regExt('[data-ext="citransfer"]', function(){ startTransfer(currentChatId); });
+regExt('[data-ext="cired"]', function(){ openSendRed(); });
+regExt('[data-ext="cifav"]', function(){ closeAllSub(); openFav(); });
+regExt('[data-ext="ciadd"]', function(){ toast('添加成员（演示）'); });
+regExt('[data-ext="ciprofile"]', function(){ openFriend(chats[currentChatId].name); });
+
+/* ============================================================
+   21 钱包：充值 / 提现
+   ============================================================ */
+const TOPUP_CHIPS = [50, 100, 200, 500, 1000, 2000];
+function openTopup(){
+  openP('page-topup', { title: '零钱充值', build: function(){
+    pbody('page-topup').innerHTML =
+      '<div class="ext-hero"><div class="h2">当前零钱</div><div class="h1">¥' + money(store.balance) + '</div></div>' +
+      '<div class="ext-title">选择充值金额</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 14px;">' + TOPUP_CHIPS.map(function(v){
+        return '<div class="ext-card" style="margin:0;padding:18px 0;text-align:center;font-size:17px;font-weight:600;" data-ext="topchip" data-v="' + v + '">¥' + v + '</div>';
+      }).join('') + '</div>' +
+      '<div class="ext-title">自定义金额</div>' +
+      '<div class="ext-card" style="padding:14px;"><input class="ext-input" id="topAmt" inputmode="decimal" placeholder="输入充值金额（1 ~ 50000）"></div>' +
+      '<div style="padding:16px;"><button class="ext-btn" id="topGo" style="width:100%;">确认充值</button></div>' +
+      '<div class="ext-hint" style="text-align:center;">演示环境，充值为模拟数据，不涉及真实资金</div>';
+    gid('topGo').addEventListener('click', function(){
+      const v = parseFloat((gid('topAmt').value || '').replace(/[^\d.]/g, ''));
+      if(!v || v <= 0){ toast('请输入充值金额'); sfx.err(); return; }
+      if(v > 50000){ toast('单次充值不能超过 ¥50000'); sfx.err(); return; }
+      earnMoney(v, '零钱充值');
+      sfx.coin(); vib([20, 40, 20]);
+      backSub();
+      showExtSuccess('充值成功', v, '零钱充值');
+    });
+  }});
+}
+regExt('[data-ext="topchip"]', function(n){ gid('topAmt').value = n.dataset.v; sfx.tap(); vib(6); });
+function openWithdraw(){
+  openP('page-withdraw', { title: '零钱提现', build: function(){
+    pbody('page-withdraw').innerHTML =
+      '<div class="ext-hero" style="background:linear-gradient(135deg,#3BAAFF,#2E86DE);"><div class="h2">可提现余额（零钱）</div><div class="h1">¥' + money(store.balance) + '</div></div>' +
+      '<div class="ext-title">提现金额</div>' +
+      '<div class="ext-card" style="padding:14px;"><input class="ext-input" id="wdAmt" inputmode="decimal" placeholder="输入提现金额"></div>' +
+      '<div style="padding:0 14px;display:flex;gap:10px;">' +
+        '<div class="ext-chip" style="padding:9px 14px;" data-ext="wdall">全部提现</div>' +
+        '<div class="ext-chip" style="padding:9px 14px;">到账：零钱通（演示）</div>' +
+      '</div>' +
+      '<div style="padding:16px;"><button class="ext-btn" id="wdGo" style="width:100%;background:#3BAAFF;">确认提现</button></div>' +
+      '<div class="ext-hint" style="text-align:center;">演示环境，提现为模拟数据</div>';
+    gid('wdGo').addEventListener('click', function(){
+      const v = parseFloat((gid('wdAmt').value || '').replace(/[^\d.]/g, ''));
+      if(!v || v <= 0){ toast('请输入提现金额'); sfx.err(); return; }
+      if(v > store.balance){ toast('超出可提现余额'); sfx.err(); return; }
+      spendMoney(v, '零钱提现');
+      sfx.ok(); vib(20); backSub();
+      showExtSuccess('提现申请已提交', v, '预计 2 小时内到账');
+    });
+  }});
+}
+regExt('[data-ext="wdall"]', function(){ gid('wdAmt').value = store.balance.toFixed(2); sfx.tap(); });
+regExt('[data-wallet="recharge"]', function(){ openTopup(); });
+regExt('[data-service="recharge"]', function(){ openTopup(); });
+regExt('[data-wallet="withdraw"]', function(){ openWithdraw(); });
+
+/* ============================================================
+   22 支付成功浮层
+   ============================================================ */
+function showExtSuccess(title, amount, merchant){
+  let m = gid('extSuccess');
+  if(!m){
+    m = document.createElement('div');
+    m.id = 'extSuccess'; m.className = 'rp-mask';
+    if(gid('phone')) gid('phone').appendChild(m);
+    m.addEventListener('click', function(){ m.classList.remove('show'); });
+  }
+  m.innerHTML = '<div class="rp-pop" style="background:linear-gradient(170deg,#f2fff8,#fff 45%,#e9fff3);color:#1a1a1a;">' +
+    '<div style="width:74px;height:74px;border-radius:50%;background:#07C160;color:#fff;font-size:42px;display:flex;align-items:center;justify-content:center;margin:0 auto;">✓</div>' +
+    '<div style="font-size:20px;font-weight:600;margin-top:18px;">' + escapeHtml(title) + '</div>' +
+    '<div style="font-size:34px;font-weight:600;margin-top:10px;letter-spacing:-1px;">¥' + Number(amount).toFixed(2) + '</div>' +
+    '<div style="font-size:14px;color:#8a8a8a;margin-top:8px;">' + escapeHtml(merchant || '') + '</div>' +
+    '<div style="font-size:12px;color:#c0c0c0;margin-top:16px;">点击任意位置关闭</div></div>';
+  m.classList.add('show'); sfx.ok();
+  clearTimeout(m._t);
+  m._t = setTimeout(function(){ m.classList.remove('show'); }, 2800);
+}
+
+/* ============================================================
+   23 微信运动（趣味页）
+   ============================================================ */
+function openSports(){
+  const days = ['一', '二', '三', '四', '五', '六', '日'];
+  const steps = days.map(function(){ return ri(3200, 15800); });
+  const max = Math.max.apply(null, steps);
+  const today = steps[6];
+  openP('page-sports', { title: '微信运动', build: function(){
+    pbody('page-sports').innerHTML =
+      '<div class="ext-hero" style="background:linear-gradient(135deg,#1f7a3a,#07C160);">' +
+        '<div class="h2">今日步数</div><div class="h1" style="font-size:38px;">' + today.toLocaleString() + '</div>' +
+        '<div class="h2">约 ' + (today / 1300).toFixed(2) + ' 公里 · 消耗 ' + Math.round(today * 0.04) + ' 千卡</div></div>' +
+      '<div class="ext-title">近 7 天</div>' +
+      '<div class="ext-card" style="padding:18px 14px 10px;">' +
+        '<div style="display:flex;align-items:flex-end;gap:10px;height:130px;">' + steps.map(function(s, i){
+          const h = Math.max(10, Math.round(s / max * 100));
+          return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:6px;">' +
+            '<div style="font-size:10px;color:#999;">' + (s / 1000).toFixed(1) + 'k</div>' +
+            '<div style="width:100%;height:' + h + '%;border-radius:6px 6px 0 0;background:linear-gradient(180deg,#4CD97B,#07C160);"></div>' +
+            '<div style="font-size:11px;color:#999;">' + days[i] + '</div></div>';
+        }).join('') + '</div></div>' +
+      '<div class="ext-title">好友排行</div>' +
+      '<div class="ext-card">' + NEARBY_POOL.slice(0, 5).map(function(p, i){
+        const st = ri(2600, 19000);
+        return extRow({ av: p[0], title: '<span style="color:#999;margin-right:6px;">' + (i + 1) + '</span>' + escapeHtml(p[0]),
+          val: st.toLocaleString() + ' 步' + (st > today ? '' : ' <span style="color:#07C160;">↑</span>') });
+      }).join('') + '</div><div style="height:30px;"></div>';
+  }});
+}
+regExt('[data-ext="sports"]', function(){ openSports(); });
+regExt('[data-ext="miniapp"]', function(){ toast('小程序：演示环境暂未接入 🧩'); });
+regExt('[data-ext="live"]', function(){ toast('直播：主播正在准备中 📺'); });
+
+/* ============================================================
+   24 发现页 / 我页 / 加号面板 增强
+   ============================================================ */
+renderDiscover = (function(orig){
+  return function(){
+    orig();
+    const box = gid('discoverList');
+    if(box) box.insertAdjacentHTML('beforeend',
+      '<div class="group">' +
+        extRow({ ico: { t: '📺', bg: '#E85D75' }, title: '直播', arrow: true, ext: 'live' }) +
+        extRow({ ico: { t: '🧩', bg: '#5B8DEF' }, title: '小程序', arrow: true, ext: 'miniapp' }) +
+        extRow({ ico: { t: '👟', bg: '#07C160' }, title: '微信运动', arrow: true, ext: 'sports' }) +
+      '</div>');
+  };
+})(renderDiscover);
+renderPlusGrid = (function(orig){
+  return function(){
+    orig();
+    const g = gid('plusGrid');
+    if(g) g.insertAdjacentHTML('beforeend',
+      '<div class="plus-item" data-plus="file"><div class="plus-ico">📎</div><span>文件</span></div>' +
+      '<div class="plus-item" data-plus="card"><div class="plus-ico">👤</div><span>名片</span></div>');
+  };
+})(renderPlusGrid);
+renderEmoji = (function(orig){
+  return function(){
+    orig();
+    const g = gid('emojiGrid');
+    if(g) (EXTS.stickers || []).forEach(function(s){
+      const sp = document.createElement('span');
+      sp.textContent = s.e; g.appendChild(sp);
+    });
+  };
+})(renderEmoji);
+
+/* 加号面板功能落地 */
+regExt('[data-plus="hongbao"]', function(){ openSendRed(); });
+regExt('[data-plus="transfer"]', function(){ if(currentChatId) startTransfer(currentChatId); });
+regExt('[data-plus="voicecall"]', function(){ if(currentChatId) startCall(currentChatId, 'voice'); });
+regExt('[data-plus="videocall"]', function(){ if(currentChatId) startCall(currentChatId, 'video'); });
+regExt('[data-plus="album"]', function(){ quickImage('🖼'); });
+regExt('[data-plus="camera"]', function(){ quickImage('📷'); });
+regExt('[data-plus="location"]', function(){
+  const c = chats[currentChatId]; if(!c) return;
+  closePanels();
+  pushMsg(c, { f: 'me', k: 'text', text: '📍 我的位置：' + rnd(['北京市朝阳区建国路', '上海市浦东新区世纪大道', '广东省深圳市南山区科技园', '浙江省杭州市西湖区文三路']) });
+  sfx.send(); vib(10); autoReply(c);
+});
+regExt('[data-plus="fav"]', function(){ closePanels(); openFav(); });
+regExt('[data-plus="file"]', function(){ toast('发送文件（演示）📎'); closePanels(); });
+regExt('[data-plus="card"]', function(){ toast('发送名片（演示）👤'); closePanels(); });
+function quickImage(e){
+  const c = chats[currentChatId]; if(!c) return;
+  closePanels();
+  pushMsg(c, { f: 'me', k: 'img', e: e,
+    bg: 'linear-gradient(135deg,hsl(' + ri(0, 360) + ',72%,88%),hsl(' + ri(0, 360) + ',66%,76%))' });
+  sfx.send(); vib(10); autoReply(c);
+}
+
+/* 我页 / 服务页 接管 */
+regExt('[data-me="fav"]', function(){ openFav(); });
+regExt('[data-me="card"]', function(){ openCards(); });
+regExt('[data-me="emoji"]', function(){ openStickers(); });
+regExt('[data-service="life"]', function(){ toast('生活缴费：水电燃气一键缴纳（演示）'); });
+regExt('[data-service="city"]', function(){ toast('城市服务：已切换城市 → ' + rnd(['北京', '上海', '深圳', '成都'])); });
+regExt('[data-service="travel"]', function(){ toast('出行：打车 / 机票 / 火车票（演示）'); });
+
+/* ============================================================
+   25 设置页重写（含深色模式）
+   ============================================================ */
+renderSettings = function(){
+  const box = gid('settingsScroll');
+  if(!box) return;
+  const on = '<div class="sw on"><i></i></div>';
+  const off = '<div class="sw"><i></i></div>';
+  box.innerHTML =
+    '<div class="group" style="margin-top:10px;">' +
+      extRow({ ico: { t: '我', bg: '#4B8BF5' }, title: '编辑个人信息', arrow: true, ext: 'setprofile2' }) +
+      extRow({ title: '账号与安全', arrow: true }) +
+      extRow({ title: '新消息通知', val: '已开启', arrow: true }) +
+      extRow({ title: '隐私', arrow: true }) +
+    '</div>' +
+    '<div class="group">' +
+      extRow({ title: '深色模式', extra: EXTS.dark ? on : off, ext: 'setdark' }) +
+      extRow({ title: '聊天背景', val: '默认', arrow: true }) +
+      extRow({ title: '字体大小', val: '标准', arrow: true }) +
+      extRow({ title: '清空缓存', val: prettySize(), arrow: true, ext: 'setcache' }) +
+    '</div>' +
+    '<div class="group">' +
+      extRow({ title: '支付密码', val: '123456（演示）', arrow: true }) +
+      extRow({ title: '我的收藏', val: EXTS.favs.length + ' 条', arrow: true, ext: 'setfav' }) +
+    '</div>' +
+    '<div class="group">' +
+      extRow({ title: '关于微信', val: 'Demo v2.0 增强版', arrow: true, ext: 'setabout' }) +
+      extRow({ title: '清空演示数据并重置', extra: '<span style="color:#E64340;">重置</span>', ext: 'setreset' }) +
+    '</div>' +
+    '<div style="height:70px;"></div>';
+};
+function prettySize(){ return (2 + (EXTS.favs.length * 0.07)).toFixed(1) + ' MB'; }
+regExt('[data-ext="setprofile2"]', function(){ openProfilePage(); });
+regExt('[data-ext="setdark"]', function(n){ toggleDark(); n.querySelector('.sw').classList.toggle('on', EXTS.dark); });
+regExt('[data-ext="setcache"]', function(n){ sfx.tap(); toast('已清理缓存 ✨'); const v = n.querySelector('.v'); if(v) v.textContent = '0.1 MB'; });
+regExt('[data-ext="setfav"]', function(){ closeAllSub(); openFav(); });
+regExt('[data-ext="setabout"]', function(){
+  alert('微信高仿 · 增强版 Demo\n\n新增功能：\n红包 · 摇一摇 · 附近的人 · 视频号 · 看一看 · 搜一搜 · 购物 · 红包雨小游戏 · 收藏 · 卡包 · 表情商店 · 语音消息 · 长按菜单 · 深色模式\n\n支付密码：123456\n本页面为纯前端演示，数据保存在本地浏览器。');
+});
+regExt('[data-ext="setreset"]', function(){
+  if(!confirm('将清空所有演示数据（余额、账单、收藏、表情、深色模式），确定继续？')) return;
+  ['wx_ext', 'wx_balance', 'wx_bills', 'wx_moments', 'wx_profile', 'wx_moment_unread'].forEach(function(k){
+    try{ localStorage.removeItem(k); }catch(e){}
+  });
+  toast('已重置，正在刷新…');
+  setTimeout(function(){ location.reload(); }, 900);
+});
+
+/* ============================================================
+   26b 绑定补全（购物 / 游戏 / 文章 / 我页）
+   ============================================================ */
+regExt('[data-ext="openart"]', function(n){ openArticle(n.dataset.id); });
+regExt('[data-discover="shopping"]', function(){ openMall(); });
+regExt('[data-discover="game"]', function(){ openGame(); });
+regExt('[data-ext="gpretry"]', function(n){
+  const o = gid('gpStage') && gid('gpStage').querySelector('.gp-over');
+  if(o) o.remove();
+  gpStart();
+});
+regExt('[data-me="service"]', function(){ openSub('page-service'); });
+
+/* ============================================================
+   26 初始化
+   ============================================================ */
+try{ applyTheme(); }catch(e){}
+try{ renderDiscover(); }catch(e){}
+try{ renderPlusGrid(); }catch(e){}
+try{ renderSettings(); }catch(e){}
+try{ renderEmoji(); }catch(e){}
+try{ renderContacts(); }catch(e){}
+try{ if(typeof renderMessages === 'function') renderMessages(); }catch(e){}
+setTimeout(function(){
+  toast('✨ 增强版已加载：红包 / 摇一摇 / 游戏 / 深色模式，支付密码 123456', 3200);
+}, 1500);
+
+})();
 </script>
 </body>
 </html>

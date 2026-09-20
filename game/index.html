@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>抓大鹅 · 搞怪版</title>
+<style>
+  * {
+    margin: 0; padding: 0; box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    user-select: none; -webkit-user-select: none;
+    background: radial-gradient(circle at 50% -10%, #9fe0ff 0%, #62bdea 45%, #2e8fd0 100%);
+  }
+
+  #app {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 8px 14px calc(10px + env(safe-area-inset-bottom));
+  }
+
+  /* ---------- 顶栏 ---------- */
+  #topbar {
+    width: 100%; max-width: 500px;
+    height: 46px; flex: 0 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    color: #fff;
+  }
+  #topbar .title {
+    font-size: 18px; font-weight: 800; letter-spacing: 1px;
+    text-shadow: 0 2px 6px rgba(0, 40, 70, .25);
+  }
+  #topbar .stat {
+    font-size: 13px; font-weight: 700;
+    background: rgba(255,255,255,.22);
+    padding: 5px 13px; border-radius: 999px;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    text-shadow: 0 1px 2px rgba(0,0,0,.1);
+  }
+  #btnRestart {
+    font-size: 13px; font-weight: 800; color: #2e8fd0;
+    background: #fff; border: none; border-radius: 999px;
+    padding: 7px 15px; cursor: pointer;
+    box-shadow: 0 3px 0 #bfe0f3, 0 4px 10px rgba(0,0,0,.15);
+    transition: transform .1s, box-shadow .1s;
+  }
+  #btnRestart:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #bfe0f3, 0 2px 5px rgba(0,0,0,.15);
+  }
+
+  /* ---------- 棋盘 ---------- */
+  #boardWrap {
+    flex: 1 1 auto;
+    width: 100%; min-height: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #board {
+    position: relative;
+    border-radius: 18px;
+    background: rgba(255,255,255,.10);
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,.18), inset 0 8px 24px rgba(0,50,90,.10);
+  }
+
+  .card {
+    position: absolute;
+    width: 16.6667%;
+    aspect-ratio: 1 / 1;
+    border-radius: 14%;
+    background: linear-gradient(180deg, #ffffff 0%, #fff7dd 58%, #ffe9b2 100%);
+    border: 2px solid #fff;
+    box-shadow: 0 2px 0 rgba(140,110,50,.20), 0 4px 10px rgba(20, 55, 85, .25);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    line-height: 1;
+    transition: filter .18s ease, transform .1s ease;
+    will-change: transform;
+    overflow: hidden;
+  }
+  .card img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    border-radius: 12%;
+    pointer-events: none;
+  }
+  .card.covered {
+    filter: brightness(.60) saturate(.65);
+    cursor: default;
+  }
+  .card:not(.covered):active {
+    transform: scale(.9);
+  }
+
+  /* ---------- 槽位 ---------- */
+  #slotArea {
+    position: relative;
+    flex: 0 0 auto;
+    margin-top: 12px;
+  }
+  #slotCells, #slots {
+    position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+  }
+  #slotCells { z-index: 0; }
+  #slots { z-index: 1; }
+
+  .cell {
+    position: absolute;
+    border-radius: 14%;
+    background: rgba(255,255,255,.16);
+    border: 2px dashed rgba(255,255,255,.45);
+  }
+
+  .slot-card {
+    position: absolute; top: 0;
+    border-radius: 14%;
+    background: linear-gradient(180deg, #ffffff 0%, #fff7dd 58%, #ffe9b2 100%);
+    border: 2px solid #fff;
+    box-shadow: 0 2px 0 rgba(140,110,50,.20), 0 4px 10px rgba(20, 55, 85, .25);
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1;
+    transition: left .22s cubic-bezier(.2,.8,.3,1);
+    will-change: left, transform;
+    overflow: hidden;
+  }
+  .slot-card img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    border-radius: 12%;
+    pointer-events: none;
+  }
+  .slot-card.vanish {
+    animation: vanish .32s ease forwards;
+    pointer-events: none;
+  }
+  @keyframes vanish {
+    0%   { transform: scale(1);    opacity: 1; }
+    35%  { transform: scale(1.28); opacity: 1; }
+    100% { transform: scale(1.65); opacity: 0; }
+  }
+
+  /* ---------- 结算弹层 ---------- */
+  #overlay {
+    position: fixed; inset: 0;
+    background: rgba(8, 38, 66, .55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999;
+    opacity: 0; pointer-events: none;
+    transition: opacity .25s ease;
+  }
+  #overlay.show { opacity: 1; pointer-events: auto; }
+
+  #panel {
+    width: 290px;
+    background: #fff;
+    border-radius: 24px;
+    padding: 28px 22px 22px;
+    text-align: center;
+    box-shadow: 0 24px 60px rgba(0, 30, 60, .35);
+    transform: scale(.82);
+    transition: transform .32s cubic-bezier(.2, 1.35, .5, 1);
+  }
+  #overlay.show #panel { transform: scale(1); }
+
+  #panelEmoji { font-size: 50px; line-height: 1; }
+  #panelTitle {
+    font-size: 22px; font-weight: 800; color: #1f4a6b;
+    margin: 14px 0 6px;
+  }
+  #panelDesc {
+    font-size: 14px; color: #7b98ad; margin-bottom: 22px;
+  }
+  #panelBtn {
+    width: 100%; padding: 14px;
+    border: none; border-radius: 15px;
+    background: linear-gradient(180deg, #ffd757, #ffb302);
+    color: #6b4300; font-size: 16px; font-weight: 800;
+    letter-spacing: 1px; cursor: pointer;
+    box-shadow: 0 4px 0 #d99400;
+    transition: transform .1s, box-shadow .1s;
+  }
+  #panelBtn:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #d99400;
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div id="topbar">
+    <div class="title">🦢 抓大鹅 · 搞怪版</div>
+    <div class="stat">剩余 <span id="leftCount">0</span></div>
+    <button id="btnRestart">重开</button>
+  </div>
+
+  <div id="boardWrap">
+    <div id="board"></div>
+  </div>
+
+  <div id="slotArea">
+    <div id="slotCells"></div>
+    <div id="slots"></div>
+  </div>
+</div>
+
+<div id="overlay">
+  <div id="panel">
+    <div id="panelEmoji">🎉</div>
+    <div id="panelTitle">通关啦！</div>
+    <div id="panelDesc">你把所有大鹅都抓住啦～</div>
+    <button id="panelBtn">再来一局</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ==================== 配置 ==================== */
+  const R = 1 / 6;              // 卡片相对棋盘尺寸
+  const LAYERS = 5;             // 堆叠层数
+  const SLOT_COUNT = 7;         // 槽位数量
+
+  // ★★★ 照片配置：请将你的10张照片命名为 1.jpg ~ 10.jpg 放在 p 文件夹下 ★★★
+  const IMAGES = [
+    'p/1.jpg', 'p/2.jpg', 'p/3.jpg', 'p/4.jpg', 'p/5.jpg',
+    'p/6.jpg', 'p/7.jpg', 'p/8.jpg', 'p/9.jpg', 'p/10.jpg'
+  ];
+
+  /* ==================== DOM ==================== */
+  const boardEl     = document.getElementById('board');
+  const boardWrap   = document.getElementById('boardWrap');
+  const slotArea    = document.getElementById('slotArea');
+  const slotCellsEl = document.getElementById('slotCells');
+  const slotsEl     = document.getElementById('slots');
+  const leftCountEl = document.getElementById('leftCount');
+  const overlay     = document.getElementById('overlay');
+  const panelEmoji  = document.getElementById('panelEmoji');
+  const panelTitle  = document.getElementById('panelTitle');
+  const panelDesc   = document.getElementById('panelDesc');
+  const panelBtn    = document.getElementById('panelBtn');
+  const btnRestart  = document.getElementById('btnRestart');
+
+  /* ==================== 状态 ==================== */
+  let cards = [];
+  let slots = [];
+  let running = false;
+
+  let boardSize = 320;
+  let cellSize  = 44;
+  let step      = 48;
+  let gap       = 4;
+
+  /* ==================== 音效引擎 ==================== */
+  let audioCtx = null;
+  let bgmTimer = null;
+  let bgmStep = 0;
+
+  function initAudio() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+  }
+
+  function playClickSound() {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(900, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.12);
+    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.12);
+  }
+
+  function playMatchSound() {
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    [660, 880, 1100].forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now + i * 0.08);
+      osc.frequency.linearRampToValueAtTime(freq * 1.5, now + i * 0.08 + 0.1);
+      gain.gain.setValueAtTime(0.1, now + i * 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.15);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now + i * 0.08);
+      osc.stop(now + i * 0.08 + 0.15);
+    });
+  }
+
+  function playWinSound() {
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    [523, 659, 783, 1046].forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now + i * 0.12);
+      gain.gain.setValueAtTime(0.12, now + i * 0.12);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.12 + 0.25);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now + i * 0.12);
+      osc.stop(now + i * 0.12 + 0.25);
+    });
+  }
+
+  function playLoseSound() {
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    [300, 250, 200, 150].forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(freq, now + i * 0.15);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.7, now + i * 0.15 + 0.2);
+      gain.gain.setValueAtTime(0.1, now + i * 0.15);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.15 + 0.2);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now + i * 0.15);
+      osc.stop(now + i * 0.15 + 0.2);
+    });
+  }
+
+  function startBGM() {
+    if (bgmTimer) return;
+    const melody = [262, 330, 392, 523, 392, 330, 262, 196, 262, 330, 392, 523, 587, 523, 392, 330];
+    bgmTimer = setInterval(() => {
+      if (!audioCtx) return;
+      const freq = melody[bgmStep % melody.length];
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.015, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.12);
+      bgmStep++;
+    }, 180);
+  }
+
+  function stopBGM() {
+    if (bgmTimer) {
+      clearInterval(bgmTimer);
+      bgmTimer = null;
+    }
+  }
+
+  /* ==================== 布局 ==================== */
+  function layout() {
+    const availW = Math.min(window.innerWidth, 520) - 28;
+    const maxByH = (window.innerHeight - 110) * 7 / 8;
+    let size = Math.floor(Math.min(availW, maxByH, 460));
+    size = Math.max(size, 200);
+    boardSize = size;
+
+    gap      = Math.max(3, Math.round(boardSize * 0.012));
+    cellSize = (boardSize - gap * (SLOT_COUNT - 1)) / SLOT_COUNT;
+    step     = cellSize + gap;
+
+    boardEl.style.width  = boardSize + 'px';
+    boardEl.style.height = boardSize + 'px';
+
+    slotArea.style.width  = boardSize + 'px';
+    slotArea.style.height = cellSize + 'px';
+
+    slotCellsEl.innerHTML = '';
+    for (let i = 0; i < SLOT_COUNT; i++) {
+      const d = document.createElement('div');
+      d.className = 'cell';
+      d.style.left   = (i * step) + 'px';
+      d.style.top    = '0px';
+      d.style.width  = cellSize + 'px';
+      d.style.height = cellSize + 'px';
+      slotCellsEl.appendChild(d);
+    }
+
+    slots.forEach(function (c, i) {
+      if (c.slotEl) {
+        c.slotEl.style.width  = cellSize + 'px';
+        c.slotEl.style.height = cellSize + 'px';
+        c.slotEl.style.left   = (i * step) + 'px';
+      }
+    });
+  }
+
+  /* ==================== 关卡生成 ==================== */
+  function generateLevel(total, layers) {
+    const positions = [];
+    const base = Math.floor(total / layers);
+    const rem  = total % layers;
+
+    for (let L = 0; L < layers; L++) {
+      const need = base + (L < rem ? 1 : 0);
+      const pts = [];
+      let tries = 0;
+      while (pts.length < need && tries < 15000) {
+        tries++;
+        const x = Math.random() * (1 - R);
+        const y = Math.random() * (1 - R);
+        let ok = true;
+        for (let i = 0; i < pts.length; i++) {
+          if (Math.abs(pts[i].x - x) < R * 0.95 &&
+              Math.abs(pts[i].y - y) < R * 0.95) { ok = false; break; }
+        }
+        if (ok) pts.push({ x: x, y: y });
+      }
+      for (let i = 0; i < pts.length; i++) {
+        positions.push({ x: pts[i].x, y: pts[i].y, layer: L });
+      }
+    }
+
+    while (positions.length < total) {
+      positions.push({
+        x: Math.random() * (1 - R),
+        y: Math.random() * (1 - R),
+        layer: positions.length % layers
+      });
+    }
+
+    const list = positions.map(function (p, i) {
+      return {
+        id: i, x: p.x, y: p.y, layer: p.layer,
+        type: 0, removed: false, covered: false,
+        el: null, slotEl: null
+      };
+    });
+
+    const alive = list.map(function (c) {
+      return { id: c.id, x: c.x, y: c.y, layer: c.layer, used: false };
+    });
+    const order = [];
+
+    while (order.length < list.length) {
+      const free = [];
+      for (let i = 0; i < alive.length; i++) {
+        const c = alive[i];
+        if (c.used) continue;
+        let cov = false;
+        for (let j = 0; j < alive.length; j++) {
+          const o = alive[j];
+          if (o === c || o.used) continue;
+          if (o.layer > c.layer &&
+              Math.abs(o.x - c.x) < R * 0.85 &&
+              Math.abs(o.y - c.y) < R * 0.85) { cov = true; break; }
+        }
+        if (!cov) free.push(c);
+      }
+      if (!free.length) break;
+      const pick = free[(Math.random() * free.length) | 0];
+      pick.used = true;
+      order.push(pick.id);
+    }
+    for (let i = 0; i < alive.length; i++) {
+      if (!alive[i].used) order.push(alive[i].id);
+    }
+
+    for (let i = 0; i < order.length; i++) {
+      list[order[i]].type = Math.floor(i / 3);
+    }
+
+    return list;
+  }
+
+  /* ==================== 渲染 ==================== */
+  function renderBoard() {
+    boardEl.innerHTML = '';
+    const sorted = cards.slice().sort(function (a, b) { return a.layer - b.layer; });
+    for (let i = 0; i < sorted.length; i++) {
+      const c = sorted[i];
+      const el = document.createElement('div');
+      el.className = 'card';
+      el.style.left   = (c.x * 100) + '%';
+      el.style.top    = (c.y * 100) + '%';
+      el.style.zIndex = String(c.layer * 1000 + c.id);
+
+      const img = document.createElement('img');
+      img.src = IMAGES[c.type % IMAGES.length];
+      img.alt = '';
+      img.onerror = function() { this.style.display = 'none'; el.textContent = '🦢'; };
+      el.appendChild(img);
+
+      el.addEventListener('click', function () { onPick(c); });
+      c.el = el;
+      boardEl.appendChild(el);
+    }
+  }
+
+  function updateCovered() {
+    const alive = cards.filter(function (c) { return !c.removed; });
+    for (let i = 0; i < alive.length; i++) {
+      const c = alive[i];
+      let cov = false;
+      for (let j = 0; j < alive.length; j++) {
+        const o = alive[j];
+        if (o === c) continue;
+        if (o.layer > c.layer &&
+            Math.abs(o.x - c.x) < R * 0.85 &&
+            Math.abs(o.y - c.y) < R * 0.85) { cov = true; break; }
+      }
+      c.covered = cov;
+      if (c.el) c.el.classList.toggle('covered', cov);
+    }
+  }
+
+  function updateLeftCount() {
+    let n = 0;
+    for (let i = 0; i < cards.length; i++) if (!cards[i].removed) n++;
+    leftCountEl.textContent = n;
+  }
+
+  function repositionSlots() {
+    for (let i = 0; i < slots.length; i++) {
+      if (slots[i].slotEl) slots[i].slotEl.style.left = (i * step) + 'px';
+    }
+  }
+
+  /* ==================== 点击取卡 ==================== */
+  function onPick(card) {
+    if (!running || card.removed || card.covered || !card.el) return;
+
+    playClickSound();
+
+    const fromRect = card.el.getBoundingClientRect();
+
+    card.removed = true;
+    card.el.remove();
+    card.el = null;
+
+    updateCovered();
+    updateLeftCount();
+
+    let idx = slots.length;
+    for (let i = slots.length - 1; i >= 0; i--) {
+      if (slots[i].type === card.type) { idx = i + 1; break; }
+    }
+    slots.splice(idx, 0, card);
+
+    const el = document.createElement('div');
+    el.className = 'slot-card';
+    el.style.width  = cellSize + 'px';
+    el.style.height = cellSize + 'px';
+    el.style.left   = (idx * step) + 'px';
+
+    const img = document.createElement('img');
+    img.src = IMAGES[card.type % IMAGES.length];
+    img.alt = '';
+    img.onerror = function() { this.style.display = 'none'; el.textContent = '🦢'; };
+    el.appendChild(img);
+
+    card.slotEl = el;
+    slotsEl.appendChild(el);
+
+    repositionSlots();
+
+    const toRect = el.getBoundingClientRect();
+    const dx = fromRect.left - toRect.left;
+    const dy = fromRect.top  - toRect.top;
+    const sc = fromRect.width / toRect.width;
+
+    el.style.transition = 'none';
+    el.style.transform  = 'translate(' + dx + 'px,' + dy + 'px) scale(' + sc + ')';
+    el.style.zIndex     = '100';
+
+    requestAnimationFrame(function () {
+      el.style.transition = 'transform .26s cubic-bezier(.2,.85,.3,1), left .22s cubic-bezier(.2,.8,.3,1)';
+      el.style.transform  = 'translate(0,0) scale(1)';
+      setTimeout(function () { el.style.zIndex = ''; }, 300);
+    });
+
+    const matched = checkMatch();
+    if (matched) {
+      setTimeout(checkGameState, 340);
+    } else {
+      checkGameState();
+    }
+  }
+
+  /* ==================== 三消 ==================== */
+  function checkMatch() {
+    const counts = {};
+    for (let i = 0; i < slots.length; i++) {
+      const t = slots[i].type;
+      counts[t] = (counts[t] || 0) + 1;
+    }
+    let target = -1;
+    for (const k in counts) {
+      if (counts[k] >= 3) { target = Number(k); break; }
+    }
+    if (target < 0) return false;
+
+    playMatchSound();
+
+    const matched = [];
+    const rest = [];
+    for (let i = 0; i < slots.length; i++) {
+      const c = slots[i];
+      if (c.type === target && matched.length < 3) matched.push(c);
+      else rest.push(c);
+    }
+    slots = rest;
+
+    for (let i = 0; i < matched.length; i++) {
+      const c = matched[i];
+      if (c.slotEl) {
+        const el = c.slotEl;
+        el.classList.add('vanish');
+        setTimeout(function () { el.remove(); }, 340);
+        c.slotEl = null;
+      }
+    }
+
+    repositionSlots();
+    return true;
+  }
+
+  /* ==================== 胜负判定 ==================== */
+  function checkGameState() {
+    if (!running) return;
+    let left = 0;
+    for (let i = 0; i < cards.length; i++) if (!cards[i].removed) left++;
+
+    if (left === 0 && slots.length === 0) {
+      win();
+    } else if (slots.length >= SLOT_COUNT) {
+      lose();
+    }
+  }
+
+  function win() {
+    running = false;
+    stopBGM();
+    playWinSound();
+    panelEmoji.textContent = '🎉';
+    panelTitle.textContent = '通关啦！';
+    panelDesc.textContent  = '你把所有大鹅都抓住啦～';
+    panelBtn.textContent   = '再来一局';
+    overlay.classList.add('show');
+  }
+
+  function lose() {
+    running = false;
+    stopBGM();
+    playLoseSound();
+    panelEmoji.textContent = '😵';
+    panelTitle.textContent = '槽位满了';
+    panelDesc.textContent  = '大鹅溜走了，再试一次吧！';
+    panelBtn.textContent   = '再试一次';
+    overlay.classList.add('show');
+  }
+
+  /* ==================== 开局 ==================== */
+  function newGame() {
+    overlay.classList.remove('show');
+    running = true;
+
+    slots = [];
+    slotsEl.innerHTML = '';
+
+    const total = 27 + 3 * Math.floor(Math.random() * 3); // 27 / 30 / 33
+    cards = generateLevel(total, LAYERS);
+
+    renderBoard();
+    layout();
+    updateCovered();
+    updateLeftCount();
+  }
+
+  /* ==================== 事件绑定 ==================== */
+  panelBtn.addEventListener('click', newGame);
+  btnRestart.addEventListener('click', newGame);
+
+  document.body.addEventListener('click', function initAudioOnce() {
+    initAudio();
+    startBGM();
+    document.body.removeEventListener('click', initAudioOnce);
+  }, { once: true });
+
+  let resizeTimer = null;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      layout();
+      repositionSlots();
+    }, 160);
+  });
+
+  window.addEventListener('orientationchange', function () {
+    setTimeout(function () { layout(); repositionSlots(); }, 260);
+  });
+
+  /* ==================== 启动 ==================== */
+  newGame();
+
+})();
+</script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>雷霆1942 — 幸存者版（v10 定制）</title>
+<title>雷霆1942 — 幸存者版（v11 直触操控）</title>
 <style>
   html, body {
     margin: 0; padding: 0; height: 100%; width: 100%;
@@ -30,16 +30,12 @@
 'use strict';
 
 /* =========================================================
-   雷霆1942 — 幸存者版（v10 定制）
+   雷霆1942 — 幸存者版（v11 直触操控）
    ---------------------------------------------------------
-   - 原子吐息 → 放大版激光炮光束
-   - 审判之剑 → 暗黑诅咒巨剑
-   - 主角战机 → 雷霆战机风格
-   - 天使虚影 → 更华丽，持续回血（随等级）
-   - 40 级机甲 → 持续变身特效
-   - 赛博坦机甲 → 霸气重制
-   - 200 级 → 奥特曼形态
-   - 修复：选卡片过多造成界面卡死
+   - 已移除虚拟摇杆：移动端直接「拖动屏幕」操控战机
+   - 手指按下即接管，飞机与手指保持固定偏移，不会瞬移
+   - 手指抬起后飞机停在原地，再次按下继续接管
+   - 单指拖动即可，无需精确按在某个固定区域
    ========================================================= */
 
 const W = 480, H = 720;
@@ -185,7 +181,7 @@ const WEAPON_DEFS = {
   nukepiece: { name:'世界核平', color:'#ff44aa', max:12, desc:'融合武器：多重核爆持续轰炸，Lv.12 世界和平万岁' },
   judgment:  { name:'审判之剑', color:'#ffe66d', max:12, desc:'融合武器：多把超大范围自旋圣剑，Lv.12 终极剑阵' },
   atombreath: { name:'原子吐息', color:'#b8fff8', max:12, desc:'融合武器：放大版激光炮光束，等级越高范围、伤害与破甲越强' },
-  linkbeam:   { name:'地狱锁链', color:'#ff4055', max:12, desc:'融合武器：缠绕紫色邪气的真实锁链，持续吸血并逐级强化破甲' },
+  linkbeam:   { name:'地狱锁链', color:'#ff4055', max:12, desc:'融合武器：缠绕紫色邪气的真实锁链，持续吸血并逐级强化破甲；主角 200 级后每升 1 级吸血 +1%' },
   tenyuan:    { name:'天元突破', color:'#ff6be8', max:12, desc:'融合武器：中央高速旋转机械巨钻，超高频伤害并减速' },
   bladestorm:  { name:'镰刀风暴', color:'#6a2050', max:12, desc:'融合武器：多把黑色镰刀大范围环绕收割' }
 };
@@ -296,7 +292,7 @@ let pendingLevels = 0, levelChoices = [], gainCoins = 0;
 let treasureRewardsRemaining = 0, treasureRewardsTotal = 0;
 let fusedWeaponLocks = {};
 
-let pickLock = 0;            // 升级卡片点击冷却，防止连点造成重复调用
+let pickLock = 0;
 let debugMode = false;
 let debugNoDrops = false;
 let debugWeaponBtns = [];
@@ -342,14 +338,8 @@ function getEnemyScale() {
   };
 }
 
-/* ==================== 触摸控制 ==================== */
+/* ==================== 触摸控制（直触拖动，无摇杆） ==================== */
 const touchCtrl = { active: false, id: null, offsetX: 0, offsetY: 0 };
-const joy = {
-  active: false, id: null,
-  baseX: 70, baseY: H - 84, R: 42, Rmax: 48,
-  knobX: 70, knobY: H - 84,
-  vx: 0, vy: 0
-};
 let btnFlash = null;
 
 /* ==================== 子弹工厂 ==================== */
@@ -390,9 +380,9 @@ function resetGame() {
   bombRings.length = 0; toast = null;
   pendingLevels = 0; levelChoices = []; gainCoins = 0;
   pickLock = 0;
-  touchCtrl.active = false; touchCtrl.id = null; btnFlash = null;
-  joy.active = false; joy.id = null; joy.vx = 0; joy.vy = 0;
-  joy.knobX = joy.baseX; joy.knobY = joy.baseY;
+  touchCtrl.active = false; touchCtrl.id = null;
+  touchCtrl.offsetX = 0; touchCtrl.offsetY = 0;
+  btnFlash = null;
 
   bullets.length = 0; enemies.length = 0; ebullets.length = 0;
   pickups.length = 0; orbs.length = 0; particles.length = 0;
@@ -913,7 +903,8 @@ function updateLinkBeam(w, dt) {
     w.links = candidates.slice(0, maxLinks).map(function (x) { return x.e; });
   }
   const tickDamage = fusionDamageRaw(w, 2.45, 0.82) * curDmg() * dt;
-  const drainRatio = Math.min(0.98, (0.62 + lv * 0.025) * bonusVamp());
+  const lvVamp = 1 + Math.max(0, player.level - 200) * 0.01;
+  const drainRatio = Math.min(0.98, (0.62 + lv * 0.025) * bonusVamp() * lvVamp);
   for (let i = w.links.length - 1; i >= 0; i--) {
     const e = w.links[i];
     if (!e || !enemies.includes(e)) { w.links.splice(i, 1); continue; }
@@ -1409,7 +1400,6 @@ function damagePlayer(dmg) {
 function gameOver() {
   state = 'gameover';
   touchCtrl.active = false; touchCtrl.id = null;
-  joy.active = false; joy.id = null; joy.vx = 0; joy.vy = 0;
   addExplosion(player.x, player.y, 50, '#ffd36b', 1.6);
   shake = 20;
   sfx('over');
@@ -1517,6 +1507,15 @@ function gainXp(v) {
     sfx('ascend');
     addExplosion(player.x, player.y, 90, '#ffe070', 2.2);
   }
+  if (oldLevel < 1000 && player.level >= 1000) {
+    toast = { text: '1000 级 · 诺亚奥特曼', sub: '诺亚之翼展开 · 光之救世主降临', timer: 4.6, color: '#bfe8ff' };
+    player.evolveFlash = 3.6; flash = Math.max(flash, 1.0);
+    player.transformTimer = 4.2;
+    player.transformDur = 4.2;
+    player.transformColor = '#cfe8ff';
+    sfx('ascend');
+    addExplosion(player.x, player.y, 110, '#cfe8ff', 2.6);
+  }
   if (leveled && state === 'playing') openLevelUp();
 }
 
@@ -1606,7 +1605,6 @@ function choiceInfo(c) {
 
 function openLevelUp() {
   levelChoices = buildChoices();
-  /* 没有可选卡时直接清空待升级并回到游戏，避免卡在死界面 */
   if (!levelChoices.length) {
     pendingLevels = 0;
     state = 'playing';
@@ -1617,10 +1615,8 @@ function openLevelUp() {
 }
 
 function pickChoice(c) {
-  /* 冷却保护：0.12s 内不允许第二次调用，防止手速过快造成卡界面 */
   if (pickLock > 0) return;
   pickLock = 0.12;
-  /* 防止在非升级状态下被误调用（调试面板的 fuse 允许） */
   if (state !== 'levelup' && c.kind !== 'fuse') return;
 
   if (c.kind === 'new') {
@@ -1696,13 +1692,9 @@ function pickChoice(c) {
 /* ==================== 主更新 ==================== */
 function updateGame(dt) {
   difficulty = Math.min(2.2, score / 1400);
-  const follow = mobileMode ? 0.5 : 0.72;
+  /* 移动端改为直接拖动：手指位置 + 固定偏移 = 目标点，平滑插值跟随 */
+  const follow = mobileMode ? 0.55 : 0.72;
   const k = 1 - Math.pow(follow, dt * 60 * player.spd);
-  if (mobileMode && joy.active) {
-    const PUSH = 130;
-    player.tx = player.x + joy.vx * PUSH;
-    player.ty = player.y + joy.vy * PUSH;
-  }
   player.x += (player.tx - player.x) * k;
   player.y += (player.ty - player.y) * k;
   player.x = clamp(player.x, player.r + 8, W - player.r - 8);
@@ -2139,7 +2131,10 @@ const FORM_PALETTES = {
   ultra:    { body:'#ffe070', stroke:'#ff8000', cockpit:'#8a3000', flame:'rgba(255,220,80,0.95)', accent:'#fff8c0', glow:'rgba(255,220,80,0.75)', core:'#ffd24a' },
   ultraman: { body:'#e8e8f0', stroke:'#c02020', cockpit:'#ffd24a',
               flame:'rgba(255,80,80,0.95)', accent:'#ff3050',
-              glow:'rgba(255,255,255,0.85)', core:'#ff2030' }
+              glow:'rgba(255,255,255,0.85)', core:'#ff2030' },
+  noah:     { body:'#eef2fa', stroke:'#9aa6bd', cockpit:'#ffd76a',
+              flame:'rgba(150,215,255,0.95)', accent:'#ffd76a',
+              glow:'rgba(220,240,255,0.9)', core:'#37b6ff' }
 };
 
 const ENEMY_SMALL_PAL  = { body:'#ff8080', stroke:'#a01818', cockpit:'#4a0000', flame:'rgba(255,120,90,0.9)', accent:'#ffc0c0', glow:'rgba(255,120,120,0.45)', core:null };
@@ -2834,12 +2829,145 @@ function drawPlaneModel(form, pal, rotate) {
     ctx.strokeStyle = '#a0a0b0'; ctx.lineWidth = 1.2; ctx.stroke();
     ctx.beginPath(); ctx.moveTo(11, 34);  ctx.lineTo(4, 34);  ctx.lineTo(6, 52);  ctx.lineTo(15, 50);  ctx.closePath(); ctx.fill();
     ctx.stroke();
+  } else if (form === 'noah') {
+    const pulse  = 0.5 + 0.5 * Math.sin(time * 5);
+    const pulse2 = 0.5 + 0.5 * Math.sin(time * 7);
+    const pulse3 = 0.5 + 0.5 * Math.sin(time * 10);
+
+    const rg = ctx.createRadialGradient(0, 0, 0, 0, 0, 150);
+    rg.addColorStop(0,   'rgba(255,255,255,0.62)');
+    rg.addColorStop(0.3, 'rgba(170,225,255,0.34)');
+    rg.addColorStop(0.62,'rgba(255,225,150,0.18)');
+    rg.addColorStop(1,   'rgba(140,190,255,0)');
+    ctx.fillStyle = rg;
+    ctx.beginPath(); ctx.arc(0, 0, 150, 0, Math.PI * 2); ctx.fill();
+
+    for (let r = 0; r < 3; r++) {
+      const R = 80 + r * 18 + pulse2 * 6;
+      const dir = (r % 2 ? -1 : 1);
+      const a0 = time * (1.0 + r * 0.5) * dir + r * 1.7;
+      ctx.beginPath();
+      ctx.arc(0, -4, R, a0, a0 + Math.PI * 1.4);
+      ctx.strokeStyle = r === 1
+        ? 'rgba(255,220,140,' + (0.42 + 0.22 * pulse) + ')'
+        : 'rgba(185,230,255,' + (0.5 - r * 0.12) + ')';
+      ctx.lineWidth = 3.2 - r * 0.7;
+      ctx.stroke();
+    }
+
+    for (const s of [-1, 1]) {
+      const flap = Math.sin(time * 2.2) * 7;
+      const wg = ctx.createLinearGradient(s * 10, -24, s * 118, -100 + flap);
+      wg.addColorStop(0,   'rgba(255,246,200,0.9)');
+      wg.addColorStop(0.35,'rgba(255,210,90,0.5)');
+      wg.addColorStop(0.75,'rgba(255,160,40,0.2)');
+      wg.addColorStop(1,   'rgba(255,140,30,0)');
+      ctx.fillStyle = wg;
+      ctx.beginPath();
+      ctx.moveTo(s * 8, -34);
+      ctx.quadraticCurveTo(s * 76, -46 + flap, s * 118, -100 + flap);
+      ctx.quadraticCurveTo(s * 86, -44 + flap * 0.5, s * 100, 8);
+      ctx.quadraticCurveTo(s * 58, -8, s * 10, 4);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,238,170,' + (0.5 + 0.3 * pulse) + ')';
+      ctx.lineWidth = 1.6;
+      ctx.stroke();
+
+      for (let f = 0; f < 4; f++) {
+        const ft = f / 3;
+        ctx.strokeStyle = 'rgba(255,225,140,' + (0.35 - f * 0.06) + ')';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(s * (14 + ft * 20), -30 + ft * 18);
+        ctx.quadraticCurveTo(s * (60 + ft * 20), -40 + flap + ft * 10, s * (86 + ft * 22), -84 + flap + ft * 26);
+        ctx.stroke();
+      }
+    }
+
+    for (let i = 0; i < 18; i++) {
+      const a = time * 1.4 + i * Math.PI / 9;
+      const R = 66 + Math.sin(time * 2 + i * 1.3) * 16;
+      ctx.fillStyle = 'rgba(230,245,255,' + (0.35 + 0.3 * Math.sin(time * 5 + i)) + ')';
+      ctx.beginPath();
+      ctx.arc(Math.cos(a) * R, Math.sin(a) * R - 6, 1.6 + Math.sin(time * 6 + i) * 0.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.fillStyle = '#eef2fa';
+    ctx.beginPath(); ctx.ellipse(0, -50, 13.5, 17.5, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#9aa6bd'; ctx.lineWidth = 1.5; ctx.stroke();
+
+    const crest = ctx.createLinearGradient(0, -88, 0, -52);
+    crest.addColorStop(0, 'rgba(210,240,255,0.95)');
+    crest.addColorStop(1, 'rgba(120,190,255,0.55)');
+    ctx.fillStyle = crest;
+    ctx.beginPath();
+    ctx.moveTo(0, -88 - pulse2 * 4);
+    ctx.lineTo(-5, -58);
+    ctx.lineTo(0, -50);
+    ctx.lineTo(5, -58);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.lineWidth = 1; ctx.stroke();
+
+    ctx.fillStyle = 'rgba(255,244,190,' + (0.9 + 0.1 * pulse) + ')';
+    ctx.beginPath(); ctx.ellipse(-5.5, -50, 4.2, 5.2, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(5.5, -50, 4.2, 5.2, 0, 0, Math.PI * 2); ctx.fill();
+
+    ctx.fillStyle = '#eef2fa';
+    ctx.beginPath();
+    ctx.moveTo(-16, -32); ctx.lineTo(16, -32);
+    ctx.lineTo(21, 6);    ctx.lineTo(15, 38);
+    ctx.lineTo(-15, 38);  ctx.lineTo(-21, 6);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#9aa6bd'; ctx.lineWidth = 1.8; ctx.stroke();
+
+    ctx.beginPath(); ctx.arc(0, -8, 10 + pulse3 * 1.8, 0, Math.PI * 2);
+    const timerG = ctx.createRadialGradient(0, -8, 0, 0, -8, 13);
+    timerG.addColorStop(0,   '#ffffff');
+    timerG.addColorStop(0.4, '#ffe680');
+    timerG.addColorStop(1,   '#c07800');
+    ctx.fillStyle = timerG; ctx.fill();
+    ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.6; ctx.stroke();
+    ctx.beginPath(); ctx.arc(0, -8, 18 + pulse3 * 5, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255,235,160,' + (0.4 + 0.45 * pulse3) + ')';
+    ctx.lineWidth = 2.2; ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(90,170,255,' + (0.65 + 0.3 * pulse2) + ')';
+    ctx.lineWidth = 2.4;
+    ctx.beginPath(); ctx.moveTo(-16, -30); ctx.lineTo(-12, 34); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(16, -30);  ctx.lineTo(12, 34);  ctx.stroke();
+
+    ctx.fillStyle = '#e6ebf5';
+    ctx.beginPath(); ctx.moveTo(-18, -30); ctx.lineTo(-30, -20); ctx.lineTo(-28, 14); ctx.lineTo(-16, 10); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = '#9aa6bd'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(18, -30);  ctx.lineTo(30, -20);  ctx.lineTo(28, 14);  ctx.lineTo(16, 10);  ctx.closePath(); ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#ffd76a';
+    ctx.fillRect(-30, -6, 11, 4);
+    ctx.fillRect(19, -6, 11, 4);
+
+    ctx.fillStyle = '#e6ebf5';
+    ctx.beginPath(); ctx.moveTo(-12, 34); ctx.lineTo(-4, 34); ctx.lineTo(-6, 54); ctx.lineTo(-16, 52); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = '#9aa6bd'; ctx.lineWidth = 1.2; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(12, 34);  ctx.lineTo(4, 34);  ctx.lineTo(6, 54);  ctx.lineTo(16, 52);  ctx.closePath(); ctx.fill();
+    ctx.stroke();
+
+    for (const s of [-1, 1]) {
+      const fl = 14 + 10 * pulse3;
+      ctx.fillStyle = 'rgba(150,215,255,' + (0.55 + 0.3 * pulse3) + ')';
+      ctx.beginPath();
+      ctx.moveTo(s * 9, 52); ctx.lineTo(s * 13, 52); ctx.lineTo(s * 11, 52 + fl);
+      ctx.closePath(); ctx.fill();
+    }
   }
 
   ctx.restore();
 }
 
 function getPlayerForm() {
+  if (player.level >= 1000) return 'noah';
   if (player.level >= 200) return 'ultraman';
   if (player.level >= 100) return 'ultra';
   if (player.level >= 90)  return 'cyber5';
@@ -3842,7 +3970,7 @@ function drawWeaponFx() {
     if (w.key === 'scythe') { drawScytheWeapon(w); continue; }
   }
 
-  /* ---- 原子吐息：放大版激光炮光束 ---- */
+  /* ---- 原子吐息 ---- */
   for (let i = 0; i < player.weapons.length; i++) {
     const w = player.weapons[i];
     if (w.key !== 'atombreath' || !w.beam) continue;
@@ -4634,15 +4762,17 @@ function getDebugWeaponButtons() {
 }
 function getDebugActionButtons() {
   debugActionBtns = [
-    { id: 'nodrops', x: 12, y: H - 180, w: W - 36, h: 36,
+    { id: 'nodrops', x: 12, y: H - 248, w: W - 36, h: 34,
       label: debugNoDrops ? '屏蔽掉落 + 经验珠：已开启，杀敌不掉落不升级（点击恢复）' : '屏蔽掉落 + 经验珠：未开启（点击屏蔽，调试不被打断）',
       color: debugNoDrops ? '#ff5a6e' : '#c08aff' },
-    { id: 'coins', x: 12, y: H - 138, w: (W - 36) / 2, h: 38, label: '+1000 金币', color: '#ffd24a' },
-    { id: 'fullhp', x: W / 2 + 6, y: H - 138, w: (W - 36) / 2, h: 38, label: '回满生命', color: '#4ade80' },
-    { id: 'lvlup10', x: 12, y: H - 96, w: (W - 36) / 2, h: 42, label: '+10 级', color: '#ffaa00' },
-    { id: 'lvl50', x: W / 2 + 6, y: H - 96, w: (W - 36) / 2, h: 42, label: '跳到 50 级', color: '#7fffff' },
-    { id: 'lvl100', x: 12, y: H - 50, w: (W - 36) / 2, h: 30, label: '跳到 100 级', color: '#ffd24a' },
-    { id: 'fuse', x: W / 2 + 6, y: H - 50, w: (W - 36) / 2, h: 30, label: '触发融合', color: '#ff44aa' }
+    { id: 'coins',   x: 12, y: H - 210, w: (W - 36) / 2, h: 34, label: '+1000 金币', color: '#ffd24a' },
+    { id: 'fullhp',  x: W / 2 + 6, y: H - 210, w: (W - 36) / 2, h: 34, label: '回满生命', color: '#4ade80' },
+    { id: 'lvlup10', x: 12, y: H - 172, w: (W - 36) / 2, h: 34, label: '+10 级', color: '#ffaa00' },
+    { id: 'lvl50',   x: W / 2 + 6, y: H - 172, w: (W - 36) / 2, h: 34, label: '跳到 50 级', color: '#7fffff' },
+    { id: 'lvl100',  x: 12, y: H - 134, w: (W - 36) / 2, h: 34, label: '跳到 100 级', color: '#ffd24a' },
+    { id: 'lvl1000', x: W / 2 + 6, y: H - 134, w: (W - 36) / 2, h: 34, label: '跳到 1000 级（诺亚）', color: '#bfe8ff' },
+    { id: 'lvldown', x: 12, y: H - 96, w: W - 36, h: 34, label: '主角等级 −1（每次点击减一级）', color: '#8fe3ff' },
+    { id: 'fuse',    x: 12, y: H - 58, w: W - 36, h: 34, label: '触发融合', color: '#ff44aa' }
   ];
   return debugActionBtns;
 }
@@ -4816,6 +4946,30 @@ function doDebugAction(id) {
       flash = Math.max(flash, 0.5);
     }
   }
+  else if (id === 'lvldown') {
+    if (player.level > 1) {
+      player.level--;
+      player.xp = 0;
+      player.xpNeed = xpNeedFor(player.level);
+      if (pendingLevels > 0) pendingLevels--;
+      sfx('pickup');
+      toast = { text:'调试：−1 级', sub:'已降至 Lv.' + player.level, timer:1.6, color:'#8fe3ff' };
+    } else sfx('deny');
+  }
+  else if (id === 'lvl1000') {
+    if (player.level < 1000) {
+      player.level = 1000;
+      player.xp = 0;
+      player.xpNeed = xpNeedFor(player.level);
+      sfx('ascend');
+      toast = { text:'调试：跳到 1000 级', sub:'诺亚奥特曼降临', timer:2.6, color:'#bfe8ff' };
+      player.evolveFlash = 3.0;
+      player.transformTimer = 3.8;
+      player.transformDur = 3.8;
+      player.transformColor = '#cfe8ff';
+      flash = Math.max(flash, 0.7);
+    } else sfx('deny');
+  }
   else if (id === 'fuse') {
     const map = {
       'nukepiece': ['littleboy', 'fatman'],
@@ -4886,6 +5040,7 @@ function doMobileButton(id) {
   }
 }
 
+/* 仅绘制按钮 + 一句拖动提示，不再绘制摇杆 */
 function drawMobileControls() {
   if (!mobileMode) return;
   const btns = getMobileButtons();
@@ -4915,40 +5070,13 @@ function drawMobileControls() {
     ctx.restore();
   }
 
+  /* 左下角提示：拖动屏幕即可操控 */
   ctx.save();
-  ctx.globalAlpha = 0.5;
-  ctx.strokeStyle = 'rgba(140,200,255,0.5)';
-  ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.arc(joy.baseX, joy.baseY, joy.R, 0, Math.PI * 2); ctx.stroke();
-  ctx.restore();
-  ctx.save();
-  ctx.globalAlpha = 0.18;
-  ctx.fillStyle = '#8fe3ff';
-  ctx.beginPath(); ctx.arc(joy.baseX, joy.baseY, joy.R, 0, Math.PI * 2); ctx.fill();
-  ctx.restore();
-  ctx.save();
-  ctx.strokeStyle = 'rgba(140,200,255,0.4)'; ctx.lineWidth = 1.4;
-  for (let d = 0; d < 4; d++) {
-    const a = d * Math.PI / 2;
-    ctx.beginPath();
-    ctx.moveTo(joy.baseX + Math.cos(a) * (joy.R - 9), joy.baseY + Math.sin(a) * (joy.R - 9));
-    ctx.lineTo(joy.baseX + Math.cos(a) * (joy.R - 2), joy.baseY + Math.sin(a) * (joy.R - 2));
-    ctx.stroke();
-  }
-  ctx.restore();
-  ctx.save();
-  ctx.translate(joy.knobX, joy.knobY);
-  const grab = joy.vx !== 0 || joy.vy !== 0;
-  ctx.fillStyle = grab ? 'rgba(120,220,255,0.55)' : 'rgba(60,120,180,0.6)';
-  ctx.beginPath(); ctx.arc(0, 0, joy.R * 0.5, 0, Math.PI * 2); ctx.fill();
-  ctx.strokeStyle = 'rgba(180,225,255,0.9)'; ctx.lineWidth = 2; ctx.stroke();
-  ctx.restore();
-  ctx.save();
-  ctx.globalAlpha = 0.6;
+  ctx.globalAlpha = 0.32 + 0.12 * Math.sin(time * 2.2);
   ctx.fillStyle = '#eaffff';
-  ctx.font = 'bold 11px system-ui, sans-serif';
+  ctx.font = 'bold 12px system-ui, sans-serif';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText('摇杆', joy.baseX, joy.baseY + joy.R + 11);
+  ctx.fillText('按住屏幕任意处拖动操控战机', W * 0.5, H - 26);
   ctx.restore();
 }
 
@@ -4995,6 +5123,7 @@ function drawHUD() {
   else if (form === 'cyber4') formLabel = '赛博Ⅳ型';
   else if (form === 'cyber5') formLabel = '赛博Ⅴ型';
   else if (form === 'ultra') formLabel = '终极进化';
+  else if (form === 'noah') formLabel = '诺亚奥特曼';
   else if (form === 'ultraman') formLabel = '奥特曼';
   else formLabel = '终极进化';
   ctx.fillText('Lv.' + player.level + ' · ' + formLabel, bx + 186, 37);
@@ -5180,10 +5309,10 @@ function drawMenu() {
   ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
   ctx.fillStyle = 'rgba(150,200,255,0.55)';
   ctx.font = '12px system-ui, sans-serif';
-  ctx.fillText(mobileMode ? '触摸选择难度 · 自动开火 · 收集经验升级' : '点击选择难度 · 自动开火 · 收集经验升级', W / 2, H - 62);
+  ctx.fillText(mobileMode ? '触摸选择难度 · 拖动屏幕操控 · 自动开火' : '点击选择难度 · 自动开火 · 收集经验升级', W / 2, H - 62);
   ctx.fillStyle = 'rgba(150,200,255,0.4)';
   ctx.font = '11px system-ui, sans-serif';
-  ctx.fillText('20→精英 · 30→进阶 · 40→机甲 · 50→赛博 · 100→终极 · 200→奥特曼', W / 2, H - 38);
+  ctx.fillText('20→精英 · 30→进阶 · 40→机甲 · 50→赛博 · 100→终极 · 200→奥特曼 · 1000→诺亚', W / 2, H - 38);
   ctx.fillText('P 暂停 · M 静音 · 空格炸弹 · D 调试', W / 2, H - 18);
 }
 
@@ -5403,7 +5532,6 @@ function render() {
   if (shake > 0.2) ctx.translate(rand(-shake, shake), rand(-shake, shake));
   drawBackground();
 
-  /* 升级界面时只画最简单的场景，避免大量特效导致点击卡顿 */
   const lightMode = (state === 'levelup');
   if (lightMode) {
     drawPlayer();
@@ -5461,7 +5589,7 @@ function doExitToMenu() {
     debugNoDrops = false;
     pickLock = 0;
     touchCtrl.active = false; touchCtrl.id = null;
-    joy.active = false; joy.id = null; joy.vx = 0; joy.vy = 0;
+    touchCtrl.offsetX = 0; touchCtrl.offsetY = 0;
     debugMode = false;
     state = 'menu';
   } else {
@@ -5576,6 +5704,7 @@ canvas.addEventListener('mousedown', function (e) {
 
 canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
 
+/* ---------- 移动端触摸：直接拖动操控，无摇杆 ---------- */
 canvas.addEventListener('touchstart', function (e) {
   e.preventDefault();
   initAudio();
@@ -5594,26 +5723,23 @@ canvas.addEventListener('touchstart', function (e) {
     if (state === 'playing') {
       const btn = hitMobileButton(p.x, p.y);
       if (btn) { doMobileButton(btn.id); continue; }
-      const inJoyZone = p.x < W * 0.5 && p.y > H * 0.42;
-      if (inJoyZone && !joy.active) {
-        joy.active = true;
-        joy.id = t.identifier;
-        joy.knobX = joy.baseX;
-        joy.knobY = joy.baseY;
-        joy.vx = 0; joy.vy = 0;
-        touchCtrl.active = false; touchCtrl.id = null;
-        continue;
-      }
+
+      /* 首指接管：记录手指与飞机的偏移，之后手指拖到哪飞机跟到哪 */
       if (!touchCtrl.active) {
         let offX = player.x - p.x;
         let offY = player.y - p.y;
         const d = Math.sqrt(offX * offX + offY * offY);
-        const MAX_OFF = 130;
-        if (d > MAX_OFF) { offX = 0; offY = -52; }
+        const MAX_OFF = 90;   /* 手指离飞机太远时，把偏移压缩到 90px 内，避免飞机瞬移 */
+        if (d > MAX_OFF) {
+          offX = (offX / d) * MAX_OFF;
+          offY = (offY / d) * MAX_OFF;
+        }
         touchCtrl.offsetX = offX;
         touchCtrl.offsetY = offY;
         touchCtrl.active = true;
         touchCtrl.id = t.identifier;
+        player.tx = p.x + offX;
+        player.ty = p.y + offY;
       }
       continue;
     }
@@ -5626,22 +5752,6 @@ canvas.addEventListener('touchmove', function (e) {
   if (state !== 'playing' || debugMode) return;
   for (let i = 0; i < e.changedTouches.length; i++) {
     const t = e.changedTouches[i];
-    if (joy.active && t.identifier === joy.id) {
-      const p = toGame(t.clientX, t.clientY);
-      let dx = p.x - joy.baseX;
-      let dy = p.y - joy.baseY;
-      const dist = Math.hypot(dx, dy);
-      if (dist > joy.R) {
-        dx = dx / dist * joy.R;
-        dy = dy / dist * joy.R;
-      }
-      joy.knobX = joy.baseX + dx;
-      joy.knobY = joy.baseY + dy;
-      const norm = joy.R || 1;
-      joy.vx = dx / norm;
-      joy.vy = dy / norm;
-      break;
-    }
     if (t.identifier === touchCtrl.id && touchCtrl.active) {
       const p = toGame(t.clientX, t.clientY);
       player.tx = p.x + touchCtrl.offsetX;
@@ -5655,11 +5765,10 @@ function endTouch(e) {
   e.preventDefault();
   for (let i = 0; i < e.changedTouches.length; i++) {
     const t = e.changedTouches[i];
-    if (joy.active && t.identifier === joy.id) {
-      joy.active = false; joy.id = null; joy.vx = 0; joy.vy = 0;
-      joy.knobX = joy.baseX; joy.knobY = joy.baseY;
+    if (t.identifier === touchCtrl.id) {
+      touchCtrl.active = false;
+      touchCtrl.id = null;
     }
-    if (t.identifier === touchCtrl.id) { touchCtrl.active = false; touchCtrl.id = null; }
   }
 }
 canvas.addEventListener('touchend', endTouch, { passive: false });

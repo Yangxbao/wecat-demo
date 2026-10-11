@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WeCAT 演示 · HTML 小游戏 Demo 合集</title>
+<meta name="description" content="一系列开箱即玩的网页小游戏 Demo：雷霆1942、深海进化大鱼吃小鱼、摸金突围、抓大鹅，以及微信界面高仿演示。">
+<style>
+  :root {
+    --bg: #0d1117;
+    --card: #161b22;
+    --border: #21262d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --accent2: #3fb950;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background:
+      radial-gradient(1200px 500px at 20% -10%, rgba(88, 166, 255, .12), transparent 60%),
+      radial-gradient(1000px 500px at 90% 0%, rgba(63, 185, 80, .08), transparent 60%),
+      var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .wrap { width: min(1060px, 92%); margin: 0 auto; }
+  header { text-align: center; padding: 72px 0 40px; }
+  header h1 {
+    font-size: clamp(30px, 5vw, 44px);
+    letter-spacing: .5px;
+  }
+  header h1 span {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  header p { color: var(--muted); margin-top: 14px; font-size: 16px; line-height: 1.8; }
+  .badges { margin-top: 20px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .badge {
+    font-size: 12.5px; color: var(--muted); text-decoration: none;
+    border: 1px solid var(--border); background: var(--card);
+    padding: 6px 14px; border-radius: 999px; transition: .2s;
+  }
+  .badge:hover { color: var(--text); border-color: var(--accent); }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 18px;
+    padding: 16px 0 56px;
+  }
+  .card {
+    display: flex; flex-direction: column; gap: 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    text-decoration: none;
+    color: inherit;
+    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .35);
+  }
+  .card .icon { font-size: 38px; line-height: 1; }
+  .card h2 { font-size: 19px; }
+  .card .tag {
+    align-self: flex-start;
+    font-size: 12px; color: var(--accent);
+    border: 1px solid rgba(88, 166, 255, .35);
+    background: rgba(88, 166, 255, .08);
+    padding: 2px 10px; border-radius: 999px;
+  }
+  .card .tag.gray { color: var(--muted); border-color: var(--border); background: transparent; }
+  .card p { color: var(--muted); font-size: 14px; line-height: 1.75; flex: 1; }
+  .card .play { color: var(--accent); font-size: 14px; font-weight: 600; }
+  .card:hover .play { text-decoration: underline; }
+  footer {
+    margin-top: auto;
+    border-top: 1px solid var(--border);
+    padding: 26px 0 34px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13.5px;
+    line-height: 2;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+  <header class="wrap">
+    <h1>🎮 WeCAT <span>演示</span></h1>
+    <p>一系列开箱即玩的 HTML 小游戏 Demo 合集<br>无需安装，点开即玩 · 支持手机与电脑</p>
+    <div class="badges">
+      <a class="badge" href="https://github.com/Yangxbao/wecat-demo">⭐ GitHub 仓库</a>
+      <a class="badge" href="./README.md">📄 项目文档</a>
+      <span class="badge">🟢 纯前端 · 零依赖</span>
+    </div>
+  </header>
+
+  <main class="wrap grid">
+    <a class="card" href="./games/thunder-1942/">
+      <div class="icon">✈️</div>
+      <h2>雷霆1942 · 幸存者版</h2>
+      <span class="tag">飞行射击</span>
+      <p>纵版飞行射击生存游戏，v11 直触操控版本，指尖拖动即可操纵战机，弹幕中求生。</p>
+      <span class="play">开始游玩 →</span>
+    </a>
+    <a class="card" href="./games/fish-evolution/">
+      <div class="icon">🐟</div>
+      <h2>深海进化 · 大鱼吃小鱼</h2>
+      <span class="tag">休闲益智</span>
+      <p>经典大鱼吃小鱼玩法：吞食比自己小的鱼不断成长进化，称霸深海食物链。</p>
+      <span class="play">开始游玩 →</span>
+    </a>
+    <a class="card" href="./games/loot-raid/">
+      <div class="icon">⛏️</div>
+      <h2>摸金突围 · Loot Raid</h2>
+      <span class="tag">地宫夺宝</span>
+      <p>深入地宫搜刮宝物，突围而出！捡装备、躲危险，体验一把摸金校尉的快感。</p>
+      <span class="play">开始游玩 →</span>
+    </a>
+    <a class="card" href="./games/catch-goose/">
+      <div class="icon">🦢</div>
+      <h2>抓大鹅 · 搞怪版</h2>
+      <span class="tag">整蛊互动</span>
+      <p>火遍全网的抓大鹅搞怪版，内置照片彩蛋，和朋友一起玩效果更佳。</p>
+      <span class="play">开始游玩 →</span>
+    </a>
+    <a class="card" href="./demos/wechat-rebel/">
+      <div class="icon">💬</div>
+      <h2>微信叛逆版</h2>
+      <span class="tag gray">界面演示 · 非游戏</span>
+      <p>微信 App 界面高仿演示：朋友圈、钱包、扫码与支付流程，纯前端实现（演示数据）。</p>
+      <span class="play">查看演示 →</span>
+    </a>
+  </main>
+
+  <footer class="wrap">
+    WeCAT 演示 · HTML 小游戏 Demo 合集<br>
+    由 <a href="https://github.com/Yangxbao">Yangxbao</a> 维护 ·
+    基于 <a href="https://github.com/Yangxbao/wecat-demo/blob/main/LICENSE">MIT 协议</a> 开源 ·
+    由 GitHub Pages 部署 🚀
+  </footer>
+</body>
+</html>
